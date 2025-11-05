@@ -30,8 +30,8 @@ namespace LoungeSaber.UI.FlowCoordinators
         [Inject] private readonly IServerListener _serverListener = null;
         [Inject] private readonly MatchmakingMenuViewController _matchmakingMenuViewController = null;
         
-        [Inject] private readonly LoungeSaberLeaderboardViewController _leaderboardViewController = null;
-        
+        // [Inject] private readonly LoungeSaberLeaderboardViewController _leaderboardViewController = null;
+        [Inject] private readonly RankingDataTabSwitcherViewController _rankingDataTabSwitcherViewController = null;
         [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null;
         
         [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null;
@@ -40,7 +40,7 @@ namespace LoungeSaber.UI.FlowCoordinators
         {
             showBackButton = true;
             SetTitle("LoungeSaber");
-            ProvideInitialViewControllers(_matchmakingMenuViewController, rightScreenViewController: _leaderboardViewController);
+            ProvideInitialViewControllers(_matchmakingMenuViewController, rightScreenViewController: _rankingDataTabSwitcherViewController);
         }
 
         private void OnMatchCreated(MatchCreatedPacket packet)

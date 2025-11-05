@@ -32,6 +32,21 @@ namespace LoungeSaber.UI.BSML.Leaderboard
             _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_aroundPlayerLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_AROUND_YOU"))); 
             IsLoaded = false;
         }
+        
+        protected override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            try
+            {
+                base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+
+                var topOfLeaderboard = await _api.GetLeaderboardRange(0, 10);
+                SetLeaderboardData(topOfLeaderboard);
+            }
+            catch (Exception e)
+            {
+                _siraLog.Error(e);
+            }
+        }
 
         #region UserInfo Modal
 
@@ -78,24 +93,6 @@ namespace LoungeSaber.UI.BSML.Leaderboard
         [UIComponent("leaderboard")] private readonly CustomCellListTableData _leaderboard = null;
 
         [UIValue("cell-data")] private readonly List<IconSegmentedControl.DataItem> _cellData = new(){};
-
-        protected override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-        {
-            try
-            {
-                base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            
-                if (!firstActivation) 
-                    return;
-
-                var topOfLeaderboard = await _api.GetLeaderboardRange(0, 10);
-                SetLeaderboardData(topOfLeaderboard);
-            }
-            catch (Exception e)
-            {
-                _siraLog.Error(e);
-            }
-        }
 
         private void SetLeaderboardData(Models.UserInfo.UserInfo[] userInfo)
         {
@@ -224,7 +221,7 @@ namespace LoungeSaber.UI.BSML.Leaderboard
             
                 var leaderboardData = await _api.GetLeaderboardRange(_pageNumber * 10, 10);
                 SetLeaderboardData(leaderboardData);
-                if (leaderboardData.Length < 10)
+                if (leaderboardData?.Length < 10)
                     DownEnabled = false;
             }
             catch (Exception e)

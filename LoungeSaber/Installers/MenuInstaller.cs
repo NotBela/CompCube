@@ -71,6 +71,7 @@ namespace LoungeSaber.Installers
             Container.BindInterfacesAndSelfTo<EventWaitingOnNextMatchViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<WaitingForEventMatchFlowCoordinator>().FromNewComponentOnNewGameObject()
                 .AsSingle();
+            Container.BindInterfacesAndSelfTo<RankingDataTabSwitcherViewController>().FromNewComponentAsViewController().AsSingle();
 
             Container.Bind<BSMLTag>().To<LevelBarTag>().AsSingle();
             Container.Bind<TypeHandler<CustomLevelBar>>().To<LevelBarHandler>().AsSingle();
