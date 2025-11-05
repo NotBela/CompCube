@@ -16,7 +16,7 @@ using Zenject;
 namespace LoungeSaber.UI.BSML.Leaderboard
 {
     [ViewDefinition("LoungeSaber.UI.BSML.Leaderboard.LoungeSaberLeaderboardView.bsml")]
-    public class LoungeSaberLeaderboardViewController : BSMLAutomaticViewController
+    public class LoungeSaberLeaderboardViewController : BSMLAutomaticViewController, IInitializable
     {
         [Inject] private readonly PlatformLeaderboardViewController _platformLeaderboardViewController = null;
         [Inject] private readonly IApi _api = null;
@@ -26,19 +26,13 @@ namespace LoungeSaber.UI.BSML.Leaderboard
 
         [UIParams] private readonly BSMLParserParams _parserParams = null;
         
-        private void Awake()
-        {
-            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_globalLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_GLOBAL")));
-            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_aroundPlayerLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_AROUND_YOU"))); 
-            IsLoaded = false;
-        }
-        
-        protected override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        [UIAction("#post-parse")]
+        private async void PostParse()
         {
             try
             {
-                base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-
+                IsLoaded = false;
+                
                 var topOfLeaderboard = await _api.GetLeaderboardRange(0, 10);
                 SetLeaderboardData(topOfLeaderboard);
             }
@@ -230,5 +224,11 @@ namespace LoungeSaber.UI.BSML.Leaderboard
             }
         }
         #endregion
+
+        public void Initialize()
+        {
+            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_globalLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_GLOBAL")));
+            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_aroundPlayerLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_AROUND_YOU")));
+        }
     }
 }
