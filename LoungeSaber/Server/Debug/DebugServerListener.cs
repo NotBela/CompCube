@@ -1,4 +1,9 @@
-﻿using LoungeSaber_Server.Models.Packets.ServerPackets;
+﻿using CompCube_Models.Models.Match;
+using CompCube_Models.Models.Packets;
+using CompCube_Models.Models.Packets.ServerPackets;
+using CompCube_Models.Models.Packets.ServerPackets.Event;
+using CompCube_Models.Models.Packets.UserPackets;
+using LoungeSaber_Server.Models.Packets.ServerPackets;
 using LoungeSaber.Interfaces;
 using LoungeSaber.Models.Packets;
 using LoungeSaber.Models.Packets.ServerPackets;
@@ -15,26 +20,26 @@ public class DebugServerListener : IServerListener
     [Inject] private readonly SiraLog _siraLog = null;
     
     public event Action<MatchCreatedPacket> OnMatchCreated;
-    public event Action<OpponentVoted> OnOpponentVoted;
-    public event Action<MatchStarted> OnMatchStarting;
+    public event Action<OpponentVotedPacket> OnOpponentVoted;
+    public event Action<MatchStartedPacket> OnMatchStarting;
     public event Action<MatchResultsPacket> OnMatchResults;
     
     public event Action<OutOfEventPacket> OnOutOfEvent;
     public event Action OnDisconnected;
     public event Action OnConnected;
-    public event Action<PrematureMatchEnd> OnPrematureMatchEnd;
+    public event Action<PrematureMatchEndPacket> OnPrematureMatchEnd;
     
     public event Action<EventStartedPacket> OnEventStarted;
 
     private bool _isConnected;
     
-    public async Task Connect(string queue, Action<JoinResponse> onConnectedCallback)
+    public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback)
     {
         await Task.Delay(1000);
 
         _isConnected = true;
         
-        onConnectedCallback?.Invoke(new JoinResponse(true, ""));
+        onConnectedCallback?.Invoke(new JoinResponsePacket(true, ""));
         OnConnected?.Invoke();
         _siraLog.Info("connected");
 
@@ -59,7 +64,7 @@ public class DebugServerListener : IServerListener
                     OnEventStarted?.Invoke(new EventStartedPacket());
 
                     await Task.Delay(5000);
-                    OnMatchStarting?.Invoke(new MatchStarted(DebugApi.Maps[0], 15,
+                    OnMatchStarting?.Invoke(new MatchStartedPacket(DebugApi.Maps[0], 15,
                         10, DebugApi.DebugOpponent));
                     return;
                 }
@@ -69,9 +74,9 @@ public class DebugServerListener : IServerListener
                 _siraLog.Info("join request");
                 break;
             case UserPacket.UserPacketTypes.Vote:
-                OnOpponentVoted?.Invoke(new OpponentVoted(0));
+                OnOpponentVoted?.Invoke(new OpponentVotedPacket(0));
                 await Task.Delay(1000);
-                OnMatchStarting?.Invoke(new MatchStarted(DebugApi.Maps[0], 15,
+                OnMatchStarting?.Invoke(new MatchStartedPacket(DebugApi.Maps[0], 15,
                     10, DebugApi.DebugOpponent));
                 _siraLog.Info("voted");
                 break;

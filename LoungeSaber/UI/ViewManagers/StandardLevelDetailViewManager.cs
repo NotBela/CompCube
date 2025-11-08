@@ -1,6 +1,6 @@
 ﻿using CompCube_Models.Models.Map;
 using HMUI;
-using LoungeSaber.Models.Map;
+using LoungeSaber.Extensions;
 using Zenject;
 
 namespace LoungeSaber.UI.ViewManagers;

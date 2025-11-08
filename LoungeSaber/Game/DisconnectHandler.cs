@@ -1,10 +1,6 @@
-﻿using HMUI;
+﻿using CompCube_Models.Models.Packets.ServerPackets;
 using JetBrains.Annotations;
-using LoungeSaber_Server.Models.Packets.ServerPackets;
-using LoungeSaber.Configuration;
 using LoungeSaber.Interfaces;
-using LoungeSaber.UI.FlowCoordinators;
-using SiraUtil.Logging;
 using UnityEngine.SceneManagement;
 using Zenject;
 
@@ -43,7 +39,7 @@ public class DisconnectHandler : IInitializable, IDisposable
         });
     }
 
-    private void OnPrematureMatchEnd(PrematureMatchEnd packet)
+    private void OnPrematureMatchEnd(PrematureMatchEndPacket packet)
     {
         EndLevelAndShowDisconnectScreen(packet.Reason, true);
     }

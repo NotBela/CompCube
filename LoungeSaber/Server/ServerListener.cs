@@ -4,6 +4,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CompCube_Models.Models.Packets;
+using CompCube_Models.Models.Packets.ServerPackets;
+using CompCube_Models.Models.Packets.ServerPackets.Event;
+using CompCube_Models.Models.Packets.UserPackets;
 using LoungeSaber_Server.Models.Packets.ServerPackets;
 using LoungeSaber.Configuration;
 using LoungeSaber.Interfaces;
@@ -58,7 +62,7 @@ namespace LoungeSaber.Server
             }
         }
 
-        public async Task Connect(string queue, Action<JoinResponse> onConnectedCallBack)
+        public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallBack)
         {
             try
             {
@@ -80,7 +84,7 @@ namespace LoungeSaber.Server
                 
                 _siraLog.Info(Encoding.UTF8.GetString(bytes));
                 
-                var responsePacket = ServerPacket.Deserialize(Encoding.UTF8.GetString(bytes)) as JoinResponse ?? throw new Exception("Could not deserialize response!");
+                var responsePacket = ServerPacket.Deserialize(Encoding.UTF8.GetString(bytes)) as JoinResponsePacket ?? throw new Exception("Could not deserialize response!");
 
                 onConnectedCallBack.Invoke(responsePacket);
 

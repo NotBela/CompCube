@@ -1,13 +1,9 @@
 ﻿using CompCube_Models.Models.ClientData;
+using CompCube_Models.Models.Events;
 using CompCube_Models.Models.Map;
 using CompCube_Models.Models.Server;
 using IPA.Utilities;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Events;
-using LoungeSaber.Models.Map;
-using LoungeSaber.Models.Server;
-using LoungeSaber.Models.UserInfo;
-using Zenject;
 
 namespace LoungeSaber.Server.Debug;
 
@@ -39,20 +35,20 @@ public class DebugApi : IApi
         return Task.FromResult(Self);
     }
 
-    public Task<Models.UserInfo.UserInfo[]> GetLeaderboardRange(int start, int range)
+    public Task<CompCube_Models.Models.ClientData.UserInfo[]> GetLeaderboardRange(int start, int range)
     {
-        return Task.FromResult(Array.Empty<Models.UserInfo.UserInfo>());
+        return Task.FromResult(Array.Empty<CompCube_Models.Models.ClientData.UserInfo>());
     }
 
-    public Task<Models.UserInfo.UserInfo[]> GetAroundUser(string id)
+    public Task<CompCube_Models.Models.ClientData.UserInfo[]> GetAroundUser(string id)
     {
-        return Task.FromResult(Array.Empty<Models.UserInfo.UserInfo>());
+        return Task.FromResult(Array.Empty<CompCube_Models.Models.ClientData.UserInfo>());
     }
 
     public Task<ServerStatus> GetServerStatus()
     {
         return Task.FromResult(new ServerStatus([UnityGame.GameVersion.ToString()], ["1.0.0"],
-            ServerStatus.ServerState.Online));
+            ServerState.State.Online));
     }
 
     public async Task<string[]> GetMapHashes()
