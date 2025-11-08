@@ -3,11 +3,11 @@ using LoungeSaber.Extensions;
 
 namespace LoungeSaber.UI.BSML.Components;
 
-public class LeaderboardSlot(Models.UserInfo.UserInfo userInfo, bool isSelf)
+public class LeaderboardSlot(CompCube_Models.Models.ClientData.UserInfo userInfo, bool isSelf)
 {
     private const string OwnCellTextColor = "#00C0FF";
 
-    public event Action<Models.UserInfo.UserInfo> OnUserInfoButtonClicked;
+    public event Action<CompCube_Models.Models.ClientData.UserInfo> OnUserInfoButtonClicked;
 
     [UIValue("leaderboardCellColor")] private string LeaderboardCellColor { get; set; } = isSelf ? OwnCellTextColor : "white";
 

@@ -1,14 +1,11 @@
-﻿using System.Runtime.InteropServices;
-using BeatSaberMarkupLanguage;
+﻿using BeatSaberMarkupLanguage;
+using CompCube_Models.Models.Map;
+using CompCube_Models.Models.Packets.ServerPackets;
+using CompCube_Models.Models.Packets.UserPackets;
 using HMUI;
 using LoungeSaber.Extensions;
 using LoungeSaber.Game;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Map;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Models.Packets.ServerPackets.Match;
-using LoungeSaber.Models.Packets.UserPackets;
-using LoungeSaber.Server;
 using LoungeSaber.UI.BSML.Disconnect;
 using LoungeSaber.UI.BSML.Match;
 using LoungeSaber.UI.Sound;
@@ -127,7 +124,7 @@ namespace LoungeSaber.UI.FlowCoordinators
             _soundEffectManager.PlayWinningMusic();
         }
 
-        private async void OnMatchStarting(MatchStarted packet)
+        private async void OnMatchStarting(MatchStartedPacket packet)
         {
             try
             {

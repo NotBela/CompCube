@@ -1,4 +1,5 @@
-﻿using LoungeSaber.Models.Map;
+﻿using CompCube_Models.Models.Map;
+using LoungeSaber.Extensions;
 using UnityEngine;
 
 namespace LoungeSaber.UI.BSML.Components.CustomLevelBar;

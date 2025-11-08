@@ -1,12 +1,11 @@
 ﻿using System.Collections;
+using CompCube_Models.Models.Packets.ServerPackets;
+using CompCube_Models.Models.Packets.UserPackets;
 using HMUI;
 using JetBrains.Annotations;
 using LoungeSaber.Extensions;
 using LoungeSaber.Game;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Models.Packets.ServerPackets.Match;
-using LoungeSaber.Models.Packets.UserPackets;
 using LoungeSaber.UI.BSML.Match;
 using LoungeSaber.UI.Sound;
 using LoungeSaber.UI.ViewManagers;
@@ -93,7 +92,7 @@ public class EventMatchFlowCoordinator : FlowCoordinator
         _disconnectFlowCoordinator.Setup(reason, callback);
     }
 
-    public async void Setup(MatchStarted eventMatchCreatedPacket, Action matchEndedCallback)
+    public async void Setup(MatchStartedPacket eventMatchCreatedPacket, Action matchEndedCallback)
     {
         try
         {

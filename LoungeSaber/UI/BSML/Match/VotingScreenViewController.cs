@@ -1,19 +1,12 @@
-﻿using System.Collections;
-using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
-using HarmonyLib;
+using CompCube_Models.Models.Map;
+using CompCube_Models.Models.Packets.ServerPackets;
 using HMUI;
 using JetBrains.Annotations;
-using LoungeSaber.Models.Map;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Server;
-using SiraUtil.Logging;
-using SongCore;
+using LoungeSaber.Extensions;
 using UnityEngine;
-using Zenject;
-using Object = UnityEngine.Object;
 
 namespace LoungeSaber.UI.BSML.Match;
 

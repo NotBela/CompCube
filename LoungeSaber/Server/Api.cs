@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Http;
+using CompCube_Models.Models.Events;
+using CompCube_Models.Models.Server;
 using JetBrains.Annotations;
 using LoungeSaber.Configuration;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Events;
-using LoungeSaber.Models.Server;
 using Newtonsoft.Json;
 using Zenject;
 
@@ -21,24 +21,24 @@ namespace LoungeSaber.Server
             _client.BaseAddress = new Uri($"https://{_config.ServerIp}:{_config.ServerApiPort}/");
         }
 
-        public async Task<Models.UserInfo.UserInfo> GetUserInfo(string id)
+        public async Task<CompCube_Models.Models.ClientData.UserInfo> GetUserInfo(string id)
         {
             var response = await _client.GetAsync($"/api/user/id/{id}");
 
-            return response.StatusCode == HttpStatusCode.NotFound ? null : JsonConvert.DeserializeObject<Models.UserInfo.UserInfo>(await response.Content.ReadAsStringAsync());
+            return response.StatusCode == HttpStatusCode.NotFound ? null : JsonConvert.DeserializeObject<CompCube_Models.Models.ClientData.UserInfo>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<Models.UserInfo.UserInfo[]> GetLeaderboardRange(int start, int range)
+        public async Task<CompCube_Models.Models.ClientData.UserInfo[]> GetLeaderboardRange(int start, int range)
         {
             var response = await _client.GetAsync($"/api/leaderboard/range?start={start}&range={range}");
             
-            return JsonConvert.DeserializeObject<Models.UserInfo.UserInfo[]>(await response.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<CompCube_Models.Models.ClientData.UserInfo[]>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<Models.UserInfo.UserInfo[]> GetAroundUser(string id)
+        public async Task<CompCube_Models.Models.ClientData.UserInfo[]> GetAroundUser(string id)
         {
             var response = await _client.GetAsync($"/api/leaderboard/aroundUser/{id}");
-            return response.StatusCode == HttpStatusCode.NotFound ? null : JsonConvert.DeserializeObject<Models.UserInfo.UserInfo[]>(await response.Content.ReadAsStringAsync());
+            return response.StatusCode == HttpStatusCode.NotFound ? null : JsonConvert.DeserializeObject<CompCube_Models.Models.ClientData.UserInfo[]>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task<ServerStatus> GetServerStatus()

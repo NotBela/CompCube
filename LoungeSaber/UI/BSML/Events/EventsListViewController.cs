@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
+using CompCube_Models.Models.Events;
 using HarmonyLib;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Events;
 using LoungeSaber.UI.BSML.Components;
 using Zenject;
 

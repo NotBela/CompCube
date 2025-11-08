@@ -1,10 +1,8 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
+using CompCube_Models.Models.Map;
+using CompCube_Models.Models.Packets.ServerPackets;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Map;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Server;
-using LoungeSaber.UI.BSML.Components;
 using LoungeSaber.UI.BSML.Components.CustomLevelBar;
 using UnityEngine;
 using Zenject;
@@ -40,7 +38,7 @@ namespace LoungeSaber.UI.BSML.Match
             _ownLevelBar.Setup(vote);
         }
 
-        private void OnOpponentVoted(OpponentVoted opponentVoted)
+        private void OnOpponentVoted(OpponentVotedPacket opponentVoted)
         {
             while (_votingMaps.Count == 0);
             

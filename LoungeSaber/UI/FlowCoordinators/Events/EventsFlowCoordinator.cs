@@ -1,9 +1,9 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
+using CompCube_Models.Models.Events;
+using CompCube_Models.Models.Packets.ServerPackets.Event;
 using HMUI;
 using LoungeSaber.Extensions;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Events;
-using LoungeSaber.Models.Packets.ServerPackets.Event;
 using LoungeSaber.UI.BSML.Disconnect;
 using LoungeSaber.UI.BSML.Events;
 using SiraUtil.Logging;
@@ -50,7 +50,7 @@ public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposabl
     {
         try
         {
-            await _serverListener.Connect(data.Name, response =>
+            await _serverListener.Connect(data.EventName, response =>
             {
                 if (response.Successful)
                 {

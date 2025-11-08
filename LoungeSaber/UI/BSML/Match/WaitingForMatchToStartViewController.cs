@@ -2,13 +2,13 @@
 using System.Globalization;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
+using CompCube_Models.Models.Map;
 using HMUI;
 using LoungeSaber.Configuration;
-using LoungeSaber.Models.Map;
+using LoungeSaber.Extensions;
 using LoungeSaber.UI.BSML.Components.CustomLevelBar;
 using UnityEngine;
 using Zenject;
-using Object = System.Object;
 
 namespace LoungeSaber.UI.BSML.Match
 {

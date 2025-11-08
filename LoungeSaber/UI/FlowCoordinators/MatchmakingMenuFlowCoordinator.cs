@@ -1,23 +1,11 @@
-﻿using System.Collections;
-using System.Reflection;
-using HarmonyLib;
+﻿using CompCube_Models.Models.Packets.ServerPackets;
 using HMUI;
-using IPA.Utilities;
 using LoungeSaber.Extensions;
-using LoungeSaber.Game;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Models.Server;
-using LoungeSaber.Server;
-using LoungeSaber.UI.BSML.Disconnect;
 using LoungeSaber.UI.BSML.Leaderboard;
-using LoungeSaber.UI.BSML.Match;
 using LoungeSaber.UI.BSML.Menu;
 using LoungeSaber.UI.FlowCoordinators.Events;
-using SiraUtil.Logging;
-using SongCore;
 using Zenject;
-using UnityEngine;
 
 namespace LoungeSaber.UI.FlowCoordinators
 {
@@ -73,7 +61,7 @@ namespace LoungeSaber.UI.FlowCoordinators
             _matchmakingMenuViewController.OnJoinFailed += OnJoinFailed;
         }
 
-        private void OnJoinFailed(JoinResponse response)
+        private void OnJoinFailed(JoinResponsePacket response)
         {
             this.PresentFlowCoordinatorSynchronously(_disconnectFlowCoordinator);
             

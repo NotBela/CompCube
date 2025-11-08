@@ -1,10 +1,8 @@
 ﻿#nullable enable
+using CompCube_Models.Models.Server;
 using IPA.Utilities;
 using LoungeSaber.Configuration;
-using LoungeSaber.Game;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Server;
-using LoungeSaber.UI.BSML.Menu;
 using SiraUtil.Tools.FPFC;
 using SongCore;
 using Zenject;
@@ -24,7 +22,7 @@ public class InitialServerChecker
     public event Action<ServerCheckingStates>? ServerCheckingStateUpdated;
 
     // keeping this around bc i will need it for the leaderboard redesign
-    public event Action<Models.UserInfo.UserInfo?>? OnUserInfoFetched;
+    public event Action<CompCube_Models.Models.ClientData.UserInfo?>? OnUserInfoFetched;
 
     public event Action? ServerCheckFinished;
 
@@ -116,7 +114,7 @@ public class InitialServerChecker
             return false;
         }
 
-        if (serverResponse.State == ServerStatus.ServerState.Online) 
+        if (serverResponse.State == ServerState.State.Online) 
             return true;
         
         ServerCheckFailed?.Invoke("ServerInMaintenance");

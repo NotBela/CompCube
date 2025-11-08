@@ -50,7 +50,7 @@ namespace LoungeSaber.UI.BSML.Leaderboard
         [UIValue("profileRankText")] private string ProfileRankText { get; set; } = string.Empty;
         [UIValue("profilePlayedMatches")] private string ProfilePlayedMatches { get; set; } = string.Empty;
         
-        private void OnUserInfoButtonClicked(Models.UserInfo.UserInfo userInfo)
+        private void OnUserInfoButtonClicked(CompCube_Models.Models.ClientData.UserInfo userInfo)
         {
             _parserParams.EmitEvent("profileModalShow");
 
@@ -88,7 +88,7 @@ namespace LoungeSaber.UI.BSML.Leaderboard
 
         [UIValue("cell-data")] private readonly List<IconSegmentedControl.DataItem> _cellData = new(){};
 
-        private void SetLeaderboardData(Models.UserInfo.UserInfo[] userInfo)
+        private void SetLeaderboardData(CompCube_Models.Models.ClientData.UserInfo[] userInfo)
         {
             _leaderboard.Data = userInfo.Select(i =>
             {

@@ -1,9 +1,8 @@
-﻿using HMUI;
+﻿using CompCube_Models.Models.Packets.ServerPackets;
+using CompCube_Models.Models.Packets.ServerPackets.Event;
+using HMUI;
 using LoungeSaber.Extensions;
-using LoungeSaber.Game;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Models.Packets.ServerPackets.Event;
 using LoungeSaber.UI.BSML.Events;
 using LoungeSaber.UI.ViewManagers;
 using Zenject;
@@ -37,7 +36,7 @@ public class WaitingForEventMatchFlowCoordinator : FlowCoordinator
         this.SetBackButtonInteractivity(false);
     }
 
-    private void OnEventMatchStarted(MatchStarted packet)
+    private void OnEventMatchStarted(MatchStartedPacket packet)
     {
         this.PresentFlowCoordinatorSynchronously(_eventMatchFlowCoordinator);
         _eventMatchFlowCoordinator.Setup(packet, () =>

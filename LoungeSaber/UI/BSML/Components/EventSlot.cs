@@ -1,6 +1,5 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
-using LoungeSaber.Models.Events;
-using UnityEngine.UI;
+using CompCube_Models.Models.Events;
 
 namespace LoungeSaber.UI.BSML.Components;
 

@@ -1,11 +1,10 @@
 ﻿using System.Globalization;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
+using CompCube_Models.Models.Match;
+using CompCube_Models.Models.Packets.ServerPackets;
 using JetBrains.Annotations;
 using LoungeSaber.Extensions;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Models.Packets.ServerPackets.Match;
-using LoungeSaber.Models.Packets.UserPackets;
 using Zenject;
 
 namespace LoungeSaber.UI.BSML.Match
@@ -47,7 +46,7 @@ namespace LoungeSaber.UI.BSML.Match
 
         private string FormatScore(MatchScore score, bool winner) => 
             $"{(winner ? "1" : "2")}. {score.User.GetFormattedUserName()} - " +
-            $"{(score.Score.RelativeScore * 100):F}% " +
+            $"{(score.Score?.RelativeScore * 100):F}% " +
             $"{(score.Score.FullCombo ? "FC".FormatWithHtmlColor("#90EE90") : $"{score.Score.Misses}x".FormatWithHtmlColor("#FF7F7F"))}" +
             $"{(score.Score.ProMode ? " (PM)" : "")}";
 

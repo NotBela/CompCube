@@ -1,21 +1,12 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using CompCube_Models.Models.Packets;
 using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube_Models.Models.Packets.ServerPackets.Event;
 using CompCube_Models.Models.Packets.UserPackets;
-using LoungeSaber_Server.Models.Packets.ServerPackets;
 using LoungeSaber.Configuration;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Packets;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Models.Packets.ServerPackets.Event;
-using LoungeSaber.Models.Packets.ServerPackets.Match;
-using LoungeSaber.Models.Packets.UserPackets;
 using SiraUtil.Logging;
 using Zenject;
 
@@ -32,14 +23,14 @@ namespace LoungeSaber.Server
         private bool _shouldListenToServer = false;
         
         public event Action<MatchCreatedPacket> OnMatchCreated;
-        public event Action<OpponentVoted> OnOpponentVoted;
-        public event Action<MatchStarted> OnMatchStarting;
+        public event Action<OpponentVotedPacket> OnOpponentVoted;
+        public event Action<MatchStartedPacket> OnMatchStarting;
         public event Action<MatchResultsPacket> OnMatchResults;
         public event Action<OutOfEventPacket> OnOutOfEvent;
 
         public event Action OnDisconnected;
         public event Action OnConnected;
-        public event Action<PrematureMatchEnd> OnPrematureMatchEnd;
+        public event Action<PrematureMatchEndPacket> OnPrematureMatchEnd;
         
         public event Action<EventStartedPacket> OnEventStarted;
 
@@ -84,7 +75,7 @@ namespace LoungeSaber.Server
                 
                 _siraLog.Info(Encoding.UTF8.GetString(bytes));
                 
-                var responsePacket = ServerPacket.Deserialize(Encoding.UTF8.GetString(bytes)) as JoinResponsePacket ?? throw new Exception("Could not deserialize response!");
+                var responsePacket = Packet.Deserialize<JoinResponsePacket>(Encoding.UTF8.GetString(bytes)) ?? throw new Exception("Could not deserialize response!");
 
                 onConnectedCallBack.Invoke(responsePacket);
 
@@ -140,7 +131,7 @@ namespace LoungeSaber.Server
                     
                     _siraLog.Info(json);
 
-                    var packet = ServerPacket.Deserialize(json);
+                    var packet = Packet.Deserialize<ServerPacket>(json);
 
                     switch (packet.PacketType)
                     {
@@ -148,16 +139,16 @@ namespace LoungeSaber.Server
                             OnMatchCreated?.Invoke(packet as MatchCreatedPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.OpponentVoted:
-                            OnOpponentVoted?.Invoke(packet as OpponentVoted);
+                            OnOpponentVoted?.Invoke(packet as OpponentVotedPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.MatchStarted:
-                            OnMatchStarting?.Invoke(packet as MatchStarted);
+                            OnMatchStarting?.Invoke(packet as MatchStartedPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.MatchResults:
                             OnMatchResults?.Invoke(packet as MatchResultsPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.PrematureMatchEnd:
-                            OnPrematureMatchEnd?.Invoke(packet as PrematureMatchEnd);
+                            OnPrematureMatchEnd?.Invoke(packet as PrematureMatchEndPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.EventStarted:
                             OnEventStarted?.Invoke(packet as EventStartedPacket);

@@ -1,18 +1,12 @@
-﻿using System.Collections;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
-using HMUI;
-using IPA.Utilities;
+using CompCube_Models.Models.Packets.ServerPackets;
 using LoungeSaber.Configuration;
 using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Server;
-using LoungeSaber.UI.FlowCoordinators;
 using SiraUtil.Logging;
-using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -31,7 +25,7 @@ namespace LoungeSaber.UI.BSML.Menu
 
         public event Action EventsButtonClicked;
 
-        public event Action<JoinResponse> OnJoinFailed; 
+        public event Action<JoinResponsePacket> OnJoinFailed; 
         
         protected override void DidDeactivate(bool firstActivation, bool addedToHierarchy)
         {
@@ -107,7 +101,7 @@ namespace LoungeSaber.UI.BSML.Menu
             }
         }
 
-        private void OnConnectedCallback(JoinResponse joinResponse)
+        private void OnConnectedCallback(JoinResponsePacket joinResponse)
         {
             if (joinResponse.Successful)
             {

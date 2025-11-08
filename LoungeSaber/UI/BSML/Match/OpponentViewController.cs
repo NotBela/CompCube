@@ -1,9 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
-using LoungeSaber.Interfaces;
-using LoungeSaber.Models.Packets.ServerPackets;
-using LoungeSaber.Server;
-using Zenject;
+using LoungeSaber.Extensions;
 
 namespace LoungeSaber.UI.BSML.Match;
 
@@ -12,7 +9,7 @@ public class OpponentViewController : BSMLAutomaticViewController
 {
     [UIValue("opponentText")] private string OpponentText { get; set; }
     
-    public void PopulateData(Models.UserInfo.UserInfo opponent)
+    public void PopulateData(CompCube_Models.Models.ClientData.UserInfo opponent)
     {
         OpponentText = $"{opponent.GetFormattedUserName()} - {opponent.Mmr} MMR";
         NotifyPropertyChanged(nameof(OpponentText));
