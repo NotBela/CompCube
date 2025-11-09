@@ -13,7 +13,7 @@
         <Copyright>Copyright © $ModAuthor$</Copyright>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>default</LangVersion>
-        <Nullable>disable</Nullable>
+        <Nullable>annotations</Nullable>
         <PackageId>CompCube</PackageId>
     </PropertyGroup>
     <PropertyGroup Condition="$(DefineConstants.Contains('CIBuild')) OR '$(NCrunch)' == '1'">
