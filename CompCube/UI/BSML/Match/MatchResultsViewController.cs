@@ -14,7 +14,7 @@ namespace CompCube.UI.BSML.Match
     {
         [Inject] private readonly IPlatformUserModel _platformUserModel = null;
         
-        [CanBeNull] private Action _onContinueButtonPressedCallback = null;
+        private Action? _onContinueButtonPressedCallback = null;
         
         [UIValue("titleBgColor")] private string TitleBgColor { get; set; } = "#0000FF";
         [UIValue("titleText")] private string TitleText { get; set; } = "You Win";
@@ -25,7 +25,7 @@ namespace CompCube.UI.BSML.Match
         
         [UIValue("mmrChangeText")] private string MmrChangeText { get; set; }
         
-        public void PopulateData(MatchResultsPacket results, Action onContinueButtonPressedCallback)
+        public void PopulateData(MatchResultsPacket results, Action? onContinueButtonPressedCallback)
         {
             _onContinueButtonPressedCallback = onContinueButtonPressedCallback;
             

@@ -11,13 +11,13 @@ public interface IServerListener
     public event Action<MatchStartedPacket> OnMatchStarting;
     public event Action<MatchResultsPacket> OnMatchResults;
     
-    public event Action<OutOfEventPacket> OnOutOfEvent;
-    
     public event Action OnDisconnected;
     public event Action OnConnected;
     public event Action<PrematureMatchEndPacket> OnPrematureMatchEnd;
     
     public event Action<EventStartedPacket> OnEventStarted;
+    public event Action<EventMapSelected> OnEventMapSelected;
+    public event Action<EventMatchStartedPacket> OnEventMatchStarted;
 
     public Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback);
 

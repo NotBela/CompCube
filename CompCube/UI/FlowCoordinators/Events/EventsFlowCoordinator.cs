@@ -13,17 +13,16 @@ namespace CompCube.UI.FlowCoordinators.Events;
 
 public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposable
 {
-    [Inject] private readonly EventsListViewController _eventsListViewController = null;
-    [Inject] private readonly SiraLog _siraLog = null;
+    [Inject] private readonly EventsListViewController _eventsListViewController = null!;
+    [Inject] private readonly SiraLog _siraLog = null!;
     
-    [Inject] private readonly IServerListener _serverListener = null;
+    [Inject] private readonly IServerListener _serverListener = null!;
     
-    [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null;
-    [Inject] private readonly DisconnectedViewController _disconnectedViewController = null;
+    [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
+    [Inject] private readonly DisconnectedViewController _disconnectedViewController = null!;
     
-    [Inject] private readonly WaitingForEventMatchFlowCoordinator _waitingForEventMatchFlowCoordinator = null;
-    
-    public event Action OnBackButtonPressed;
+    [Inject] private readonly InEventFlowCoordinator _inEventFlowCoordinator = null!;
+    public event Action? OnBackButtonPressed;
     
     protected override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
@@ -44,7 +43,7 @@ public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposabl
         }
     }
 
-    private void WaitingForEventFlowCoordinatorOnBackButtonPressed() => DismissFlowCoordinator(_waitingForEventMatchFlowCoordinator);
+    private void InEventFlowCoordinatorOnBackButtonPressed() => DismissFlowCoordinator(_inEventFlowCoordinator);
 
     private async void OnEventJoinRequested(EventData data)
     {
@@ -54,7 +53,11 @@ public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposabl
             {
                 if (response.Successful)
                 {
-                    this.PresentFlowCoordinatorSynchronously(_waitingForEventMatchFlowCoordinator);
+                    this.PresentFlowCoordinatorSynchronously(_inEventFlowCoordinator);
+                    _inEventFlowCoordinator.Setup(() =>
+                    {
+                        DismissFlowCoordinator(_inEventFlowCoordinator);
+                    });
                     return;
                 }
             
@@ -76,18 +79,10 @@ public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposabl
     public void Initialize()
     {
         _eventsListViewController.OnEventJoinRequested += OnEventJoinRequested;
-        _waitingForEventMatchFlowCoordinator.OnBackButtonPressed += WaitingForEventFlowCoordinatorOnBackButtonPressed;
-        _serverListener.OnOutOfEvent += OnOutOfEvent;
-    }
-
-    private void OnOutOfEvent(OutOfEventPacket outOfEvent)
-    {
-        
     }
 
     public void Dispose()
     {
         _eventsListViewController.OnEventJoinRequested -= OnEventJoinRequested;
-        _waitingForEventMatchFlowCoordinator.OnBackButtonPressed -= WaitingForEventFlowCoordinatorOnBackButtonPressed;
     }
 }

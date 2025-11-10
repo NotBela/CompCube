@@ -58,7 +58,7 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<EventsFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<EventsListViewController>().FromNewComponentAsViewController().AsSingle();
             
-            Container.BindInterfacesAndSelfTo<EventMatchFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
+            Container.BindInterfacesAndSelfTo<InEventFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
 
             Container.BindInterfacesAndSelfTo<GameplaySetupViewManager>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<StandardLevelDetailViewManager>().FromNewComponentOnNewGameObject().AsSingle();
@@ -69,7 +69,7 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<InitialServerChecker>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<EventWaitingOnNextMatchViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.BindInterfacesAndSelfTo<WaitingForEventMatchFlowCoordinator>().FromNewComponentOnNewGameObject()
+            Container.BindInterfacesAndSelfTo<InEventFlowCoordinator>().FromNewComponentOnNewGameObject()
                 .AsSingle();
             Container.BindInterfacesAndSelfTo<RankingDataTabSwitcherViewController>().FromNewComponentAsViewController().AsSingle();
 
