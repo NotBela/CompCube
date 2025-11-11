@@ -18,7 +18,7 @@ public class DebugApi : IApi
 
     public static readonly CompCube_Models.Models.ClientData.UserInfo DebugOpponent = new("debugOpponent", "1", 1000,
         new DivisionInfo("Iron", 4, "#111111", false), new Badge("test", "#111111", false), 2, null,
-        false);
+        false, 0, 0, 0, 0);
 
     public static readonly CompCube_Models.Models.ClientData.UserInfo Self = new(
         "self",
@@ -28,7 +28,7 @@ public class DebugApi : IApi
         null,
         1,
         null,
-        false);
+        false, 0, 0, 0, 0);
     
     public Task<CompCube_Models.Models.ClientData.UserInfo> GetUserInfo(string id)
     {
@@ -60,6 +60,6 @@ public class DebugApi : IApi
     public async Task<EventData[]> GetEvents()
     {
         await Task.Delay(500);
-        return [new EventData("test", "test event", "test desc")];
+        return [new EventData("test", "test event", "test desc", true)];
     }
 }

@@ -11,19 +11,22 @@ namespace CompCube.Server.Debug;
 
 public class DebugServerListener : IServerListener
 {
-    [Inject] private readonly SiraLog _siraLog = null;
+    [Inject] private readonly SiraLog _siraLog = null!;
     
-    public event Action<MatchCreatedPacket> OnMatchCreated;
-    public event Action<OpponentVotedPacket> OnOpponentVoted;
-    public event Action<MatchStartedPacket> OnMatchStarting;
-    public event Action<MatchResultsPacket> OnMatchResults;
+    public event Action<MatchCreatedPacket>? OnMatchCreated;
+    public event Action<OpponentVotedPacket>? OnOpponentVoted;
+    public event Action<MatchStartedPacket>? OnMatchStarting;
+    public event Action<MatchResultsPacket>? OnMatchResults;
     
-    public event Action<OutOfEventPacket> OnOutOfEvent;
-    public event Action OnDisconnected;
-    public event Action OnConnected;
-    public event Action<PrematureMatchEndPacket> OnPrematureMatchEnd;
+    public event Action? OnDisconnected;
+    public event Action? OnConnected;
+    public event Action<PrematureMatchEndPacket>? OnPrematureMatchEnd;
     
-    public event Action<EventStartedPacket> OnEventStarted;
+    public event Action<EventStartedPacket>? OnEventStarted;
+    
+    public event Action<EventMapSelected>? OnEventMapSelected;
+    public event Action<EventMatchStartedPacket>? OnEventMatchStarted;
+    public event Action<EventClosedPacket>? OnEventClosed;
 
     private bool _isConnected;
     

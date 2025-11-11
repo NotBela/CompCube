@@ -19,6 +19,8 @@ public interface IServerListener
     public event Action<EventMapSelected> OnEventMapSelected;
     public event Action<EventMatchStartedPacket> OnEventMatchStarted;
 
+    public event Action<EventClosedPacket> OnEventClosed;
+
     public Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback);
 
     public Task SendPacket(UserPacket packet);

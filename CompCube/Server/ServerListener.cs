@@ -14,27 +14,29 @@ namespace CompCube.Server
 {
     public class ServerListener : IServerListener
     {
-        [Inject] private readonly PluginConfig _config = null;
-        [Inject] private readonly SiraLog _siraLog = null;
+        [Inject] private readonly PluginConfig _config = null!;
+        [Inject] private readonly SiraLog _siraLog = null!;
 
         private TcpClient _client = new();
-        private Thread _listenerThread;
+        private Thread? _listenerThread;
 
         private bool _shouldListenToServer = false;
         
-        public event Action<MatchCreatedPacket> OnMatchCreated;
-        public event Action<OpponentVotedPacket> OnOpponentVoted;
-        public event Action<MatchStartedPacket> OnMatchStarting;
-        public event Action<MatchResultsPacket> OnMatchResults;
-        public event Action<OutOfEventPacket> OnOutOfEvent;
+        public event Action<MatchCreatedPacket>? OnMatchCreated;
+        public event Action<OpponentVotedPacket>? OnOpponentVoted;
+        public event Action<MatchStartedPacket>? OnMatchStarting;
+        public event Action<MatchResultsPacket>? OnMatchResults;
 
-        public event Action OnDisconnected;
-        public event Action OnConnected;
-        public event Action<PrematureMatchEndPacket> OnPrematureMatchEnd;
+        public event Action? OnDisconnected;
+        public event Action? OnConnected;
+        public event Action<PrematureMatchEndPacket>? OnPrematureMatchEnd;
         
-        public event Action<EventStartedPacket> OnEventStarted;
+        public event Action<EventStartedPacket>? OnEventStarted;
+        public event Action<EventMapSelected>? OnEventMapSelected;
+        public event Action<EventMatchStartedPacket>? OnEventMatchStarted;
+        public event Action<EventClosedPacket>? OnEventClosed;
 
-        [Inject] private readonly IPlatformUserModel _platformUserModel = null;
+        [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
 
         private bool Connected
         {
@@ -85,7 +87,6 @@ namespace CompCube.Server
                     _shouldListenToServer = true;
                     _listenerThread.Start();
                     OnConnected?.Invoke();
-                    return;
                 }
             }
             catch (Exception e)
@@ -153,8 +154,14 @@ namespace CompCube.Server
                         case ServerPacket.ServerPacketTypes.EventStarted:
                             OnEventStarted?.Invoke(packet as EventStartedPacket);
                             break;
-                        case ServerPacket.ServerPacketTypes.OutOfEvent:
-                            OnOutOfEvent?.Invoke(packet as OutOfEventPacket);
+                        case ServerPacket.ServerPacketTypes.EventMapSelected:
+                            OnEventMapSelected?.Invoke(packet as EventMapSelected);
+                            break;
+                        case ServerPacket.ServerPacketTypes.EventMatchStarted:
+                            OnEventMatchStarted?.Invoke(packet as EventMatchStartedPacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.EventClosed:
+                            OnEventClosed?.Invoke(packet as EventClosedPacket);
                             break;
                         default:
                             throw new Exception("Could not get packet type!");
