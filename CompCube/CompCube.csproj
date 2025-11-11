@@ -225,7 +225,4 @@
     <ItemGroup>
       <Content Include="CompCube.csproj.user" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="UI\BSML\EventMatch\" />
-    </ItemGroup>
 </Project>
