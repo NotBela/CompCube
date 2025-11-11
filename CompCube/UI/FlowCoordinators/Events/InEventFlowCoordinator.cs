@@ -23,6 +23,9 @@ public class InEventFlowCoordinator : FlowCoordinator
     
     [Inject] private readonly EventWaitingOnNextMatchViewController _eventWaitingOnNextMatchViewController = null!;
     [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
+    [Inject] private readonly WaitingForMatchToStartViewController _waitingForMatchToStartViewController = null!;
+
+    [Inject] private readonly SoundEffectManager _soundEffectManager = null!;
 
     private Action? _backButtonPressedCallback;
     
@@ -33,16 +36,27 @@ public class InEventFlowCoordinator : FlowCoordinator
         ProvideInitialViewControllers(_eventWaitingOnNextMatchViewController, leftScreenViewController: _gameplaySetupViewManager.ManagedController);
         
         _serverListener.OnEventStarted += ServerListenerOnOnEventStarted;
+        _serverListener.OnEventMapSelected += OnEventMapSelected;
+    }
+
+    private void OnEventMapSelected(EventMapSelected eventMap)
+    {
+        this.ReplaceViewControllerSynchronously(_waitingForMatchToStartViewController);
+        _waitingForMatchToStartViewController.PopulateData(eventMap.Map, null);
+        
+        _soundEffectManager.PlayGongSoundEffect();
     }
 
     private void ServerListenerOnOnEventStarted(EventStartedPacket eventStartedPacket)
     {
         this.SetBackButtonInteractivity(false);
+        
+        _eventWaitingOnNextMatchViewController.SetText("Event in progress!\nWaiting for host...");
     }
 
     protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
-        
+        _serverListener.Disconnect();
     }
 
     public void Setup(Action? backButtonPressedCallback) => _backButtonPressedCallback = backButtonPressedCallback;

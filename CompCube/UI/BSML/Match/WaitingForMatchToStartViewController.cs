@@ -15,7 +15,7 @@ namespace CompCube.UI.BSML.Match
     [ViewDefinition("CompCube.UI.BSML.Match.WaitingForMatchToStartView.bsml")]
     public class WaitingForMatchToStartViewController : BSMLAutomaticViewController, ITickable
     {
-        [Inject] private readonly PluginConfig _config = null;
+        [Inject] private readonly PluginConfig _config = null!;
         
         [UIValue("matchStartTimer")] private string MatchStartTimer { get; set; } = "";
 
@@ -27,12 +27,12 @@ namespace CompCube.UI.BSML.Match
         }
         
         
-        [UIComponent("difficultySegmentData")] private readonly TextSegmentedControl _difficultySegmentData = null;
-        [UIComponent("categorySegmentData")] private readonly TextSegmentedControl _categorySegmentData = null;
+        [UIComponent("difficultySegmentData")] private readonly TextSegmentedControl _difficultySegmentData = null!;
+        [UIComponent("categorySegmentData")] private readonly TextSegmentedControl _categorySegmentData = null!;
 
-        private CustomLevelBar _customLevelBar = null;
+        private CustomLevelBar? _customLevelBar = null;
          
-        private DateTime _startTime;
+        private DateTime? _startTime;
 
         [UIAction("#post-parse")]
         private void PostParse()
@@ -44,7 +44,7 @@ namespace CompCube.UI.BSML.Match
         [UIAction("nothing")]
         private void Nothing(SegmentedControl _, int cell){}
         
-        public async Task PopulateData(VotingMap votingMap, DateTime startTime)
+        public async Task PopulateData(VotingMap votingMap, DateTime? startTime)
         {
             // awful
             while (_customLevelBar is null)
@@ -53,6 +53,11 @@ namespace CompCube.UI.BSML.Match
             _startTime = startTime;
             
             _customLevelBar?.Setup(votingMap);
+
+            if (startTime == null)
+            {
+                MatchStartTimer = "Starting soon. Please wait!";
+            }
 
             StartCoroutine(UpdateTexts());
 
@@ -73,8 +78,11 @@ namespace CompCube.UI.BSML.Match
         {
             if (!isActivated)
                 return;
+
+            if (_startTime == null)
+                return;
             
-            MatchStartTimer = $"Starting in {((int) (_startTime - DateTime.UtcNow).TotalSeconds).ToString(CultureInfo.InvariantCulture)}...";
+            MatchStartTimer = $"Starting in {((int) (_startTime.Value - DateTime.UtcNow).TotalSeconds).ToString(CultureInfo.InvariantCulture)}...";
             
             NotifyPropertyChanged(nameof(MatchStartTimer));
         }
