@@ -9,11 +9,11 @@ namespace CompCube.Game;
 
 public class MapDownloader
 {
-    [Inject] private readonly SiraLog _siraLog = null;
+    [Inject] private readonly SiraLog _siraLog = null!;
     
     private readonly BeatSaver _beatSaver = new("CompCube", Version.Parse(IPA.Loader.PluginManager.GetPlugin("CompCube").HVersion.ToString()));
     
-    public event Action<int, int> OnMapDownloaded;
+    public event Action<int, int>? OnMapDownloaded;
 
     public async Task DownloadMaps(string[] mapHashes)
     {

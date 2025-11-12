@@ -1,0 +1,8 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+    <vertical>
+        <text text="~nameText" align="MidlineLeft"/>
+        <text text="~rankText" align="MidlineLeft"/>
+        <text text="~mmrText" align="MidlineLeft"/>
+    </vertical>
+</bg>
