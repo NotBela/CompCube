@@ -1,8 +1,14 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical>
-        <text text="~nameText" align="MidlineLeft"/>
-        <text text="~rankText" align="MidlineLeft"/>
+    <vertical active="~loading">
+        <loading preserve-aspect="true"/>
+    </vertical>
+    
+    <vertical anchor-pos-x="10" active="~notLoading">
+        <text text="~nameText" align="MidlineLeft" italics="true"/>
         <text text="~mmrText" align="MidlineLeft"/>
+        <text text="~rankText" align="MidlineLeft"/>
+        <text text="~winRateText" align="MidlineLeft"/>
+        <text text="~winstreakText" align="MidlineLeft"/>
     </vertical>
 </bg>

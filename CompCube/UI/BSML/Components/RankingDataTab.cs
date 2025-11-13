@@ -13,16 +13,16 @@ public class RankingDataTab
     private string _tabName { set; get; }
 
     [UIObject("root-tab")]
-    private readonly GameObject _tabObject = null;
+    private readonly GameObject _tabObject = null!;
 
-    private readonly object _host;
+    public Interfaces.IRefreshable Host { get; private set; }
 
     private readonly string _resource;
     
-    public RankingDataTab(string name, string resource, object host)
+    public RankingDataTab(string name, string resource, Interfaces.IRefreshable host)
     {
         _tabName = name;
-        _host = host;
+        Host = host;
         _resource = resource;
     }
 

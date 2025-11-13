@@ -16,7 +16,7 @@ using Zenject;
 namespace CompCube.UI.BSML.Leaderboard
 {
     [ViewDefinition("CompCube.UI.BSML.Leaderboard.LeaderboardView.bsml")]
-    public class LeaderboardViewController : BSMLAutomaticViewController, IInitializable
+    public class LeaderboardViewController : BSMLAutomaticViewController, IInitializable, Interfaces.IRefreshable
     {
         [Inject] private readonly PlatformLeaderboardViewController _platformLeaderboardViewController = null;
         [Inject] private readonly IApi _api = null;
@@ -229,6 +229,11 @@ namespace CompCube.UI.BSML.Leaderboard
         {
             _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_globalLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_GLOBAL")));
             _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_aroundPlayerLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_AROUND_YOU")));
+        }
+
+        public void Refresh()
+        {
+            this.SetLeaderboardState(LeaderboardStates.Global);
         }
     }
 }

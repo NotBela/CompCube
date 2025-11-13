@@ -30,34 +30,34 @@ public class DebugApi : IApi
         null,
         false, 0, 0, 0, 0);
     
-    public Task<CompCube_Models.Models.ClientData.UserInfo> GetUserInfo(string id)
+    public Task<CompCube_Models.Models.ClientData.UserInfo?> GetUserInfo(string id)
     {
         return Task.FromResult(Self);
     }
 
-    public Task<CompCube_Models.Models.ClientData.UserInfo[]> GetLeaderboardRange(int start, int range)
+    public Task<CompCube_Models.Models.ClientData.UserInfo[]?> GetLeaderboardRange(int start, int range)
     {
         return Task.FromResult(Array.Empty<CompCube_Models.Models.ClientData.UserInfo>());
     }
 
-    public Task<CompCube_Models.Models.ClientData.UserInfo[]> GetAroundUser(string id)
+    public Task<CompCube_Models.Models.ClientData.UserInfo[]?> GetAroundUser(string id)
     {
         return Task.FromResult(Array.Empty<CompCube_Models.Models.ClientData.UserInfo>());
     }
 
-    public Task<ServerStatus> GetServerStatus()
+    public Task<ServerStatus?> GetServerStatus()
     {
         return Task.FromResult(new ServerStatus([UnityGame.GameVersion.ToString()], ["1.0.0"],
             ServerState.State.Online));
     }
 
-    public async Task<string[]> GetMapHashes()
+    public async Task<string[]?> GetMapHashes()
     {
         await Task.Delay(1000);
         return Maps.Select(i => i.Hash).ToArray();
     }
 
-    public async Task<EventData[]> GetEvents()
+    public async Task<EventData[]?> GetEvents()
     {
         await Task.Delay(500);
         return [new EventData("test", "test event", "test desc", true)];
