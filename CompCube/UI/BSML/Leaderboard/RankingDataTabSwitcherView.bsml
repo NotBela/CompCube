@@ -4,6 +4,6 @@
         <tab-selector tab-tag="rankingDataTabSelectorTag" id="rankingDataTabSelector" select-cell="onCellSelected"/>
     </vertical>
 
-    <tab tags="rankingDataTabSelectorTag" tab-name="Rankings" id="rankingsTab"/>
-    <tab tags="rankingDataTabSelectorTag" tab-name="Self" id="selfTab"/>
+    <tab tags="rankingDataTabSelectorTag" tab-name="Ranking" id="selfTab"/>
+    <tab tags="rankingDataTabSelectorTag" tab-name="Leaderboards" id="rankingsTab"/>
 </bg>

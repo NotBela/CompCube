@@ -32,8 +32,10 @@ public class RankingDataTabSwitcherViewController : BSMLAutomaticViewController
     [UIAction("#post-parse")]
     void PostParse()
     {
-        _rankingDataTabItems.Add(new RankingDataTab("Ranking", _ownRankingViewController.ContentFilePath, _ownRankingViewController));
-        _rankingDataTabItems.Add(new RankingDataTab("Leaderboard", _leaderboardViewController.ContentFilePath, _leaderboardViewController));
+        _rankingDataTabItems.Add(new RankingDataTab(_ownRankingViewController, _selfTab));
+        _rankingDataTabItems.Add(new RankingDataTab(_leaderboardViewController, _rankingsTab));
+        
+        _rankingDataTabItems[0].Refresh();
         
         _rankingDataTabSelector.TextSegmentedControl.ReloadData();
         _rankingDataTabSelector.Refresh();
@@ -42,7 +44,6 @@ public class RankingDataTabSwitcherViewController : BSMLAutomaticViewController
     [UIAction("onCellSelected")]
     private void OnCellSelected(object _, int index)
     {
-        var cell = _rankingDataTabItems[index];
-        cell.Host.Refresh();
+        _rankingDataTabItems[index].Refresh();
     }
 }

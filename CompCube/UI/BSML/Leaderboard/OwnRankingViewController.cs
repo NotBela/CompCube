@@ -12,13 +12,13 @@ public class OwnRankingViewController : BSMLAutomaticViewController, Interfaces.
     [Inject] private readonly IApi _api = null!;
     [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
     
-    [UIValue("nameText")] private string NameText { get; set; } = "";
-    [UIValue("mmrText")] private string MmrText { get; set; } = "";
-    [UIValue("rankText")] private string RankText { get; set; } = "";
-    [UIValue("winRateText")] private string WinRateText { get; set; } = "";
-    [UIValue("winstreakText")] private string WinStreakText { get; set; } = "";
-
-    private bool _loading;
+    [UIValue("nameText")] private string NameText { get; set; } = "default";
+    [UIValue("mmrText")] private string MmrText { get; set; } = "default";
+    [UIValue("rankText")] private string RankText { get; set; } = "default";
+    [UIValue("winRateText")] private string WinRateText { get; set; } = "default";
+    [UIValue("winstreakText")] private string WinStreakText { get; set; } = "default";
+    
+    private bool _loading = true;
 
     [UIValue("loading")]
     private bool Loading
@@ -27,7 +27,7 @@ public class OwnRankingViewController : BSMLAutomaticViewController, Interfaces.
         set
         {
             _loading = value;
-            NotifyPropertyChanged();
+            NotifyPropertyChanged(null);  
         }
     }
     
@@ -38,30 +38,30 @@ public class OwnRankingViewController : BSMLAutomaticViewController, Interfaces.
         Loading = true;
 
         var selfData = await _api.GetUserInfo((await _platformUserModel.GetUserInfo(CancellationToken.None)).platformUserId);
-
+        
         if (selfData == null)
-        {
             return;
-        }
+
+        Loading = false;
 
         NameText = selfData.GetFormattedUserName();
         MmrText = $"MMR: {selfData.Mmr} ({selfData.Division.GetFormattedDivision()})";
+        RankText = $"Rank: #{selfData.Rank}";
         WinRateText = $"Win rate: {selfData.Wins}/{selfData.Wins + selfData.Losses} ({(float) selfData.Wins / selfData.Wins + selfData.Losses:F}%)";
         WinStreakText = $"Winstreak: {selfData.Winstreak} (Highest: {selfData.HighestWinstreak})";
-
-        Loading = false;
-    }
-
-    public void UpdateData() => UpdateDataAsync();
-
-    [UIAction("#post-parse")]
-    private void PostParse()
-    {
-        UpdateData();
-    }
-
-    public void Refresh()
-    {
         
+        NotifyPropertyChanged(null);
+    }
+
+    public async void Refresh()
+    {
+        try
+        {
+            await UpdateDataAsync();
+        }
+        catch (Exception e)
+        {
+            Plugin.Log.Info(e);
+        }
     }
 }

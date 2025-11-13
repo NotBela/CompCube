@@ -20,7 +20,7 @@
                 </vertical>
 
                 <vertical pref-width="10" anchor-pos-x="30">
-                    <icon-button icon="LoungeSaber.Resources.profile-icon.png" on-click="profileButtonOnClick" pref-width="8" pref-height="8" show-underline="false"/>
+                    <icon-button icon="CompCube.Resources.profile-icon.png" on-click="profileButtonOnClick" pref-width="8" pref-height="8" show-underline="false"/>
                 </vertical>
             </custom-list>
         </vertical>

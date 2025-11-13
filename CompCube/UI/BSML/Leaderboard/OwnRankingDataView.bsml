@@ -4,7 +4,7 @@
         <loading preserve-aspect="true"/>
     </vertical>
     
-    <vertical anchor-pos-x="10" active="~notLoading">
+    <vertical anchor-pos-x="0" active="~notLoading">
         <text text="~nameText" align="MidlineLeft" italics="true"/>
         <text text="~mmrText" align="MidlineLeft"/>
         <text text="~rankText" align="MidlineLeft"/>

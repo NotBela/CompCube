@@ -179,6 +179,8 @@ namespace CompCube.UI.BSML.Leaderboard
                         SetLeaderboardData(aroundUser);
                         break;
                 }
+
+                IsLoaded = true;
             }
             catch (Exception e)
             {
@@ -234,6 +236,7 @@ namespace CompCube.UI.BSML.Leaderboard
         public void Refresh()
         {
             this.SetLeaderboardState(LeaderboardStates.Global);
+            _siraLog.Info("hello");
         }
     }
 }

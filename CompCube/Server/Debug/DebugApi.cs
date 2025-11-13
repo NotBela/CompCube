@@ -22,7 +22,7 @@ public class DebugApi : IApi
 
     public static readonly CompCube_Models.Models.ClientData.UserInfo Self = new(
         "self",
-        "",
+        "0",
         1000,
         new DivisionInfo("Iron", 1, "#000000", false),
         null,
@@ -30,14 +30,19 @@ public class DebugApi : IApi
         null,
         false, 0, 0, 0, 0);
     
-    public Task<CompCube_Models.Models.ClientData.UserInfo?> GetUserInfo(string id)
+    public async Task<CompCube_Models.Models.ClientData.UserInfo?> GetUserInfo(string id)
     {
-        return Task.FromResult(Self);
+        await Task.Delay(1000);
+        return Self;
     }
 
     public Task<CompCube_Models.Models.ClientData.UserInfo[]?> GetLeaderboardRange(int start, int range)
     {
-        return Task.FromResult(Array.Empty<CompCube_Models.Models.ClientData.UserInfo>());
+        var info = new List<CompCube_Models.Models.ClientData.UserInfo>()
+        {
+            DebugOpponent, Self
+        };
+        return Task.FromResult(info.ToArray());
     }
 
     public Task<CompCube_Models.Models.ClientData.UserInfo[]?> GetAroundUser(string id)
