@@ -30,7 +30,7 @@ public class EventPointsLeaderboardViewController : BSMLAutomaticViewController,
 
     private void OnEventScoresUpdated(EventScoresUpdated packet)
     {
-        _scores = packet.MatchScores;
+        _scores = packet.Scores;
     }
 
     private void UpdateLeaderboard()
@@ -44,6 +44,8 @@ public class EventPointsLeaderboardViewController : BSMLAutomaticViewController,
             _eventsLeaderboard.SetScores(scores, _scores.IndexOf(_scores.First(j => j.User.UserId == _platformUserModel.GetUserInfo(CancellationToken.None).Result.platformUserId)));
             return;
         }
+        
+        
     }
 
     public void Dispose()
