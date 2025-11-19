@@ -224,6 +224,8 @@
       <EmbeddedResource Include="UI\BSML\Leaderboard\OwnRankingDataView.bsml" />
       <None Remove="UI\BSML\TabSwitcherView.bsml" />
       <EmbeddedResource Include="UI\BSML\TabSwitcherView.bsml" />
+      <None Remove="UI\BSML\Events\EventLeaderboardView.bsml" />
+      <EmbeddedResource Include="UI\BSML\Events\EventPointsLeaderboardView.bsml" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="CompCube.csproj.user" />

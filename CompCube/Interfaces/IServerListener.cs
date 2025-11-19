@@ -20,6 +20,8 @@ public interface IServerListener
     public event Action<EventMatchStartedPacket> OnEventMatchStarted;
 
     public event Action<EventClosedPacket> OnEventClosed;
+    
+    public event Action<EventScoresUpdated> OnEventScoresUpdated;
 
     public Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback);
 

@@ -35,6 +35,7 @@ namespace CompCube.Server
         public event Action<EventMapSelected>? OnEventMapSelected;
         public event Action<EventMatchStartedPacket>? OnEventMatchStarted;
         public event Action<EventClosedPacket>? OnEventClosed;
+        public event Action<EventScoresUpdated>? OnEventScoresUpdated;
 
         [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
 
@@ -162,6 +163,9 @@ namespace CompCube.Server
                             break;
                         case ServerPacket.ServerPacketTypes.EventClosed:
                             OnEventClosed?.Invoke(packet as EventClosedPacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.EventScoresUpdated:
+                            OnEventScoresUpdated?.Invoke(packet as EventScoresUpdated);
                             break;
                         default:
                             throw new Exception("Could not get packet type!");
