@@ -47,7 +47,7 @@ public class OwnRankingViewController : BSMLAutomaticViewController, IRefreshabl
         NameText = selfData.GetFormattedUserName();
         MmrText = $"MMR: {selfData.Mmr} ({selfData.Division.GetFormattedDivision()})";
         RankText = $"Rank: #{selfData.Rank}";
-        WinRateText = $"Win rate: {selfData.Wins}/{selfData.Wins + selfData.Losses} ({(float) selfData.Wins / selfData.Wins + selfData.Losses:F}%)";
+        WinRateText = $"Win rate: {selfData.Wins}/{selfData.TotalGames} ({(float) selfData.Wins / selfData.TotalGames:F}%)";
         WinStreakText = $"Winstreak: {selfData.Winstreak} (Highest: {selfData.HighestWinstreak})";
         
         NotifyPropertyChanged(null);

@@ -22,15 +22,17 @@ namespace CompCube.UI.BSML.Match
         [UIValue("winnerScoreText")] private string WinnerScoreText { get; set; }
         [UIValue("loserScoreText")] private string LoserScoreText { get; set; }
         
-        
-        public void PopulateData(RoundResultsPacket results, Action? onContinueButtonPressedCallback)
+        public void PopulateData(RoundResultsPacket results)
         {
-            _onContinueButtonPressedCallback = onContinueButtonPressedCallback;
-            
             WinnerScoreText = FormatScore(new MatchScore(results.Scores.ElementAt(0).Key, results.Scores.ElementAt(0).Value), 1);
             LoserScoreText = FormatScore(new MatchScore(results.Scores.ElementAt(1).Key, results.Scores.ElementAt(1).Value), 2);
             
             NotifyPropertyChanged(null);
+        }
+
+        public void SetContinueButtonCallback(Action? onContinueButtonPressedCallback)
+        {
+            _onContinueButtonPressedCallback = onContinueButtonPressedCallback;
         }
 
         private string FormatScore(MatchScore score, int placement) => 

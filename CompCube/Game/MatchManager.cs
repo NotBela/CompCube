@@ -54,7 +54,7 @@ namespace CompCube.Game
                 false,
                 true,
                 null,
-                diContainer => AfterSceneSwitchToGameplayCallback(diContainer, unpauseTime, opponent),
+                diContainer => AfterSceneSwitchToGameplayCallback(diContainer, unpauseTime),
                 AfterSceneSwitchToMenuCallback,
                 null
                 );
@@ -98,14 +98,14 @@ namespace CompCube.Game
             _menuSwitchCallback = null;
         }
 
-        private async void AfterSceneSwitchToGameplayCallback(DiContainer diContainer, DateTime unpauseTime, CompCube_Models.Models.ClientData.UserInfo opponent)
+        private async void AfterSceneSwitchToGameplayCallback(DiContainer diContainer, DateTime unpauseTime)
         {
             try
             {
                 if (!_config.ScoreSubmission)
                     diContainer.Resolve<Submission>().DisableScoreSubmission("CompCube");
                 
-                diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime, opponent);
+                diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime, RedTeamPlayers[0]);
                 
                 var startingMenuController = diContainer.TryResolve<MatchStartUnpauseController>() ?? throw new Exception("Could not resolve StartingPauseMenuController");
                 

@@ -19,28 +19,28 @@ namespace CompCube.UI.FlowCoordinators
 {
     public class MatchFlowCoordinator : FlowCoordinator
     {
-        [Inject] private readonly VotingScreenViewController _votingScreenViewController = null;
-        [Inject] private readonly AwaitingMapDecisionViewController _awaitingMapDecisionViewController = null;
-        [Inject] private readonly WaitingForMatchToStartViewController _waitingForMatchToStartViewController = null;
-        [Inject] private readonly AwaitMatchEndViewController _awaitMatchEndViewController = null;
-        [Inject] private readonly MatchResultsViewController _matchResultsViewController = null;
-        [Inject] private readonly OpponentViewController _opponentViewController = null;
+        [Inject] private readonly VotingScreenViewController _votingScreenViewController = null!;
+        [Inject] private readonly AwaitingMapDecisionViewController _awaitingMapDecisionViewController = null!;
+        [Inject] private readonly WaitingForMatchToStartViewController _waitingForMatchToStartViewController = null!;
+        [Inject] private readonly AwaitMatchEndViewController _awaitMatchEndViewController = null!;
+        [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
+        [Inject] private readonly OpponentViewController _opponentViewController = null!;
         
-        [Inject] private readonly IServerListener _serverListener = null;
-        [Inject] private readonly MatchManager _matchManager = null;
+        [Inject] private readonly IServerListener _serverListener = null!;
+        [Inject] private readonly MatchManager _matchManager = null!;
         
-        [Inject] private readonly SiraLog _siraLog = null;
+        [Inject] private readonly SiraLog _siraLog = null!;
         
-        [Inject] private readonly StandardLevelDetailViewManager _standardLevelDetailViewManager = null;
-        [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null;
+        [Inject] private readonly StandardLevelDetailViewManager _standardLevelDetailViewManager = null!;
+        [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         
-        [Inject] private readonly DisconnectHandler _disconnectHandler = null;
+        [Inject] private readonly DisconnectHandler _disconnectHandler = null!;
 
-        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null;
-        [Inject] private readonly DisconnectedViewController _disconnectedViewController = null;
+        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
+        [Inject] private readonly DisconnectedViewController _disconnectedViewController = null!;
         
-        [Inject] private readonly IPlatformUserModel _platformUserModel = null;
-        [Inject] private readonly SoundEffectManager _soundEffectManager = null;
+        [Inject] private readonly IPlatformUserModel _platformUserModel = null!;
+        [Inject] private readonly SoundEffectManager _soundEffectManager = null!;
 
         private NavigationController _votingScreenNavigationController;
 
@@ -63,14 +63,34 @@ namespace CompCube.UI.FlowCoordinators
             ProvideInitialViewControllers(_votingScreenNavigationController, _gameplaySetupViewManager.ManagedController, bottomScreenViewController: _opponentViewController);
             _votingScreenNavigationController.PushViewController(_votingScreenViewController, null);
             
+            _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
+            
             _serverListener.OnRoundStarted += OnRoundStarted;
             _serverListener.OnBeginGameTransition += TransitionToGame;
             _serverListener.OnRoundResults += OnRoundResults;
         }
 
+        private void HandleVotingScreenMapSelected(VotingMap votingMap, List<VotingMap> votingMaps)
+        {
+            if (!_standardLevelDetailViewManager.ManagedController.isActivated)
+                _votingScreenNavigationController.PushViewController(_standardLevelDetailViewManager.ManagedController,
+                    () =>
+                    {
+                        _standardLevelDetailViewManager.ManagedController.transform.position = new Vector3(1.4f,
+                            _standardLevelDetailViewManager.ManagedController.transform.position.y, 
+                            _standardLevelDetailViewManager.ManagedController.transform.position.z);
+                    });
+            
+            _standardLevelDetailViewManager.SetData(votingMap, votingMaps);
+            
+            _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
+        }
+
         private void OnRoundResults(RoundResultsPacket results)
         {
-            _matchResultsViewController.PopulateData();
+            this.ReplaceViewControllerSynchronously(_matchResultsViewController);
+            
+            _matchResultsViewController.PopulateData(results);
         }
 
         private async void TransitionToGame(BeginGameTransitionPacket packet)
@@ -96,6 +116,16 @@ namespace CompCube.UI.FlowCoordinators
 
         private void OnRoundStarted(RoundStartedPacket roundStartedPacket)
         {
+            _matchResultsViewController.SetContinueButtonCallback(() =>
+            {
+                ResetNavigationController();
+                this.ReplaceViewControllerSynchronously(_votingScreenNavigationController);
+                _votingScreenViewController.SetActivationCallback(() =>
+                {
+                    _votingScreenViewController.PopulateData(roundStartedPacket.Maps, roundStartedPacket.VotingTime);
+                });
+            });
+            
             if (!_votingScreenViewController.isActivated)
             {
                 _votingScreenViewController.SetActivationCallback(() =>
@@ -110,7 +140,16 @@ namespace CompCube.UI.FlowCoordinators
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
-            
+            _votingScreenViewController.MapSelected -= HandleVotingScreenMapSelected;
+        }
+
+        private void ResetNavigationController()
+        {
+            if (_votingScreenNavigationController)
+                Destroy(_votingScreenNavigationController);
+            _votingScreenNavigationController = BeatSaberUI.CreateViewController<NavigationController>();
+            _votingScreenNavigationController.PushViewController(
+                                                    _votingScreenViewController, null);
         }
     }
 }
