@@ -11,12 +11,12 @@ public class StandardLevelDetailViewManager : ViewManager
     
     public override ViewController ManagedController => _standardLevelDetailViewController;
     
-    public event Action<VotingMap, List<VotingMap>> OnMapVoteButtonPressed;
+    private Action<VotingMap, List<VotingMap>>? _votedCallback;
 
     private List<VotingMap> _votingMaps;
     public VotingMap CurrentVotingMap { get; private set; }
     
-    public void SetData(VotingMap votingMap, List<VotingMap> votingMaps)
+    public void SetData(VotingMap votingMap, List<VotingMap> votingMaps, Action<VotingMap, List<VotingMap>> voteClickedCallback)
     {
         CurrentVotingMap = votingMap;
         _votingMaps = votingMaps;
@@ -38,7 +38,11 @@ public class StandardLevelDetailViewManager : ViewManager
         _standardLevelDetailViewController._standardLevelDetailView.actionButton.onClick.AddListener(OnActionButtonPressed);
     }
 
-    private void OnActionButtonPressed() => OnMapVoteButtonPressed?.Invoke(CurrentVotingMap, _votingMaps);
+    private void OnActionButtonPressed()
+    {
+        _votedCallback?.Invoke(CurrentVotingMap, _votingMaps);
+        _votedCallback = null;
+    }
 
     protected override void ResetManagedController()
     {

@@ -81,9 +81,23 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, votingMaps);
+            _standardLevelDetailViewManager.SetData(votingMap, votingMaps, HandleVoteButtonPressed);
             
             _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
+        }
+
+        private async void HandleVoteButtonPressed(VotingMap votingMap, List<VotingMap> votingMaps)
+        {
+            try
+            {
+                this.ReplaceViewControllerSynchronously(_opponentViewController);
+                
+                await _serverListener.SendPacket(new VotePacket(votingMaps.IndexOf(votingMap)));
+            }
+            catch (Exception e)
+            {
+                _siraLog.Error(e);
+            }
         }
 
         private void OnRoundResults(RoundResultsPacket results)
