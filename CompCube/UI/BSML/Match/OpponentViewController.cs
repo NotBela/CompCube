@@ -9,9 +9,8 @@ public class OpponentViewController : BSMLAutomaticViewController
 {
     [UIValue("opponentText")] private string OpponentText { get; set; }
     
-    public void PopulateData(CompCube_Models.Models.ClientData.UserInfo opponent)
+    public void PopulateData(CompCube_Models.Models.ClientData.UserInfo[] redTeam, CompCube_Models.Models.ClientData.UserInfo[] blueTeam, int redPoints, int bluePoints, int currentRound)
     {
-        OpponentText = $"{opponent.GetFormattedUserName()} - {opponent.Mmr} MMR";
-        NotifyPropertyChanged(nameof(OpponentText));
+        
     }
 }

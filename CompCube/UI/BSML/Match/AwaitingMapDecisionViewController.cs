@@ -38,7 +38,7 @@ namespace CompCube.UI.BSML.Match
             _ownLevelBar.Setup(vote);
         }
 
-        private void OnOpponentVoted(OpponentVotedPacket opponentVoted)
+        private void OnOpponentVoted(PlayerVotedPacket opponentVoted)
         {
             while (_votingMaps.Count == 0);
             
@@ -47,12 +47,12 @@ namespace CompCube.UI.BSML.Match
 
         public void Dispose()
         {
-            _serverListener.OnOpponentVoted -= OnOpponentVoted;
+            _serverListener.OnPlayerVoted -= OnOpponentVoted;
         }
 
         public void Initialize()
         {
-            _serverListener.OnOpponentVoted += OnOpponentVoted;
+            _serverListener.OnPlayerVoted += OnOpponentVoted;
         }
     }
 }

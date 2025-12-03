@@ -18,12 +18,14 @@ namespace CompCube.Game
         public bool InMatch { get; private set; } = false;
 
         private Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? _menuSwitchCallback;
+
+        public List<CompCube_Models.Models.ClientData.UserInfo> RedTeamPlayers { get; private set; } = [];
+        public List<CompCube_Models.Models.ClientData.UserInfo> BlueTeamPlayers { get; private set; } = [];
         
         public void StartMatch(
             VotingMap level, 
             DateTime unpauseTime, 
-            bool proMode, 
-            CompCube_Models.Models.ClientData.UserInfo opponent, 
+            bool proMode,
             Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO> onLevelCompletedCallback)
         {
             if (InMatch) 
@@ -113,6 +115,12 @@ namespace CompCube.Game
             {
                 _siraLog.Error(e);
             }
+        }
+
+        public void SetOpponents(CompCube_Models.Models.ClientData.UserInfo[] red, CompCube_Models.Models.ClientData.UserInfo[] blue)
+        {
+            RedTeamPlayers = red.ToList();
+            BlueTeamPlayers = blue.ToList();
         }
     }
 }

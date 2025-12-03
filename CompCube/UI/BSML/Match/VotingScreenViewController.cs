@@ -48,9 +48,9 @@ public class VotingScreenViewController : BSMLAutomaticViewController
 
     private void DidSelectCellWithIdxEvent(TableView tableView, int idx) => MapSelected?.Invoke(_votingListDataSource.Data[idx], _votingListDataSource.Data);
 
-    public void PopulateData(MatchCreatedPacket packet)
+    public void PopulateData(VotingMap[] maps, int countdown)
     {
-        _votingListDataSource.SetData(packet.Maps.ToList());
+        _votingListDataSource.SetData(maps.ToList());
         _votingListDataSource.TableView.ClearSelection();
         
         NotifyPropertyChanged(null);

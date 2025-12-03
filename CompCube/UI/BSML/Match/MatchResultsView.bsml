@@ -11,10 +11,6 @@
             <text text="~loserScoreText" align="Midline" font-size="4.75"/>
         </vertical>
     </horizontal>
-    
-    <horizontal anchor-pos-x="0" anchor-pos-y="-10">
-        <text text="~mmrChangeText" align="Midline" font-size="4.75" italics="true"/>
-    </horizontal>
 
     <horizontal anchor-pos-x="0" anchor-pos-y="-20">
         <primary-button text="Continue" on-click="continueButtonClicked" pref-width='34' pref-height='10'/>

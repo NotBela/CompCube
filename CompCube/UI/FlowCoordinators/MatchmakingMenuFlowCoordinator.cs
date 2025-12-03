@@ -35,7 +35,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             this.PresentFlowCoordinatorSynchronously(_matchFlowCoordinator);
 
-            _matchFlowCoordinator.StartMatch(packet, () =>
+            _matchFlowCoordinator.PopulateData(packet, () =>
             {
                 DismissFlowCoordinator(_matchFlowCoordinator);
             });
