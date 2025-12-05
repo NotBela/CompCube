@@ -48,7 +48,6 @@ namespace CompCube.UI.FlowCoordinators
 
         public void PopulateData(MatchCreatedPacket packet, Action? onMatchFinishedCallback)
         {
-            _matchManager.SetOpponents(packet.Red, packet.Blue);
             _opponentViewController.PopulateData(packet.Red, packet.Blue);
             _opponentViewController.UpdateRound(1);
             _opponentViewController.UpdatePoints(0, 0);

@@ -11,7 +11,7 @@ namespace CompCube.UI.BSML.PauseMenu;
 [ViewDefinition("CompCube.UI.BSML.PauseMenu.PauseMenuView.bsml")]
 public class PauseMenuViewController : BSMLAutomaticViewController, IInitializable, IDisposable, ITickable
 {
-    [Inject] private readonly PauseController _pauseController = null;
+    [Inject] private readonly PauseController _pauseController = null!;
     
     private readonly FloatingScreen _floatingScreen = FloatingScreen.CreateFloatingScreen(new Vector2(50f, 50f), false, Vector3.zero, Quaternion.identity);
     
@@ -20,6 +20,8 @@ public class PauseMenuViewController : BSMLAutomaticViewController, IInitializab
     private DateTime? _matchStartingTime;
     
     [UIValue("opponentText")] private string OpponentText { get; set; }
+    
+    [UIValue("pointsText")] private string PointsText { get; set; }
     
     public void Initialize()
     {
@@ -40,12 +42,13 @@ public class PauseMenuViewController : BSMLAutomaticViewController, IInitializab
 
     private void Resumed() => _floatingScreen.gameObject.SetActive(false);
 
-    public void PopulateData(DateTime time, CompCube_Models.Models.ClientData.UserInfo opponent)
+    public void PopulateData(DateTime time, CompCube_Models.Models.ClientData.UserInfo[] red, CompCube_Models.Models.ClientData.UserInfo[] blue, int redPoints, int bluePoints)
     {
         _matchStartingTime = time;
         
-        OpponentText = $"{opponent.GetFormattedUserName()} - {opponent.Mmr.ToString().FormatWithHtmlColor(opponent.Division.Color)} MMR";
-        NotifyPropertyChanged(nameof(OpponentText));
+        OpponentText = $"{red[0].GetFormattedUserName()} vs. {blue[0].GetFormattedUserName()}";
+        PointsText = $"{redPoints} - {bluePoints}";
+        NotifyPropertyChanged(null);
     }
 
     public void Dispose()
