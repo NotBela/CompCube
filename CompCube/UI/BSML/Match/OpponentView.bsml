@@ -1,9 +1,23 @@
 <bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
     <vertical anchor-pos-y="15">
-        <text text="Your Opponent:" align="Center" italics="true" font-size="5"/>
+        <text text="~roundText" align="Center" italics="true" font-size="5"/>
     </vertical>
-    <vertical anchor-pos-y="8">
-        <text text="~opponentText" align="Center" font-size="7" italics="true"/>
+    <vertical anchor-pos-y="7">
+        <text text="~pointsText" align="Center" italics="true" font-size="7"/>
     </vertical>
+    <horizontal anchor-pos-y="3" horizontal-fit="PreferredSize" pref-width="30">
+        <vertical horizontal-fit="PreferredSize" pref-width="10">
+            <text text="~redText" italics="true" align="Right" font-size="7"/>
+        </vertical>
+        
+        <vertical pad="1">
+            <text text="vs." italics="true" align="Center" font-size="7"/>
+        </vertical>
+        
+        <vertical horizontal-fit="PreferredSize" pref-width="10">
+            <text text="~blueText" italics="true" align="Left" font-size="7"/>
+        </vertical>
+        
+    </horizontal>
 </bg>

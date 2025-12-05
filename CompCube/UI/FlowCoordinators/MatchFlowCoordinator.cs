@@ -49,6 +49,9 @@ namespace CompCube.UI.FlowCoordinators
         public void PopulateData(MatchCreatedPacket packet, Action? onMatchFinishedCallback)
         {
             _matchManager.SetOpponents(packet.Red, packet.Blue);
+            _opponentViewController.PopulateData(packet.Red, packet.Blue);
+            _opponentViewController.UpdateRound(1);
+            _opponentViewController.UpdatePoints(0, 0);
             
             _onMatchFinishedCallback = onMatchFinishedCallback;
         }
@@ -110,6 +113,8 @@ namespace CompCube.UI.FlowCoordinators
             this.ReplaceViewControllerSynchronously(_matchResultsViewController);
             
             _matchResultsViewController.PopulateData(results);
+            
+            _opponentViewController.UpdatePoints(results.RedPoints, results.BluePoints);
         }
 
         private async void TransitionToGame(BeginGameTransitionPacket packet)
@@ -137,26 +142,21 @@ namespace CompCube.UI.FlowCoordinators
 
         private void OnRoundStarted(RoundStartedPacket roundStartedPacket)
         {
+            _votingScreenViewController.SetActivationCallback(() =>
+            { 
+                _votingScreenViewController.PopulateData(roundStartedPacket.Maps, roundStartedPacket.VotingTime);
+            });
+
+            if (!_matchResultsViewController.isActivated) 
+                return;
+            
             _matchResultsViewController.SetContinueButtonCallback(() =>
             {
                 ResetNavigationController();
                 this.ReplaceViewControllerSynchronously(_votingScreenNavigationController);
-                _votingScreenViewController.SetActivationCallback(() =>
-                {
-                    _votingScreenViewController.PopulateData(roundStartedPacket.Maps, roundStartedPacket.VotingTime);
-                });
             });
-            
-            if (!_votingScreenViewController.isActivated)
-            {
-                _votingScreenViewController.SetActivationCallback(() =>
-                {
-                    _votingScreenViewController.PopulateData(roundStartedPacket.Maps, roundStartedPacket.VotingTime);
-                });
-                return;
-            }
-            
-            _votingScreenViewController.PopulateData(roundStartedPacket.Maps, roundStartedPacket.VotingTime);
+                
+            _opponentViewController.UpdateRound(1);
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
