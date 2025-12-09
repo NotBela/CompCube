@@ -4,6 +4,7 @@ using CompCube.Configuration;
 using CompCube.Game;
 using CompCube.Interfaces;
 using IPA.Utilities;
+using SiraUtil.Logging;
 using SiraUtil.Tools.FPFC;
 using SongCore;
 using Zenject;
@@ -18,12 +19,11 @@ public class InitialServerChecker
     [Inject] private readonly PluginConfig _config = null!;
     [Inject] private readonly IFPFCSettings _fpfcSettings = null!;
     
+    [Inject] private readonly SiraLog _siraLog = null!;
+    
     public event Action<string>? ServerCheckFailed;
 
     public event Action<ServerCheckingStates>? ServerCheckingStateUpdated;
-
-    // keeping this around bc i will need it for the leaderboard redesign
-    public event Action<CompCube_Models.Models.ClientData.UserInfo?>? OnUserInfoFetched;
 
     public event Action? ServerCheckFinished;
 
@@ -31,48 +31,35 @@ public class InitialServerChecker
     
     public async Task CheckServer()
     {
-        // if (!CheckFpfc())
-            // return;
-        
         if (!await CheckServerState())
             return;
         if (!await CheckUserData())
             return;
+
         if (!await CheckMaps())
             return;
         
         ServerCheckFinished?.Invoke();
     }
 
-    private bool CheckFpfc()
-    {
-        if (_config.SkipServer)
-            return true;
-
-        if (!_fpfcSettings.Enabled) 
-            return true;
-        
-        ServerCheckFailed?.Invoke("FPFC is enabled. Please restart your game.");
-        return false;
-
-    }
-
     private async Task<bool> CheckMaps()
     {
+        _siraLog.Info("starting map check");
         ServerCheckingStateUpdated?.Invoke(ServerCheckingStates.Maps);
         
         while (Loader.AreSongsLoading)
             await Task.Delay(25);
 
+        _siraLog.Info("checking");
         var maps = await _api.GetMapHashes();
-        var missingMapHashes = maps.Where(i => Loader.GetLevelByHash(i) == null).ToArray();
+        var missingMapHashes = maps?.Where(i => Loader.GetLevelByHash(i) == null).ToArray();
         
-        if (missingMapHashes.Length == 0)
+        if (missingMapHashes?.Length == 0)
         {
             return true;
         }
         
-        StartMapDownload?.Invoke(missingMapHashes);
+        StartMapDownload?.Invoke(missingMapHashes ?? []);
         return false;
     }
 
@@ -88,7 +75,6 @@ public class InitialServerChecker
             return false;
         }
         
-        OnUserInfoFetched?.Invoke(userData);
         return true;
     }
     

@@ -12,19 +12,19 @@ namespace CompCube.UI.FlowCoordinators;
 
 public class ServerCheckingFlowCoordinator : FlowCoordinator
 {
-    [Inject] private readonly MatchmakingMenuFlowCoordinator _matchmakingMenuFlowCoordinator = null;
+    [Inject] private readonly MatchmakingMenuFlowCoordinator _matchmakingMenuFlowCoordinator = null!;
     
-    [Inject] private readonly CheckingServerStatusViewController _checkingServerStatusViewController = null;
-    [Inject] private readonly CantConnectToServerViewController _cantConnectToServerViewController = null;
-    [Inject] private readonly MissingMapsViewController _missingMapsViewController = null;
+    [Inject] private readonly CheckingServerStatusViewController _checkingServerStatusViewController = null!;
+    [Inject] private readonly CantConnectToServerViewController _cantConnectToServerViewController = null!;
+    [Inject] private readonly MissingMapsViewController _missingMapsViewController = null!;
     
-    [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null;
+    [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
 
-    [Inject] private readonly InitialServerChecker _serverChecker = null;
-    [Inject] private readonly MapDownloader _mapDownloader = null;
+    [Inject] private readonly InitialServerChecker _serverChecker = null!;
+    [Inject] private readonly MapDownloader _mapDownloader = null!;
     
-    [Inject] private readonly SiraLog _siraLog = null;
-    [Inject] private readonly PluginConfig _config = null;
+    [Inject] private readonly SiraLog _siraLog = null!;
+    [Inject] private readonly PluginConfig _config = null!;
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
@@ -40,7 +40,7 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
         _serverChecker.ServerCheckFinished += ServerCheckFinished;
         _serverChecker.StartMapDownload += OnStartMapDownload;
 
-        Task.Run(async Task () => { await _serverChecker.CheckServer(); });
+        Task.Run(async () => await _serverChecker.CheckServer());
     }
 
     protected override void BackButtonWasPressed(ViewController _)
@@ -50,13 +50,17 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
 
     private void OnStartMapDownload(string[] missingMapHashes)
     {
+        _siraLog.Info("here 0");
         if (_config.DownloadMapsAutomatically)
         {
             UserChoseToDownloadMaps(true, missingMapHashes);
             return;
         }
         
+        _siraLog.Info("here 1");
+        
         this.ReplaceViewControllerSynchronously(_missingMapsViewController);
+        _siraLog.Info("here 2");
         _missingMapsViewController.SetMissingMapCount(missingMapHashes.Length, (choice) =>
         {
             UserChoseToDownloadMaps(choice, missingMapHashes);

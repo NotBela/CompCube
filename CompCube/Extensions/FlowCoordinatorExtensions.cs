@@ -9,16 +9,18 @@ namespace CompCube.Extensions;
 
 public static class FlowCoordinatorExtensions
 {
-    internal static void ReplaceViewControllerSynchronously(this FlowCoordinator flowCoordinator, ViewController viewController, bool immediately = false)
+    internal static void ReplaceViewControllerSynchronously(this FlowCoordinator flowCoordinator, ViewController viewController, bool immediately = false) => ReplaceViewControllerSynchronouslyAsync(flowCoordinator, viewController, immediately);
+    
+    private static async Task ReplaceViewControllerSynchronouslyAsync(this FlowCoordinator flowCoordinator, ViewController viewController, bool immediately = false)
     {
         if (!flowCoordinator.isActivated) 
             return;
 
         if (flowCoordinator.topViewController == viewController)
             return;
-
-        if (flowCoordinator.isInTransition)
-            return;
+        
+        while (flowCoordinator.isInTransition)
+            await Task.Delay(25);
             
         flowCoordinator.StartCoroutine(PresentViewControllerSynchronouslyCoroutine(flowCoordinator, viewController, immediately: immediately));
     }

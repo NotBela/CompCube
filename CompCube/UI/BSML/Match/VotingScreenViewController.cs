@@ -1,4 +1,5 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using System.Collections;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube_Models.Models.Map;
@@ -13,10 +14,10 @@ namespace CompCube.UI.BSML.Match;
 [ViewDefinition("CompCube.UI.BSML.Match.VotingScreenView.bsml")]
 public class VotingScreenViewController : BSMLAutomaticViewController
 {
-    public event Action<VotingMap, List<VotingMap>> MapSelected;
+    public event Action<VotingMap, List<VotingMap>>? MapSelected;
         
-    [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null;
-    private VotingListDataSource _votingListDataSource = null;
+    [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null!;
+    private VotingListDataSource _votingListDataSource = null!;
     
     private Action? _activationCallback = null;
 
@@ -56,10 +57,18 @@ public class VotingScreenViewController : BSMLAutomaticViewController
 
     public void PopulateData(VotingMap[] maps, int countdown)
     {
-        _votingListDataSource.SetData(maps.ToList());
-        _votingListDataSource.TableView.ClearSelection();
+        StartCoroutine(PopulateDataCoroutine());
+        return;
         
-        NotifyPropertyChanged(null);
+        IEnumerator PopulateDataCoroutine()
+        {
+            yield return new WaitForEndOfFrame();
+            
+            _votingListDataSource.SetData(maps.ToList());
+            _votingListDataSource.TableView.ClearSelection();
+        
+            NotifyPropertyChanged(null);
+        }
     }
 }
     

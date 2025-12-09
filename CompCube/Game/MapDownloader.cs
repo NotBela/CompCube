@@ -18,8 +18,10 @@ public class MapDownloader
     public async Task DownloadMaps(string[] mapHashes)
     {
         var mapsDownloaded = 0;
+
+        var hashesWithoutDuplicates = mapHashes.Distinct().ToArray();
         
-        foreach (var mapHash in mapHashes)
+        foreach (var mapHash in hashesWithoutDuplicates)
         {
             if (Loader.GetLevelByHash(mapHash) != null)
                 continue;
