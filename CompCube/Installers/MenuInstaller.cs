@@ -18,6 +18,7 @@ using CompCube.UI.Sound;
 using CompCube.UI.ViewManagers;
 using CompCube.UI.BSML;
 using CompCube.UI.BSML.Components;
+using CompCube.UI.BSML.EarlyLeaveWarning;
 using Zenject;
 
 namespace CompCube.Installers
@@ -72,6 +73,8 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<RankingDataTabSwitcherViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<OwnRankingViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<MatchResultsViewController>().FromNewComponentAsViewController()
+                .AsSingle();
+            Container.BindInterfacesAndSelfTo<EarlyLeaveWarningModalViewController>().FromNewComponentAsViewController()
                 .AsSingle();
 
             Container.Bind<BSMLTag>().To<LevelBarTag>().AsSingle();

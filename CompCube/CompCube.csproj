@@ -227,6 +227,8 @@
       <EmbeddedResource Include="UI\BSML\TabSwitcherView.bsml" />
       <None Remove="UI\BSML\Events\EventLeaderboardView.bsml" />
       <EmbeddedResource Include="UI\BSML\Events\EventPointsLeaderboardView.bsml" />
+      <None Remove="UI\BSML\EarlyLeaveWarning\EarlyLeaveWarningModalView.bsml" />
+      <EmbeddedResource Include="UI\BSML\EarlyLeaveWarning\EarlyLeaveWarningModalView.bsml" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="CompCube.csproj.user" />

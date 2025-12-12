@@ -11,6 +11,7 @@ using CompCube.UI.Sound;
 using CompCube.UI.ViewManagers;
 using HMUI;
 using CompCube.Extensions;
+using CompCube.UI.BSML.EarlyLeaveWarning;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -26,7 +27,8 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly RoundResultsViewController _roundResultsViewController = null!;
         [Inject] private readonly OpponentViewController _opponentViewController = null!;
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
-        
+        [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
+         
         [Inject] private readonly IServerListener _serverListener = null!;
         [Inject] private readonly MatchManager _matchManager = null!;
         
@@ -58,7 +60,7 @@ namespace CompCube.UI.FlowCoordinators
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             SetTitle("Match Room");
-            showBackButton = false;
+            showBackButton = true;
             
             _votingScreenNavigationController = BeatSaberUI.CreateViewController<NavigationController>();
             
@@ -206,6 +208,14 @@ namespace CompCube.UI.FlowCoordinators
             _votingScreenNavigationController = BeatSaberUI.CreateViewController<NavigationController>();
             _votingScreenNavigationController.PushViewController(
                                                     _votingScreenViewController, null);
+        }
+
+        protected override void BackButtonWasPressed(ViewController viewController)
+        {
+            _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, () =>
+            {
+                _onMatchFinishedCallback?.Invoke();
+            });
         }
     }
 }

@@ -38,6 +38,7 @@ namespace CompCube.UI.FlowCoordinators
             _matchFlowCoordinator.PopulateData(packet, () =>
             {
                 DismissFlowCoordinator(_matchFlowCoordinator);
+                _serverListener.Disconnect();
             });
         }
 
