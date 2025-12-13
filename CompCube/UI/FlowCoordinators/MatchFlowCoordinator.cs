@@ -153,9 +153,15 @@ namespace CompCube.UI.FlowCoordinators
             try
             {
                 this.ReplaceViewControllerSynchronously(_waitingForMatchToStartViewController);
-                await _waitingForMatchToStartViewController.PopulateData(packet.Map, DateTime.UtcNow.AddSeconds(packet.TransitionToGameTime));
+                _waitingForMatchToStartViewController.SetPostParseCallback(() =>
+                {
+                    _waitingForMatchToStartViewController.PopulateData(packet.Map, DateTime.UtcNow.AddSeconds(packet.TransitionToGameTime));
+                });
             
                 await Task.Delay(packet.TransitionToGameTime * 1000);
+
+                if (!isActivated)
+                    return;
             
                 _matchManager.StartMatch(packet.Map, DateTime.UtcNow.AddSeconds(packet.UnpauseTime), _gameplaySetupViewManager.ProMode,
                     (results, so) =>

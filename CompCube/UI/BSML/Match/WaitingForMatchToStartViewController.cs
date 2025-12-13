@@ -34,22 +34,33 @@ namespace CompCube.UI.BSML.Match
          
         private DateTime? _startTime;
 
+        private Action? _postParseCallback = null!;
+
         [UIAction("#post-parse")]
         private void PostParse()
         {
             _customLevelBar ??= Resources.FindObjectsOfTypeAll<CustomLevelBar>()
                 .First(i => i.name == "WaitingForMatchStartLevelBar");
+            
+            _postParseCallback?.Invoke();
         }
         
         [UIAction("nothing")]
         private void Nothing(SegmentedControl _, int cell){}
-        
-        public async Task PopulateData(VotingMap votingMap, DateTime? startTime)
+
+        public void SetPostParseCallback(Action callback)
         {
-            // awful
-            while (_customLevelBar is null)
-                await Task.Delay(25);
+            if (_customLevelBar is null)
+            {
+                _postParseCallback = callback;
+                return;
+            }
             
+            callback?.Invoke();
+        } 
+        
+        public void PopulateData(VotingMap votingMap, DateTime? startTime)
+        {
             _startTime = startTime;
             
             _customLevelBar?.Setup(votingMap);

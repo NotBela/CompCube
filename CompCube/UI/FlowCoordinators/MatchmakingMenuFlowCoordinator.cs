@@ -11,18 +11,18 @@ namespace CompCube.UI.FlowCoordinators
 {
     public class MatchmakingMenuFlowCoordinator : FlowCoordinator, IInitializable, IDisposable
     {
-        [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null;
-        [Inject] private readonly MatchFlowCoordinator _matchFlowCoordinator = null;
-        [Inject] private readonly InfoFlowCoordinator _infoFlowCoordinator = null;
+        [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
+        [Inject] private readonly MatchFlowCoordinator _matchFlowCoordinator = null!;
+        [Inject] private readonly InfoFlowCoordinator _infoFlowCoordinator = null!;
         
-        [Inject] private readonly IServerListener _serverListener = null;
-        [Inject] private readonly MatchmakingMenuViewController _matchmakingMenuViewController = null;
+        [Inject] private readonly IServerListener _serverListener = null!;
+        [Inject] private readonly MatchmakingMenuViewController _matchmakingMenuViewController = null!;
         
         // [Inject] private readonly LoungeSaberLeaderboardViewController _leaderboardViewController = null;
-        [Inject] private readonly RankingDataTabSwitcherViewController _rankingDataTabSwitcherViewController = null;
-        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null;
+        [Inject] private readonly RankingDataTabSwitcherViewController _rankingDataTabSwitcherViewController = null!;
+        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
         
-        [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null;
+        [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null!;
         
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
