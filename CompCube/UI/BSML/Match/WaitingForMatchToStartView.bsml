@@ -5,6 +5,43 @@
         <level-bar name="WaitingForMatchStartLevelBar"/>
     </vertical>
     
+    <vertical>
+        <horizontal anchor-pos-y="15" spacing="2">
+            <vertical>
+                <img src="#ClockIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songDurationText" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#MetronomeIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songBpmText" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#NPSIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songNpsText" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#FastNotesIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songNjsText" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#MeasureIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songJdText" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#GameNoteIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text id="~songNoteCountText" text="--" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#ObstacleIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songWallCountText" align="Center"/>
+            </vertical>
+            <vertical>
+                <img src="#BombIcon" preserve-aspect="true" pref-width="4" pref-height="4"/>
+                <text text="~songBombCountText" align="Center"/>
+            </vertical>
+        </horizontal>
+    </vertical>
+    
     <horizontal anchor-pos-y="-10">
         <vertical spacing="1">
             <vertical bg="round-rect-panel" pref-width="80" pref-height="5.5">

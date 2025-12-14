@@ -7,6 +7,7 @@ using CompCube.Configuration;
 using CompCube.UI.BSML.Components.CustomLevelBar;
 using HMUI;
 using CompCube.Extensions;
+using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
 
@@ -16,6 +17,7 @@ namespace CompCube.UI.BSML.Match
     public class WaitingForMatchToStartViewController : BSMLAutomaticViewController, ITickable
     {
         [Inject] private readonly PluginConfig _config = null!;
+        [Inject] private readonly SiraLog _siraLog = null!;
         
         [UIValue("matchStartTimer")] private string MatchStartTimer { get; set; } = "";
 
@@ -34,7 +36,7 @@ namespace CompCube.UI.BSML.Match
          
         private DateTime? _startTime;
 
-        private Action? _postParseCallback = null!;
+        private Action? _postParseCallback = null;
 
         [UIAction("#post-parse")]
         private void PostParse()
@@ -57,13 +59,39 @@ namespace CompCube.UI.BSML.Match
             }
             
             callback?.Invoke();
-        } 
+        }
+
+        [UIValue("songDurationText")] private string SongDurationText { get; set; } = "";
+        [UIValue("songBpmText")] private string SongBpmText { get; set; } = "";
+        [UIValue("songNpsText")] private string SongNpsText { get; set; } = "";
+        [UIValue("songNjsText")] private string SongNjsText { get; set; } = "";
+        [UIValue("songJdText")] private string SongJdText { get; set; } = "";
+        [UIValue("songNoteCountText")] private string SongNoteCountText { get; set; } = "";
+        [UIValue("songWallCountText")] private string SongWallCountText { get; set; } = "";
+        [UIValue("songBombCountText")] private string SongBombCountText { get; set; } = "";
         
         public void PopulateData(VotingMap votingMap, DateTime? startTime)
         {
             _startTime = startTime;
             
             _customLevelBar?.Setup(votingMap);
+
+            var beatmap = votingMap.GetBeatmapLevel();
+
+            var data = beatmap?.GetDifficultyBeatmapData(beatmap.GetCharacteristics().First(), votingMap.GetBaseGameDifficultyType());
+            
+            _siraLog.Info(beatmap?.beatmapBasicData.First().Value.cuttableObjectsCount.ToString() ?? "nothing :(");
+
+            SongDurationText = $"{(int) beatmap?.songDuration! / 60}:{(int) beatmap?.songDuration % 60}";
+            SongBpmText = Mathf.RoundToInt((float) beatmap?.beatsPerMinute).ToString();
+            SongNjsText = $"{data?.noteJumpMovementSpeed}";
+            SongNpsText = $"{(data?.notesCount / beatmap.songDuration)::F1}";
+            SongJdText = $"{data?.noteJumpStartBeatOffset}";
+            SongNoteCountText = $"{data?.notesCount}";
+            SongWallCountText = $"{data?.obstaclesCount}";
+            SongBombCountText = $"{data?.bombsCount}";
+            
+            NotifyPropertyChanged(null);
 
             if (startTime == null)
             {
