@@ -5,6 +5,7 @@ using CompCube.UI.BSML.Menu;
 using CompCube.UI.FlowCoordinators.Events;
 using HMUI;
 using CompCube.Extensions;
+using CompCube.UI.ViewManagers;
 using Zenject;
 
 namespace CompCube.UI.FlowCoordinators
@@ -17,8 +18,8 @@ namespace CompCube.UI.FlowCoordinators
         
         [Inject] private readonly IServerListener _serverListener = null!;
         [Inject] private readonly MatchmakingMenuViewController _matchmakingMenuViewController = null!;
-        
-        // [Inject] private readonly LoungeSaberLeaderboardViewController _leaderboardViewController = null;
+
+        [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         [Inject] private readonly RankingDataTabSwitcherViewController _rankingDataTabSwitcherViewController = null!;
         [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
         
@@ -28,7 +29,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             showBackButton = true;
             SetTitle("CompCube");
-            ProvideInitialViewControllers(_matchmakingMenuViewController, rightScreenViewController: _rankingDataTabSwitcherViewController);
+            ProvideInitialViewControllers(_matchmakingMenuViewController, rightScreenViewController: _rankingDataTabSwitcherViewController, leftScreenViewController: _gameplaySetupViewManager.ManagedController);
         }
 
         private void OnMatchCreated(MatchCreatedPacket packet)
