@@ -115,6 +115,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             try
             {
+                _votingScreenNavigationController.PopViewController(() => {}, true);
                 this.ReplaceViewControllerSynchronously(_awaitingMapDecisionViewController);
                 
                 while (!_awaitingMapDecisionViewController.isActivated)

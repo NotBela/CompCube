@@ -79,23 +79,23 @@ namespace CompCube.UI.BSML.Match
             var beatmap = votingMap.GetBeatmapLevel();
             var key = votingMap.GetBeatmapKey();
 
-            var data = beatmapDataLoader.LoadBeatmapData();
-            var basicData = beatmapDataLoader.LoadBasicBeatmapData();
+            // var data = beatmapDataLoader.LoadBeatmapData();
+            // var basicData = beatmapDataLoader.LoadBasicBeatmapData();
             
             _siraLog.Info(key.beatmapCharacteristic.serializedName + " " + key.difficulty);
 
             var bpm = beatmap?.beatsPerMinute ?? 0;
-            var njs = 
-            var offset = 
+            // var njs = 
+            // var offset = 
             
             SongDurationText = $"{(int) beatmap?.songDuration! / 60}:{(int) beatmap?.songDuration % 60}";
             SongBpmText = Mathf.RoundToInt(bpm).ToString();
-            SongNjsText = $"{njs}";
-            SongNpsText = $"{(data?.cuttableNotesCount / beatmap.songDuration)::F1}";
-            SongJdText = $"{GetJumpDistance(bpm, njs, startOffset)}";
-            SongNoteCountText = $"{data?.cuttableNotesCount}";
-            SongWallCountText = $"{data?.obstaclesCount}";
-            SongBombCountText = $"{data?.bombsCount}";
+            // SongNjsText = $"{njs}";
+            // SongNpsText = $"{(data?.cuttableNotesCount / beatmap.songDuration)::F1}";
+            // SongJdText = $"{GetJumpDistance(bpm, njs, startOffset)}";
+            // SongNoteCountText = $"{data?.cuttableNotesCount}";
+            // SongWallCountText = $"{data?.obstaclesCount}";
+            // SongBombCountText = $"{data?.bombsCount}";
             
             NotifyPropertyChanged(null);
 
