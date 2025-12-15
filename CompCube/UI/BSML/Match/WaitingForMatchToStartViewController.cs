@@ -77,10 +77,11 @@ namespace CompCube.UI.BSML.Match
             _customLevelBar?.Setup(votingMap);
 
             var beatmap = votingMap.GetBeatmapLevel();
+            var key = votingMap.GetBeatmapKey();
 
-            var data = beatmap?.GetDifficultyBeatmapData(beatmap.GetCharacteristics().First(), votingMap.GetBaseGameDifficultyType());
+            var data = beatmap?.GetDifficultyBeatmapData(key.beatmapCharacteristic, key.difficulty);
             
-            _siraLog.Info(beatmap?.beatmapBasicData.First().Value.cuttableObjectsCount.ToString() ?? "nothing :(");
+            _siraLog.Info(key.beatmapCharacteristic.serializedName + " " + key.difficulty);
 
             SongDurationText = $"{(int) beatmap?.songDuration! / 60}:{(int) beatmap?.songDuration % 60}";
             SongBpmText = Mathf.RoundToInt((float) beatmap?.beatsPerMinute).ToString();
