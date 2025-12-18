@@ -145,8 +145,8 @@ namespace CompCube.UI.FlowCoordinators
         
         private void HandleMatchResults(MatchResultsPacket results)
         {
+            showBackButton = false;
             this.ReplaceViewControllerSynchronously(_matchResultsViewController);
-            
             _matchResultsViewController.PopulateData(results.FinalRedScore, results.FinalBlueScore, results.MmrChange, () => _onMatchFinishedCallback?.Invoke());
             
             if ((results.FinalRedScore > results.FinalBlueScore && _matchStateManager.OwnTeam == MatchStateManager.Team.Red) || 
