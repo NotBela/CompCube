@@ -226,7 +226,7 @@ namespace CompCube.UI.FlowCoordinators
 
         protected override void BackButtonWasPressed(ViewController viewController)
         {
-            _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, () =>
+            _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", () =>
             {
                 _onMatchFinishedCallback?.Invoke();
             });

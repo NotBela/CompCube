@@ -77,7 +77,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             if (_matchmakingMenuViewController.IsInMatchmakingQueue)
             {
-                _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, () =>
+                _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the matchmaking queue?", () =>
                 {
                     _serverListener.Disconnect();
                     _mainFlowCoordinator.DismissAllChildFlowCoordinators();
