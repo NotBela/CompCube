@@ -13,7 +13,7 @@ using Zenject;
 
 namespace CompCube.Server
 {
-    public class ServerListener : IServerListener
+    public class ServerListener : IServerListener, IDisposable
     {
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly SiraLog _siraLog = null!;
@@ -193,5 +193,7 @@ namespace CompCube.Server
                 }
             }
         }
+
+        public void Dispose() => Disconnect();
     }
 }
