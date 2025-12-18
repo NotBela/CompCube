@@ -42,7 +42,7 @@ public class DebugServerListener : IServerListener
 
         _isConnected = true;
         
-        onConnectedCallback?.Invoke(new JoinResponsePacket(true, ""));
+        onConnectedCallback?.Invoke(new JoinResponsePacket(false, ""));
         OnConnected?.Invoke();
         _siraLog.Info("connected");
 

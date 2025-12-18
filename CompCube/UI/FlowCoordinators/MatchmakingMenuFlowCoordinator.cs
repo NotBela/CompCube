@@ -5,6 +5,7 @@ using CompCube.UI.BSML.Menu;
 using CompCube.UI.FlowCoordinators.Events;
 using HMUI;
 using CompCube.Extensions;
+using CompCube.UI.BSML.EarlyLeaveWarning;
 using CompCube.UI.ViewManagers;
 using Zenject;
 
@@ -21,7 +22,7 @@ namespace CompCube.UI.FlowCoordinators
 
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         [Inject] private readonly RankingDataTabSwitcherViewController _rankingDataTabSwitcherViewController = null!;
-        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
+        [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
         
         [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null!;
         
@@ -72,13 +73,19 @@ namespace CompCube.UI.FlowCoordinators
             this.PresentFlowCoordinatorSynchronously(_infoFlowCoordinator);
         }
 
-        protected override void BackButtonWasPressed(ViewController _)
+        protected override void BackButtonWasPressed(ViewController viewController)
         {
-            _serverListener.Disconnect();
+            if (_matchmakingMenuViewController.IsInMatchmakingQueue)
+            {
+                _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, () =>
+                {
+                    _serverListener.Disconnect();
+                    _mainFlowCoordinator.DismissAllChildFlowCoordinators();
+                });
+                return;
+            }
+                
             _mainFlowCoordinator.DismissAllChildFlowCoordinators();
-            
-            // _mainFlowCoordinator.GetType().GetMethod("DismissChildFlowCoordinatorsRecursively", BindingFlags.NonPublic | BindingFlags.Instance)?.Invoke(_mainFlowCoordinator,
-            //     [false]);
         }
     }
 }  

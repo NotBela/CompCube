@@ -35,10 +35,10 @@ namespace CompCube.UI.BSML.Menu
         [UIComponent("queueTabSelector")] private readonly TabSelector _queueTabSelector = null!;
 
         [UIValue("is-queued")]
-        private bool IsInMatchmakingQueue
+        public bool IsInMatchmakingQueue
         {
             get => _isQueued;
-            set
+            private set
             {
                 _isQueued = value;
                 NotifyPropertyChanged(null);
@@ -62,7 +62,8 @@ namespace CompCube.UI.BSML.Menu
                 
                 _parserParams.EmitEvent("failedToConnectModalShow");
                 FailedToConnectReason = $"Reason: {response.Message}";
-                NotifyPropertyChanged(nameof(FailedToConnectReason));
+                IsInMatchmakingQueue = false;
+                NotifyPropertyChanged(null);
             });
         }
 
