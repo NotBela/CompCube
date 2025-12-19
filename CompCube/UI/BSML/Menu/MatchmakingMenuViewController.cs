@@ -8,6 +8,7 @@ using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube.Configuration;
 using CompCube.Interfaces;
 using CompCube.UI.BSML.Components;
+using HarmonyLib;
 using SiraUtil.Logging;
 using UnityEngine.UI;
 using Zenject;
@@ -41,6 +42,7 @@ namespace CompCube.UI.BSML.Menu
             private set
             {
                 _isQueued = value;
+                // _queueTabSelector.TextSegmentedControl.cells.Do(i => i.interactable = !value);
                 NotifyPropertyChanged(null);
             }
         }
@@ -65,6 +67,13 @@ namespace CompCube.UI.BSML.Menu
                 IsInMatchmakingQueue = false;
                 NotifyPropertyChanged(null);
             });
+        }
+        
+        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+            
+            NotifyPropertyChanged(null);
         }
 
         [UIAction("leaveMatchmakingPoolButtonOnClick")]
