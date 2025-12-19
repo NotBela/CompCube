@@ -26,6 +26,8 @@ public interface IServerListener
     public event Action<EventClosedPacket> OnEventClosed;
     
     public event Action<EventScoresUpdated> OnEventScoresUpdated;
+    
+    public bool Connected { get; }
 
     public Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback);
 

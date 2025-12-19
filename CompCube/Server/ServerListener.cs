@@ -43,7 +43,7 @@ namespace CompCube.Server
 
         [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
 
-        private bool Connected
+        public bool Connected
         {
             get
             {

@@ -19,7 +19,6 @@ public class DebugServerListener : IServerListener
     public event Action<RoundResultsPacket>? OnRoundResults;
     public event Action<RoundStartedPacket>? OnRoundStarted;
     public event Action<UserDisconnectedPacket>? OnUserDisconnected;
-    public event Action<MatchCreatedPacket>? OnMatchStarting;
     
     public event Action<MatchResultsPacket>? OnMatchResults;
     
@@ -35,7 +34,9 @@ public class DebugServerListener : IServerListener
     public event Action<EventScoresUpdated>? OnEventScoresUpdated;
 
     private bool _isConnected;
-    
+
+    public bool Connected => _isConnected;
+
     public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback)
     {
         await Task.Delay(1000);
@@ -78,17 +79,17 @@ public class DebugServerListener : IServerListener
                 _siraLog.Info("score submitted");
                 await Task.Delay(1000);
 
-                var scores = new Dictionary<CompCube_Models.Models.ClientData.UserInfo, Score>
+                var scores = new Dictionary<string, Score>
                 {
-                    { DebugApi.Self, new Score(0, 0, true, 0, true) },
-                    {DebugApi.DebugOpponent, new Score(0, 0, true, 0, true)}
+                    { DebugApi.Self.UserId, new Score(10000, .60f, true, 5, false) },
+                    {DebugApi.DebugOpponent.UserId, new Score(15000, .90f, true, 10, false)}
                 };
                 
-                OnMatchResults?.Invoke(new MatchResultsPacket(10, 1, 1));
+                // OnMatchResults?.Invoke(new MatchResultsPacket(10, 1, 1));
 
-                // OnRoundResults?.Invoke(new RoundResultsPacket(scores, 1, 1));
-                // await Task.Delay(1);
-                // OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30));
+                OnRoundResults?.Invoke(new RoundResultsPacket(scores, 1, 1));
+                await Task.Delay(1);
+                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30));
 
                 _siraLog.Info("match results invoked");
                 break;

@@ -23,27 +23,22 @@ namespace CompCube.UI.BSML.Menu
 
         [UIParams] private readonly BSMLParserParams _parserParams = null!;
 
-        public event Action? AboutButtonClicked;
+        private Action? _aboutButtonClickedCallback;
 
-        public event Action? EventsButtonClicked;
-
-        private bool _isQueued = false;
+        public void SetButtonCallbacks(Action aboutButtonClickedCallback)
+        {
+            _aboutButtonClickedCallback = aboutButtonClickedCallback;
+        }
+        
+        [UIAction("aboutButtonOnClick")]
+        private void AboutButtonClicked() => _aboutButtonClickedCallback?.Invoke();
         
         [UIValue("queueOptions")] 
         private readonly List<object> _queueOptions = [new QueueOptionTab("Casual 1v1", "standard_casual_1v1"), new QueueOptionTab("Competitive 1v1", "standard_competitive_1v1")];
 
         [UIComponent("queueTabSelector")] private readonly TabSelector _queueTabSelector = null!;
 
-        [UIValue("is-queued")]
-        private bool IsInMatchmakingQueue
-        {
-            get => _isQueued;
-            set
-            {
-                _isQueued = value;
-                NotifyPropertyChanged(null);
-            }
-        }
+        [UIValue("is-queued")] private bool IsInMatchmakingQueue => _serverListener.Connected;
 
         [UIValue("is-not-queued")]
         private bool IsNotInMatchmakingQueue => !IsInMatchmakingQueue;
@@ -53,8 +48,6 @@ namespace CompCube.UI.BSML.Menu
         [UIAction("joinMatchmakingPoolButtonOnClick")]
         private void HandleJoinMatchmakingPoolClicked()
         {
-            IsInMatchmakingQueue = true;
-            
             _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
             {
                 if (response.Successful) 
@@ -95,7 +88,7 @@ namespace CompCube.UI.BSML.Menu
             _queueOptions.Add(new QueueOptionTab("Debug", "debug"));
         }
 
-        private void HandleDisconnected() => IsInMatchmakingQueue = false;
+        private void HandleDisconnected() => NotifyPropertyChanged(null);
 
         public void Dispose()
         {

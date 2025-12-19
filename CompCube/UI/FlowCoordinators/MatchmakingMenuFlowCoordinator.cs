@@ -21,7 +21,6 @@ namespace CompCube.UI.FlowCoordinators
 
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         [Inject] private readonly RankingDataTabSwitcherViewController _rankingDataTabSwitcherViewController = null!;
-        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
         
         [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null!;
         
@@ -46,18 +45,19 @@ namespace CompCube.UI.FlowCoordinators
         public void Dispose()
         {
             _serverListener.OnMatchCreated -= OnMatchCreated;
-            _matchmakingMenuViewController.AboutButtonClicked -= OnAboutButtonClicked;
             _infoFlowCoordinator.OnBackButtonPressed -= OnInfoFlowCoordinatorBackButtonPressed;
-            _matchmakingMenuViewController.EventsButtonClicked -= OnEventsButtonClicked;
             _eventsFlowCoordinator.OnBackButtonPressed -= EventsFlowCoordinatorOnBackButtonPressed;
         }
         
         public void Initialize()
         {
+            _matchmakingMenuViewController.SetButtonCallbacks(() =>
+            {
+                this.PresentFlowCoordinatorSynchronously(_infoFlowCoordinator);
+            });
+            
             _serverListener.OnMatchCreated += OnMatchCreated;
-            _matchmakingMenuViewController.AboutButtonClicked += OnAboutButtonClicked;
             _infoFlowCoordinator.OnBackButtonPressed += OnInfoFlowCoordinatorBackButtonPressed;
-            _matchmakingMenuViewController.EventsButtonClicked += OnEventsButtonClicked;
             _eventsFlowCoordinator.OnBackButtonPressed += EventsFlowCoordinatorOnBackButtonPressed;
         }
 
@@ -76,9 +76,6 @@ namespace CompCube.UI.FlowCoordinators
         {
             _serverListener.Disconnect();
             _mainFlowCoordinator.DismissAllChildFlowCoordinators();
-            
-            // _mainFlowCoordinator.GetType().GetMethod("DismissChildFlowCoordinatorsRecursively", BindingFlags.NonPublic | BindingFlags.Instance)?.Invoke(_mainFlowCoordinator,
-            //     [false]);
         }
     }
 }  
