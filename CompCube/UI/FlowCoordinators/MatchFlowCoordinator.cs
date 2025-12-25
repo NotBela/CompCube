@@ -145,6 +145,9 @@ namespace CompCube.UI.FlowCoordinators
         
         private void HandleMatchResults(MatchResultsPacket results)
         {
+            // garbage
+            _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
+            
             showBackButton = false;
             this.ReplaceViewControllerSynchronously(_matchResultsViewController);
             _matchResultsViewController.PopulateData(results.FinalRedScore, results.FinalBlueScore, results.MmrChange, () => _onMatchFinishedCallback?.Invoke());
@@ -152,6 +155,8 @@ namespace CompCube.UI.FlowCoordinators
             if ((results.FinalRedScore > results.FinalBlueScore && _matchStateManager.OwnTeam == MatchStateManager.Team.Red) || 
                 (results.FinalBlueScore > results.FinalRedScore && _matchStateManager.OwnTeam == MatchStateManager.Team.Blue))
                 _soundEffectManager.PlayWinningMusic();
+            
+            _serverListener.Disconnect();
         }
 
         private async void TransitionToGame(BeginGameTransitionPacket packet)
