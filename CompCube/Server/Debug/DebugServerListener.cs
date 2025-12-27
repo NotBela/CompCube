@@ -65,7 +65,7 @@ public class DebugServerListener : IServerListener
                 await Task.Delay(1000);
                 OnMatchCreated?.Invoke(new MatchCreatedPacket([DebugApi.Self], [DebugApi.DebugOpponent]));
                 await Task.Delay(1);
-                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30));
+                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30, 1));
                 _siraLog.Info("join request");
                 break;
             case UserPacket.UserPacketTypes.Vote:
@@ -89,7 +89,7 @@ public class DebugServerListener : IServerListener
 
                 OnRoundResults?.Invoke(new RoundResultsPacket(scores, 1, 1));
                 await Task.Delay(1);
-                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30));
+                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30, 2));
 
                 _siraLog.Info("match results invoked");
                 break;

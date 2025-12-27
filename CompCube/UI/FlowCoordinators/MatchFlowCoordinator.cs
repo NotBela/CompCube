@@ -206,7 +206,7 @@ namespace CompCube.UI.FlowCoordinators
                 this.ReplaceViewControllerSynchronously(_votingScreenNavigationController);
             });
                 
-            _opponentViewController.UpdateRound(1);
+            _opponentViewController.UpdateRound(roundStartedPacket.Round);
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
