@@ -7,17 +7,25 @@ using CompCube_Models.Models.Packets.ServerPackets;
 using HMUI;
 using JetBrains.Annotations;
 using CompCube.Extensions;
+using SiraUtil.Logging;
+using TMPro;
 using UnityEngine;
+using Zenject;
 
 namespace CompCube.UI.BSML.Match;
 
 [ViewDefinition("CompCube.UI.BSML.Match.VotingScreenView.bsml")]
 public class VotingScreenViewController : BSMLAutomaticViewController
 {
+    [Inject] private readonly SiraLog _log = null!;
+    
     public event Action<VotingMap, List<VotingMap>>? MapSelected;
-        
+    public event Action<List<VotingMap>>? RanOutOfTime;
+
     [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null!;
     private VotingListDataSource _votingListDataSource = null!;
+
+    [UIComponent("voteStatusText")] private TextMeshProUGUI _voteStatusText = null!;
     
     private Action? _activationCallback = null;
 
@@ -53,10 +61,14 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         _votingListDataSource.TableView.didSelectCellWithIdxEvent += DidSelectCellWithIdxEvent;
     }
 
-    private void DidSelectCellWithIdxEvent(TableView tableView, int idx) => MapSelected?.Invoke(_votingListDataSource.Data[idx], _votingListDataSource.Data);
+    private void DidSelectCellWithIdxEvent(TableView tableView, int idx)
+    {
+        MapSelected?.Invoke(_votingListDataSource.Data[idx], _votingListDataSource.Data);
+    }
 
     public void PopulateData(VotingMap[] maps, int countdown)
     {
+        _log.Notice("Populating maps");
         StartCoroutine(PopulateDataCoroutine());
         return;
         
@@ -66,8 +78,22 @@ public class VotingScreenViewController : BSMLAutomaticViewController
             
             _votingListDataSource.SetData(maps.ToList());
             _votingListDataSource.TableView.ClearSelection();
-        
-            NotifyPropertyChanged(null);
+
+            yield return CountDown();
+        }
+
+        IEnumerator CountDown()
+        {
+            _log.Notice("Counting down");
+            int count = countdown - 5;
+            var time = DateTime.Now;
+            var finaliseVote = DateTime.Now.AddSeconds(count);
+            while (DateTime.Now < finaliseVote)
+            {
+                _voteStatusText.text = $"Please vote on a map to play!\nTime left: {(finaliseVote - DateTime.Now).Seconds}";
+                yield return new WaitForEndOfFrame();
+            }
+            RanOutOfTime?.Invoke(maps.ToList());
         }
     }
 }
