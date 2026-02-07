@@ -159,6 +159,9 @@ namespace CompCube.UI.FlowCoordinators
             // garbage
             _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
             
+            _opponentViewController.UpdatePoints(results.FinalRedScore, results.FinalBlueScore);
+            _opponentViewController.SetStatus("Match Concluded!");
+            
             showBackButton = false;
             this.ReplaceViewControllerSynchronously(_matchResultsViewController);
             _matchResultsViewController.PopulateData(results.FinalRedScore, results.FinalBlueScore, results.MmrChange, () => _onMatchFinishedCallback?.Invoke());

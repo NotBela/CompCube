@@ -88,10 +88,16 @@ public class VotingScreenViewController : BSMLAutomaticViewController
             int count = countdown - 5;
             var time = DateTime.Now;
             var finaliseVote = DateTime.Now.AddSeconds(count);
-            while (DateTime.Now < finaliseVote)
+            while (true)
             {
-                _voteStatusText.text = $"Please vote on a map to play!\nTime left: {(finaliseVote - DateTime.Now).Seconds}";
-                yield return new WaitForEndOfFrame();
+                var remaining = finaliseVote - DateTime.Now;
+                if (remaining.TotalSeconds <= 0)
+                    break;
+
+                _voteStatusText.text =
+                    $"Please vote on a map to play!\nTime left: {Mathf.CeilToInt((float)remaining.TotalSeconds)}";
+
+                yield return null;
             }
             RanOutOfTime?.Invoke(maps.ToList());
         }
