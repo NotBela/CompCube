@@ -206,9 +206,11 @@ namespace CompCube.UI.FlowCoordinators
 
         private void OnRoundStarted(RoundStartedPacket roundStartedPacket)
         {
+            _votingScreenViewController.SetCountdownTime(DateTime.Now.AddSeconds(roundStartedPacket.VotingTime));
+            
             _votingScreenViewController.SetActivationCallback(() =>
             { 
-                _votingScreenViewController.PopulateData(roundStartedPacket.Maps, roundStartedPacket.VotingTime);
+                _votingScreenViewController.PopulateData(roundStartedPacket.Maps);
             });
 
             if (!_roundResultsViewController.isActivated) 

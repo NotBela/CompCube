@@ -25,9 +25,11 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null!;
     private VotingListDataSource _votingListDataSource = null!;
 
-    [UIComponent("voteStatusText")] private TextMeshProUGUI _voteStatusText = null!;
+    [UIComponent("voteStatusText")] private readonly TextMeshProUGUI _voteStatusText = null!;
     
     private Action? _activationCallback = null;
+    
+    private DateTime? _timeWhenCountdownWillEnd = null;
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
@@ -66,7 +68,12 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         MapSelected?.Invoke(_votingListDataSource.Data[idx], _votingListDataSource.Data);
     }
 
-    public void PopulateData(VotingMap[] maps, int countdown)
+    public void SetCountdownTime(DateTime timeWhenCountdownWillEnd)
+    {
+        _timeWhenCountdownWillEnd = timeWhenCountdownWillEnd;
+    }
+
+    public void PopulateData(VotingMap[] maps)
     {
         _log.Notice("Populating maps");
         StartCoroutine(PopulateDataCoroutine());
@@ -85,12 +92,12 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         IEnumerator CountDown()
         {
             _log.Notice("Counting down");
-            int count = countdown - 5;
-            var time = DateTime.Now;
-            var finaliseVote = DateTime.Now.AddSeconds(count);
             while (true)
             {
-                var remaining = finaliseVote - DateTime.Now;
+                if (_timeWhenCountdownWillEnd == null)
+                    yield return null;
+                
+                var remaining = (_timeWhenCountdownWillEnd ?? DateTime.Now.AddSeconds(10)) - DateTime.Now;
                 if (remaining.TotalSeconds <= 0)
                     break;
 
