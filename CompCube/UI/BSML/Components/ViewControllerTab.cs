@@ -25,7 +25,7 @@ public class ViewControllerTab
     [UIAction("#post-parse")]
     private void PostParse()
     {
-        BSMLParser.Instance.Parse(_host.Content, _gameObject, _host);
+        BSMLParser.instance.Parse(_host.Content, _gameObject, _host);
     }
 
     public void Refresh()

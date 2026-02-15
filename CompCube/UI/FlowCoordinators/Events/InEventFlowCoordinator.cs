@@ -29,7 +29,7 @@ public class InEventFlowCoordinator : FlowCoordinator
 
     private Action? _backButtonPressedCallback;
     
-    protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+    public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         showBackButton = true;
         SetTitle("Event");
@@ -54,12 +54,12 @@ public class InEventFlowCoordinator : FlowCoordinator
         _eventWaitingOnNextMatchViewController.SetText("Event in progress!\nWaiting for host...");
     }
 
-    protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+    public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
         _serverListener.Disconnect();
     }
 
     public void Setup(Action? backButtonPressedCallback) => _backButtonPressedCallback = backButtonPressedCallback;
 
-    protected override void BackButtonWasPressed(ViewController _) => _backButtonPressedCallback?.Invoke();
+    public override void BackButtonWasPressed(ViewController _) => _backButtonPressedCallback?.Invoke();
 }

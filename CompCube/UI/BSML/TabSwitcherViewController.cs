@@ -23,7 +23,7 @@ public abstract class TabSwitcherViewController : BSMLViewController
     [UIAction("#post-parse")]
     protected void PostParse()
     {
-        TabSelector.TextSegmentedControl.ReloadData();
+        TabSelector.textSegmentedControl.ReloadData();
         TabSelector.Refresh();
         
         Tabs[0].Refresh();

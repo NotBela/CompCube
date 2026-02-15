@@ -58,7 +58,7 @@ namespace CompCube.UI.FlowCoordinators
             _onMatchFinishedCallback = onMatchFinishedCallback;
         }
         
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             SetTitle("Match Room");
             showBackButton = true;
@@ -90,7 +90,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 try
                 {
-                    await DismissChildFlowCoordinatorsRecursively();
+                    this.DismissAllChildFlowCoordinators();
                 }
                 catch(Exception e)
                 {
@@ -225,7 +225,7 @@ namespace CompCube.UI.FlowCoordinators
             _opponentViewController.UpdateRound(roundStartedPacket.Round);
         }
 
-        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+        public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             _votingScreenViewController.MapSelected -= HandleVotingScreenMapSelected;
             
@@ -245,7 +245,7 @@ namespace CompCube.UI.FlowCoordinators
                                                     _votingScreenViewController, null);
         }
 
-        protected override void BackButtonWasPressed(ViewController viewController)
+        public override void BackButtonWasPressed(ViewController viewController)
         {
             _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", () =>
             {

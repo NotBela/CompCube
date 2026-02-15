@@ -6,10 +6,9 @@ namespace CompCube.Extensions;
 
 public static class VotingMapExtensions
 {
-    [CanBeNull]
-    public static BeatmapLevel GetBeatmapLevel(this VotingMap votingMap)
+    public static IBeatmapLevel? GetBeatmapLevel(this VotingMap votingMap)
     {
-        return Loader.GetLevelByHash(votingMap.Hash);
+        return Loader.GetLevelByHash(votingMap.Hash) as IBeatmapLevel;
     }
 
     public static BeatmapDifficulty GetBaseGameDifficultyType(this VotingMap votingMap) => votingMap.Difficulty switch
@@ -31,7 +30,8 @@ public static class VotingMapExtensions
         BeatmapDifficulty.ExpertPlus => BeatmapDifficultyMask.ExpertPlus,
         _ => BeatmapDifficultyMask.All
     };
-    
-    public static BeatmapKey GetBeatmapKey(this VotingMap votingMap) => votingMap.GetBeatmapLevel()?.GetBeatmapKeys().First(i =>
-        i.beatmapCharacteristic.serializedName == "Standard" && i.difficulty == votingMap.GetBaseGameDifficultyType()) ?? throw new Exception("Could not find beatmap key!");
+
+    public static IDifficultyBeatmap? GetBeatmapKey(this VotingMap votingMap) => votingMap.GetBeatmapLevel()
+        ?.beatmapLevelData.difficultyBeatmapSets.First(i => i.beatmapCharacteristic.serializedName == "Standard")
+        .difficultyBeatmaps.First(i => i.difficulty == votingMap.GetBaseGameDifficultyType());
 }

@@ -32,13 +32,13 @@ public class EventsListViewController : BSMLAutomaticViewController
         
         var events = await _api.GetEvents();
 
-        _eventsList.Data = events.Select(i =>
+        _eventsList.data = events.Select(i =>
         {
             var slot = new EventSlot(i);
             slot.OnJoinButtonClicked += OnSlotJoinButtonClicked;
-            return slot;
+            return (object) slot;
         }).ToList();
-        _eventsList.TableView.ReloadData();
+        _eventsList.tableView.ReloadData();
         
         _parserParams.EmitEvent("loadingModalHide");
     }
@@ -54,6 +54,6 @@ public class EventsListViewController : BSMLAutomaticViewController
     {
         base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
 
-        _eventsList.Data.Cast<EventSlot>().Do(i => i.OnJoinButtonClicked -= OnSlotJoinButtonClicked);
+        _eventsList.data.Cast<EventSlot>().Do(i => i.OnJoinButtonClicked -= OnSlotJoinButtonClicked);
     }
 }

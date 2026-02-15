@@ -81,8 +81,6 @@ namespace CompCube.UI.BSML.Match
 
             // var data = beatmapDataLoader.LoadBeatmapData();
             // var basicData = beatmapDataLoader.LoadBasicBeatmapData();
-            
-            _siraLog.Info(key.beatmapCharacteristic.serializedName + " " + key.difficulty);
 
             var bpm = beatmap?.beatsPerMinute ?? 0;
             // var njs = 

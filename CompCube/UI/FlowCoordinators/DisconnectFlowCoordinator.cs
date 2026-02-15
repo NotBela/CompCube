@@ -9,7 +9,7 @@ public class DisconnectFlowCoordinator : FlowCoordinator
 {
     [Inject] private readonly DisconnectedViewController _disconnectedViewController = null!;
     
-    protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+    public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         SetTitle("CompCube");
         showBackButton = false;

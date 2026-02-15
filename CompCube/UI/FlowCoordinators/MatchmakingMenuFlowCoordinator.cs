@@ -26,7 +26,7 @@ namespace CompCube.UI.FlowCoordinators
         
         [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null!;
         
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             showBackButton = true;
             SetTitle("CompCube");
@@ -74,7 +74,7 @@ namespace CompCube.UI.FlowCoordinators
             this.PresentFlowCoordinatorSynchronously(_infoFlowCoordinator);
         }
 
-        protected override void BackButtonWasPressed(ViewController viewController)
+        public override void BackButtonWasPressed(ViewController viewController)
         {
             if (_serverListener.Connected)
             {

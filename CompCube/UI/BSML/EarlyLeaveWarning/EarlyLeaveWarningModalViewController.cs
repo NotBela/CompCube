@@ -21,7 +21,7 @@ public class EarlyLeaveWarningModalViewController : BSMLAutomaticViewController
 
         ModalText = text;
         
-        BSMLParser.Instance.Parse(Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "CompCube.UI.BSML.EarlyLeaveWarning.EarlyLeaveWarningModalView.bsml"), viewController.gameObject, this);
+        BSMLParser.instance.Parse(Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "CompCube.UI.BSML.EarlyLeaveWarning.EarlyLeaveWarningModalView.bsml"), viewController.gameObject, this);
         Show();
     }
 

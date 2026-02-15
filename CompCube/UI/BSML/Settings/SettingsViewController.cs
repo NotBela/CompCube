@@ -11,10 +11,9 @@ namespace CompCube.UI.BSML.Settings;
 [ViewDefinition("CompCube.UI.BSML.Settings.SettingsView.bsml")]
 public class SettingsViewController : BSMLAutomaticViewController, IInitializable, IDisposable
 {
-    [Inject] private readonly BSMLSettings _bsmlSettings = null;
-    [Inject] private readonly PluginConfig _config = null;
+    [Inject] private readonly PluginConfig _config = null!;
 
-    [UIParams] private readonly BSMLParserParams _parserParams = null;
+    [UIParams] private readonly BSMLParserParams _parserParams = null!;
 
     [UIValue("serverIp")]
     private string ServerIp
@@ -81,7 +80,7 @@ public class SettingsViewController : BSMLAutomaticViewController, IInitializabl
     [UIAction("invalidValueModalOkButtonOnClick")]
     private void OkButtonOnClick() => _parserParams.EmitEvent("invalidValueModalHide");
 
-    public void Initialize() => _bsmlSettings.AddSettingsMenu("CompCube", "CompCube.UI.BSML.Settings.SettingsView.bsml", this);
+    public void Initialize() => BSMLSettings.instance.AddSettingsMenu("CompCube", "CompCube.UI.BSML.Settings.SettingsView.bsml", this);
 
-    public void Dispose() => _bsmlSettings.RemoveSettingsMenu(this);
+    public void Dispose() => BSMLSettings.instance.RemoveSettingsMenu(this);
 }

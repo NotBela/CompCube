@@ -10,7 +10,6 @@ namespace CompCube.UI
     {
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
         [Inject] private readonly ServerCheckingFlowCoordinator _serverCheckingFlowCoordinator = null!;
-        [Inject] private readonly MenuButtons _menuButtons = null!;
         
         private readonly MenuButton _menuButton;
         
@@ -21,8 +20,8 @@ namespace CompCube.UI
 
         private void OnClick() => _mainFlowCoordinator.PresentFlowCoordinator(_serverCheckingFlowCoordinator);
 
-        public void Initialize() => _menuButtons.RegisterButton(_menuButton);
+        public void Initialize() => MenuButtons.instance.RegisterButton(_menuButton);
 
-        public void Dispose() => _menuButtons.UnregisterButton(_menuButton);
+        public void Dispose() => MenuButtons.instance.UnregisterButton(_menuButton);
     }
 }

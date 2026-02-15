@@ -2,7 +2,6 @@
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
-using BGLib.Polyglot;
 using CompCube.Interfaces;
 using CompCube.UI.BSML.Components;
 using HMUI;
@@ -91,14 +90,14 @@ namespace CompCube.UI.BSML.Leaderboard
 
         private void SetLeaderboardData(CompCube_Models.Models.ClientData.UserInfo[] userInfo)
         {
-            _leaderboard.Data = userInfo.Select(i =>
+            _leaderboard.data = userInfo.Select(i =>
             {
                 var leaderboardSlot = new LeaderboardSlot(i, i.UserId == _userModelWrapper.UserId);
                 leaderboardSlot.OnUserInfoButtonClicked += OnUserInfoButtonClicked;
-                return leaderboardSlot;
+                return (object) leaderboardSlot;
             }).ToList();
             
-            _leaderboard.TableView.ReloadData();
+            _leaderboard.tableView.ReloadData();
             IsLoaded = true;
         }
 
@@ -230,8 +229,8 @@ namespace CompCube.UI.BSML.Leaderboard
 
         public void Initialize()
         {
-            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_globalLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_GLOBAL")));
-            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_aroundPlayerLeaderboardIcon"), Localization.Get("BUTTON_HIGHSCORES_AROUND_YOU")));
+            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_globalLeaderboardIcon"), "Global"));
+            _cellData.Add(new IconSegmentedControl.DataItem(_platformLeaderboardViewController.GetField<Sprite, PlatformLeaderboardViewController>("_aroundPlayerLeaderboardIcon"), "Around You"));
         }
 
         public void Refresh()

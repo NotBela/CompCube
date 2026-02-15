@@ -31,9 +31,9 @@ public class SoundEffectManager : MonoBehaviour, IInitializable
         _audioSource.PlayOneShot(_gongAudioClip);
     }
 
-    public void PlayBeatmapLevelPreview(BeatmapLevel level) => PlayBeatmapLevelPreviewAsync(level);
+    public void PlayBeatmapLevelPreview(IBeatmapLevel level) => PlayBeatmapLevelPreviewAsync(level);
 
-    private async Task PlayBeatmapLevelPreviewAsync(BeatmapLevel level)
+    private async Task PlayBeatmapLevelPreviewAsync(IBeatmapLevel level)
     {
         var clip = await _audioClipAsyncLoader.LoadPreview(level);
 

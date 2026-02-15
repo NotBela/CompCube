@@ -48,7 +48,7 @@ namespace CompCube.UI.BSML.Menu
         [UIAction("joinMatchmakingPoolButtonOnClick")]
         private void HandleJoinMatchmakingPoolClicked()
         {
-            _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
+            _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.textSegmentedControl.selectedCellNumber]).Queue, (response) =>
             {
                 if (response.Successful) 
                     return;

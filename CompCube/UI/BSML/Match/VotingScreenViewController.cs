@@ -54,9 +54,9 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     void PostParse()
     {
         _votingListDataSource = gameObject.AddComponent<VotingListDataSource>();
-        _mapListTableData.TableView.SetDataSource(_votingListDataSource, true);
+        _mapListTableData.tableView.SetDataSource(_votingListDataSource, true);
         
-        _votingListDataSource.Init(_mapListTableData.TableView);
+        _votingListDataSource.Init(_mapListTableData.tableView);
         
         Destroy(_mapListTableData);
         
@@ -142,7 +142,7 @@ public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
         TableView.ReloadData();
     }
 
-    public float CellSize(int idx) => 8.5f;
+    public float CellSize() => 8.5f;
 
     public int NumberOfCells() => Data.Count;
 
@@ -158,7 +158,7 @@ public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
         }
 
         var info = Data[idx];
-        cell.SetDataFromLevelAsync(info.GetBeatmapLevel(), false,false, false, true);
+        cell.SetDataFromLevelAsync(info.GetBeatmapLevel(), false,false, false);
 
         return cell;
     }

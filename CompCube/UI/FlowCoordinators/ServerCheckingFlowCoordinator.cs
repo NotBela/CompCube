@@ -26,7 +26,7 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
     [Inject] private readonly SiraLog _siraLog = null!;
     [Inject] private readonly PluginConfig _config = null!;
 
-    protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+    public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         showBackButton = true;
         SetTitle("CompCube");
@@ -43,7 +43,7 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
         Task.Run(async () => await _serverChecker.CheckServer());
     }
 
-    protected override void BackButtonWasPressed(ViewController _)
+    public override void BackButtonWasPressed(ViewController _)
     {
         _mainFlowCoordinator.DismissFlowCoordinator(this);
     }
@@ -91,7 +91,7 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
         _cantConnectToServerViewController.SetReasonText(reason);
     }
 
-    protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+    public override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
     {
         _cantConnectToServerViewController.OnContinueButtonPressed -= OnContinueButtonPressed;
         _serverChecker.ServerCheckFailed -= OnServerCheckFailed;

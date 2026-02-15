@@ -35,8 +35,7 @@ public class CustomLevelBar : MonoBehaviour
         if (map != null) // happens when vote is forced and player didn't vote
         {
             // cannot use BeatmapKey overload because it is broken ??
-            LevelBar.Setup(map.GetBeatmapLevel(), map.GetBaseGameDifficultyType(),
-                map.GetBeatmapLevel()?.GetCharacteristics().First(i => i.serializedName == "Standard"));
+            LevelBar.Setup(map.GetBeatmapLevel());
         }
         else
         {

@@ -23,16 +23,14 @@ public class StandardLevelDetailViewManager : ViewManager
         
         _votedCallback = voteClickedCallback;
         
+        // fuck
         _standardLevelDetailViewController.SetData(
             votingMap.GetBeatmapLevel(), 
             true, 
+            true, 
             "Vote", 
             votingMap.GetBaseGameDifficultyTypeMask(), 
-            votingMap.GetBeatmapLevel()?.beatmapBasicData.Keys
-                .Select(i => i.characteristic)
-                .Where(i => i.serializedName != "Standard")
-                .ToArray()
-            );
+            []);
     }
 
     protected override void SetupManagedController()

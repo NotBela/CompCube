@@ -11,12 +11,12 @@ public class InfoFlowCoordinator : FlowCoordinator
     
     public event Action? OnBackButtonPressed;
     
-    protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+    public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         SetTitle("CompCube");
         ProvideInitialViewControllers(_infoViewController);
         showBackButton = true;
     }
 
-    protected override void BackButtonWasPressed(ViewController _) => OnBackButtonPressed?.Invoke();
+    public override void BackButtonWasPressed(ViewController _) => OnBackButtonPressed?.Invoke();
 }

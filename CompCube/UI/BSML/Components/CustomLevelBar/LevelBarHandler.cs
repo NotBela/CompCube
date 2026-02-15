@@ -9,9 +9,9 @@ public class LevelBarHandler : TypeHandler<CustomLevelBar>
 {
     public override void HandleType(BSMLParser.ComponentTypeWithData componentType, BSMLParserParams parserParams)
     {
-        var levelBar = componentType.Component as CustomLevelBar;
+        var levelBar = componentType.component as CustomLevelBar;
 
-        if (!componentType.Data.TryGetValue("name", out var name))
+        if (!componentType.data.TryGetValue("name", out var name))
             throw new Exception("Level bar name never declared!");
 
         levelBar!.name = name;

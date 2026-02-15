@@ -24,7 +24,7 @@ public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposabl
     [Inject] private readonly InEventFlowCoordinator _inEventFlowCoordinator = null!;
     public event Action? OnBackButtonPressed;
     
-    protected override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+    public override async void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
         try
         {
@@ -75,7 +75,8 @@ public class EventsFlowCoordinator : FlowCoordinator, IInitializable, IDisposabl
         }
     }
 
-    protected override void BackButtonWasPressed(ViewController _) => OnBackButtonPressed?.Invoke();
+    public override void BackButtonWasPressed(ViewController _) => OnBackButtonPressed?.Invoke();
+    
     public void Initialize()
     {
         _eventsListViewController.OnEventJoinRequested += OnEventJoinRequested;

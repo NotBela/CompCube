@@ -19,7 +19,7 @@ public static class FlowCoordinatorExtensions
         if (flowCoordinator.topViewController == viewController)
             return;
         
-        while (flowCoordinator.isInTransition)
+        while (flowCoordinator._isInTransition)
             await Task.Delay(25);
             
         flowCoordinator.StartCoroutine(PresentViewControllerSynchronouslyCoroutine(flowCoordinator, viewController, immediately: immediately));
@@ -42,7 +42,7 @@ public static class FlowCoordinatorExtensions
 
     public static void PresentFlowCoordinatorSynchronously(this FlowCoordinator parent, FlowCoordinator flowCoordinator, bool immediately = false)
     {
-        while (parent.isInTransition);
+        while (parent._isInTransition);
         
         parent.StartCoroutine(PresentFlowCoordinatorCoroutine(parent, flowCoordinator, immediately));
     }
