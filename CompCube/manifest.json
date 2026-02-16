@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
-  "id": "LoungeSaber",
-  "name": "LoungeSaber",
+  "id": "CompCube",
+  "name": "CompCube",
   "author": "Bela",
   "version": "1.0.0",
   "description": "",
