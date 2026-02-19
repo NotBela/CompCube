@@ -37,7 +37,6 @@ public class MatchManager
         var beatmapLevel = level.GetBeatmapLevel() ?? throw new Exception("Could not get beatmap level!");
             
         // 1.39.1
-        /*
         _menuTransitionsHelper.StartStandardLevel(
             "Solo",
             level.GetBeatmapKey(),
@@ -58,10 +57,9 @@ public class MatchManager
             AfterSceneSwitchToMenuCallback,
             null
         );
-        */
             
         // 1.40.8
-        _menuTransitionsHelper.StartStandardLevel(
+        /*_menuTransitionsHelper.StartStandardLevel(
             "Solo",
             level.GetBeatmapKey(),
             beatmapLevel,
@@ -80,7 +78,7 @@ public class MatchManager
             diContainer => AfterSceneSwitchToGameplayCallback(diContainer, unpauseTime),
             AfterSceneSwitchToMenuCallback,
             null
-        );
+        );*/
     }
 
     public void StopMatch(Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? menuSwitchCallback = null)
