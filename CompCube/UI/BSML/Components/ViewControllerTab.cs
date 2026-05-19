@@ -27,12 +27,4 @@ public class ViewControllerTab
     {
         BSMLParser.Instance.Parse(_host.Content, _gameObject, _host);
     }
-
-    public void Refresh()
-    {
-        if (_host is not IRefreshableView refreshableHost)
-            return;
-        
-        refreshableHost.Refresh();
-    }
 }

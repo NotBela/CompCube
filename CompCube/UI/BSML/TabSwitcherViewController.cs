@@ -25,13 +25,5 @@ public abstract class TabSwitcherViewController : BSMLViewController
     {
         TabSelector.TextSegmentedControl.ReloadData();
         TabSelector.Refresh();
-        
-        Tabs[0].Refresh();
-    }
-
-    [UIAction("onCellSelected")]
-    protected void OnCellSelected(object _, int index)
-    {
-        Tabs[index].Refresh();
     }
 }

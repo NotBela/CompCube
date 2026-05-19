@@ -85,12 +85,11 @@ public class DebugServerListener : IServerListener
                     { DebugApi.Self.UserId, new Score(10000, .60f, true, 5, false) },
                     {DebugApi.DebugOpponent.UserId, new Score(15000, .90f, true, 10, false)}
                 };
-                
-                // OnMatchResults?.Invoke(new MatchResultsPacket(10, 1, 1));
 
-                OnRoundResults?.Invoke(new RoundResultsPacket(scores, 1, 1));
-                await Task.Delay(1);
-                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30, 2));
+                // OnRoundResults?.Invoke(new RoundResultsPacket(scores, 1, 1));
+                OnMatchResults?.Invoke(new MatchResultsPacket(10, 1, 1));
+                // await Task.Delay(1);
+                // OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30, 2));
 
                 _siraLog.Info("match results invoked");
                 break;

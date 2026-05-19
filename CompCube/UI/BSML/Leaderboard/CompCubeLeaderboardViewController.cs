@@ -18,16 +18,26 @@ using Zenject;
 namespace CompCube.UI.BSML.Leaderboard
 {
     [ViewDefinition("CompCube.UI.BSML.Leaderboard.LeaderboardView.bsml")]
-    public class CompCubeLeaderboardViewController : BSMLAutomaticViewController, IInitializable, IRefreshableView
+    public class CompCubeLeaderboardViewController : BSMLAutomaticViewController, IInitializable
     {
-        [Inject] private readonly PlatformLeaderboardViewController _platformLeaderboardViewController = null;
-        [Inject] private readonly IApi _api = null;
-        [Inject] private readonly SiraLog _siraLog = null;
-        [Inject] private readonly DiContainer _container = null;
+        [Inject] private readonly PlatformLeaderboardViewController _platformLeaderboardViewController = null!;
+        [Inject] private readonly IApi _api = null!;
+        [Inject] private readonly SiraLog _siraLog = null!;
+        [Inject] private readonly DiContainer _container = null!;
 
-        [Inject] private readonly UserModelWrapper _userModelWrapper = null;
+        [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
 
-        [UIParams] private readonly BSMLParserParams _parserParams = null;
+        [UIParams] private readonly BSMLParserParams _parserParams = null!;
+
+        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+
+            if (firstActivation)
+                return;
+            
+            Refresh();
+        }
         
         [UIAction("#post-parse")]
         private async void PostParse()
@@ -113,10 +123,10 @@ namespace CompCube.UI.BSML.Leaderboard
         private bool IsLoading => !IsLoaded;
 
         [UIComponent("leaderboardTableView")]
-        private readonly CustomListTableData leaderboardTableData = null;
+        private readonly CustomListTableData leaderboardTableData = null!;
         
         [UIComponent("leaderboardTableView")]
-        internal readonly Transform leaderboardTransform = null;
+        internal readonly Transform leaderboardTransform = null!;
         
         internal PlayerCellDataSource _playerCellDataSource = null;
 
@@ -300,6 +310,7 @@ namespace CompCube.UI.BSML.Leaderboard
 
         public void Refresh()
         {
+            _playerCellDataSource.TableView.SelectCellWithIdx(0);
             this.SetLeaderboardState(LeaderboardStates.Global);
         }
     }
