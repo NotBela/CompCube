@@ -1,4 +1,5 @@
-﻿using BeatSaberMarkupLanguage;
+﻿using System.Collections;
+using BeatSaberMarkupLanguage;
 using CompCube_Models.Models.Map;
 using CompCube_Models.Models.Packets;
 using CompCube_Models.Models.Packets.ServerPackets;
@@ -75,10 +76,9 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnBeginGameTransition += TransitionToGame;
             _serverListener.OnRoundResults += OnRoundResults;
             _serverListener.OnMatchResults += HandleMatchResults;
+            _serverListener.OnPlayerVoted += HandlePlayerVoted;
             _disconnectHandler.ShouldShowDisconnectScreen += HandleShouldShowDisconnectScreen;
         }
-
-
 
         private void HandleShouldShowDisconnectScreen(string reason, bool matchOnly)
         {
@@ -203,6 +203,19 @@ namespace CompCube.UI.FlowCoordinators
                 _siraLog.Error(e);
             }
         }
+        
+        private void HandlePlayerVoted(PlayerVotedPacket packet)
+        {
+            StartCoroutine(WaitForPlayerToVote());
+            return;
+            
+            IEnumerator WaitForPlayerToVote()
+            {
+                yield return new WaitUntil(() => _awaitingMapDecisionViewController.isActivated);
+                
+                _awaitingMapDecisionViewController.PopulateOpponentVote(packet);
+            }
+        }
 
         private void OnRoundStarted(RoundStartedPacket roundStartedPacket)
         {
@@ -233,6 +246,7 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnBeginGameTransition -= TransitionToGame;
             _serverListener.OnRoundResults -= OnRoundResults;
             _serverListener.OnMatchResults -= HandleMatchResults;
+            _serverListener.OnPlayerVoted -= HandlePlayerVoted;
             _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
         }
 

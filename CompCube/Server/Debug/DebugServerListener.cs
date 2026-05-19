@@ -69,7 +69,8 @@ public class DebugServerListener : IServerListener
                 _siraLog.Info("join request");
                 break;
             case UserPacket.UserPacketTypes.Vote:
-                OnPlayerVoted?.Invoke(new PlayerVotedPacket(0, DebugApi.DebugOpponent.UserId));
+                await Task.Delay(5000);
+                OnPlayerVoted?.Invoke(new PlayerVotedPacket(DebugApi.Maps[0]));
                 await Task.Delay(1000);
                 OnBeginGameTransition?.Invoke(new BeginGameTransitionPacket(DebugApi.Maps[0], 15,
                     10));
