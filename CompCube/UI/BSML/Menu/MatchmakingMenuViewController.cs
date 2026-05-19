@@ -15,7 +15,7 @@ using Zenject;
 namespace CompCube.UI.BSML.Menu
 {
     [ViewDefinition("CompCube.UI.BSML.Menu.MatchmakingMenuView.bsml")]
-    public class MatchmakingMenuViewController : BSMLAutomaticViewController, IInitializable, IDisposable
+    public class MatchmakingMenuViewController : BSMLAutomaticViewController, IInitializable
     {
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly IServerListener _serverListener = null!;
@@ -38,16 +38,13 @@ namespace CompCube.UI.BSML.Menu
 
         [UIComponent("queueTabSelector")] private readonly TabSelector _queueTabSelector = null!;
 
-        [UIValue("is-queued")] private bool IsInMatchmakingQueue => _serverListener.Connected;
-
-        [UIValue("is-not-queued")]
-        private bool IsNotInMatchmakingQueue => !IsInMatchmakingQueue;
-
         [UIValue("failedToConnectReason")] private string FailedToConnectReason { get; set; } = "";
 
         [UIAction("joinMatchmakingPoolButtonOnClick")]
         private void HandleJoinMatchmakingPoolClicked()
         {
+            SetState(true);
+            
             _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
             {
                 if (response.Successful) 
@@ -56,16 +53,30 @@ namespace CompCube.UI.BSML.Menu
                 _parserParams.EmitEvent("failedToConnectModalShow");
                 FailedToConnectReason = $"Reason: {response.Message}";
                 NotifyPropertyChanged(nameof(FailedToConnectReason));
+                SetState(false);
             });
-            
-            NotifyPropertyChanged(null);
+        }
+
+        [UIComponent("join-pool-button")] private readonly Button _joinPoolButton = null!;
+
+        [UIComponent("leave-pool-button")] private readonly Button _leavePoolButton = null!;
+
+        [UIComponent("about-button")] private readonly Button _aboutButton = null!;
+
+        [UIComponent("events-button")] private readonly Button _eventsButton = null!;
+        private void SetState(bool connected)
+        {
+            _joinPoolButton.interactable = !connected;
+            _leavePoolButton.gameObject.SetActive(connected);
+            _aboutButton.interactable = !connected;
+            _eventsButton.interactable = !connected;
         }
         
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
             
-            NotifyPropertyChanged(null);
+            SetState(false);
         }
 
         [UIAction("leaveMatchmakingPoolButtonOnClick")]
@@ -86,9 +97,6 @@ namespace CompCube.UI.BSML.Menu
 
         public void Initialize()
         {
-            _serverListener.OnDisconnected += HandleDisconnected;
-            _serverListener.OnConnected += HandleConnected;
-            
             if (!_config.ConnectToDebugQueue)
                 return;
             
@@ -96,19 +104,6 @@ namespace CompCube.UI.BSML.Menu
                 return;
             
             _queueOptions.Add(new QueueOptionTab("Debug", "debug"));
-        }
-
-        private void HandleConnected()
-        {
-            NotifyPropertyChanged(null);
-        }
-
-        private void HandleDisconnected() => NotifyPropertyChanged(null);
-
-        public void Dispose()
-        {
-            _serverListener.OnDisconnected -= HandleDisconnected;
-            _serverListener.OnConnected -= HandleConnected;
         }
     }
 }

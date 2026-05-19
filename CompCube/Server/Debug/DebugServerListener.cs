@@ -101,7 +101,8 @@ public class DebugServerListener : IServerListener
     public void Disconnect()
     {
         if (!_isConnected) return;
-        
+
+        _isConnected = false;
         OnDisconnected?.Invoke();
     }
 }

@@ -10,19 +10,19 @@
     </macro.for-each>
     
     <vertical anchor-pos-x="0" anchor-pos-y="-15">
-        <primary-button on-click="joinMatchmakingPoolButtonOnClick" text="Find Match" pref-width='34' pref-height='10' interactable="~is-not-queued"/>
+        <primary-button on-click="joinMatchmakingPoolButtonOnClick" text="Find Match" pref-width='34' pref-height='10' id="join-pool-button"/>
     </vertical>
     
     <vertical anchor-pos-x="0" anchor-pos-y="10">
-        <button on-click="leaveMatchmakingPoolButtonOnClick" text="Cancel" preferred-width="24" pref-height="8" active="~is-queued"/>
+        <button on-click="leaveMatchmakingPoolButtonOnClick" text="Cancel" preferred-width="24" pref-height="8" id="leave-pool-button" active="false"/>
     </vertical>
 
     <vertical pref-width="5" pref-height="5" anchor-pos-y="-10" horizontal-fit="PreferredSize">
-        <button text="About" on-click="aboutButtonOnClick" interactable="~is-not-queued"/>
+        <button text="About" on-click="aboutButtonOnClick" id="about-button"/>
     </vertical>
     
     <vertical anchor-pos-y="-15" pref-width="5" pref-height="5">
-        <button text="Events" on-click="eventsButtonOnClick" active="false"/>
+        <button text="Events" on-click="events-button-on-click" active="false" id="events-button"/>
     </vertical>
     
     <modal move-to-center="true" click-off-closes="true" show-event="disconnectModalShowEvent" hide-event="disconnectModalHideEvent" size-delta-x="70" size-delta-y="40">
