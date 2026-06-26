@@ -12,10 +12,10 @@ public class OpponentViewController : BSMLAutomaticViewController
     [UIValue("redText")] private string RedText { get; set; }
     [UIValue("blueText")] private string BlueText { get; set; }
     
-    public void PopulateData(CompCube_Models.Models.ClientData.UserInfo[] redTeam, CompCube_Models.Models.ClientData.UserInfo[] blueTeam)
+    public void PopulateData(CompCube_Models.Models.ClientData.UserInfo red, CompCube_Models.Models.ClientData.UserInfo blue)
     {
-        RedText = redTeam[0].GetFormattedUserName();
-        BlueText = blueTeam[0].GetFormattedUserName();
+        RedText = red.GetFormattedUserName();
+        BlueText = red.GetFormattedUserName();
         
         NotifyPropertyChanged(null);
     }

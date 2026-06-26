@@ -62,39 +62,8 @@ public class DebugServerListener : IServerListener
         switch (packet.PacketType)
         {
             case UserPacket.UserPacketTypes.JoinRequest:
-                await Task.Delay(1000);
-                OnMatchCreated?.Invoke(new MatchCreatedPacket([DebugApi.Self], [DebugApi.DebugOpponent]));
-                await Task.Delay(1);
-                OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30, 1));
-                _siraLog.Info("join request");
+                OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
                 break;
-            case UserPacket.UserPacketTypes.Vote:
-                await Task.Delay(5000);
-                OnPlayerVoted?.Invoke(new PlayerVotedPacket(DebugApi.Maps[0]));
-                await Task.Delay(1000);
-                OnBeginGameTransition?.Invoke(new BeginGameTransitionPacket(DebugApi.Maps[0], 15,
-                    10));
-                _siraLog.Info("voted");
-                break;
-            case UserPacket.UserPacketTypes.ScoreSubmission:
-                _siraLog.Info("score submitted");
-                await Task.Delay(1000);
-
-                var scores = new Dictionary<string, Score>
-                {
-                    { DebugApi.Self.UserId, new Score(10000, .60f, true, 5, false) },
-                    {DebugApi.DebugOpponent.UserId, new Score(15000, .90f, true, 10, false)}
-                };
-
-                // OnRoundResults?.Invoke(new RoundResultsPacket(scores, 1, 1));
-                OnMatchResults?.Invoke(new MatchResultsPacket(10, 1, 1));
-                // await Task.Delay(1);
-                // OnRoundStarted?.Invoke(new RoundStartedPacket(DebugApi.Maps, 30, 2));
-
-                _siraLog.Info("match results invoked");
-                break;
-            default:
-                throw new NotImplementedException();
         }
     }
 

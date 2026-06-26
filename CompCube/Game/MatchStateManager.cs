@@ -1,6 +1,8 @@
-﻿using CompCube_Models.Models.Packets.ServerPackets;
+﻿using CompCube_Models.Models.Map;
+using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube.Interfaces;
 using HarmonyLib;
+using SiraUtil.Logging;
 using Zenject;
 
 namespace CompCube.Game;
@@ -8,64 +10,70 @@ namespace CompCube.Game;
 public class MatchStateManager : IInitializable, IDisposable
 {
     [Inject] private readonly IServerListener _serverListener = null!;
-
+    [Inject] private readonly SiraLog _siraLog = null!;
     [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
 
-    public Dictionary<CompCube_Models.Models.ClientData.UserInfo, Team> Players { get; private set; } = new();
-    
-    public List<CompCube_Models.Models.ClientData.UserInfo> RedTeam => Players.Where(i => i.Value == Team.Red).Select(i => i.Key).ToList();
-    public List<CompCube_Models.Models.ClientData.UserInfo> BlueTeam => Players.Where(i => i.Value == Team.Blue).Select(i => i.Key).ToList();
-    
-    public Dictionary<Team, int> Points { get; private set; } = new();
+    public CompCube_Models.Models.ClientData.UserInfo RedPlayer { get; private set; }
+    public CompCube_Models.Models.ClientData.UserInfo BluePlayer { get; private set; }
 
-    public Team OwnTeam => Players.First(i =>
-        i.Key.UserId == _userModelWrapper.UserId).Value;
+    public int RedHealth { get; private set; } = 1000000;
+    public int BlueHealth { get; private set; } = 1000000;
+    
+    public float RedMultiplier { get; private set; } = 1f;
+    public float BlueMultiplier { get; private set; } = 1f;
+    
+    public int DiscardedMapCount { get; private set; } = 0;
 
+    public bool InDiscardPhase { get; private set; } = true;
+
+    public List<VotingMap> Maps = [];
+
+    public bool IsRedTeam => RedPlayer.UserId == _userModelWrapper.UserId;
+    
+    public bool CanDiscardMaps => InDiscardPhase && DiscardedMapCount < 2;
+
+    public void DiscardMap(VotingMap map)
+    {
+        Maps.Remove(map);
+        DiscardedMapCount++;
+    }
     
     public void Initialize()
     {
         _serverListener.OnMatchCreated += HandleMatchCreated;
-        _serverListener.OnUserDisconnected += HandleUserDisconnected;
-        _serverListener.OnDisconnected += HandleDisconnect;
-    }
-
-    private void HandleDisconnect()
-    {
-        Players.Clear();
-        Points.Clear();
-    }
-
-    private void HandleUserDisconnected(UserDisconnectedPacket packet)
-    {
-        Players.Remove(Players.First(i => i.Key.UserId == packet.UserId).Key);
+        _serverListener.OnRoundResults += HandleRoundResults;
     }
 
     private void HandleMatchCreated(MatchCreatedPacket matchCreated)
     {
-        matchCreated.Red.Do(i => Players.Add(i, Team.Red));
-        matchCreated.Blue.Do(i => Players.Add(i, Team.Blue));
+        RedPlayer = matchCreated.Red;
+        BluePlayer = matchCreated.Blue;
+        
+        RedHealth = 1000000;
+        BlueHealth = 1000000;
 
-        Points[Team.Red] = 0;
-        Points[Team.Blue] = 0;
+        RedMultiplier = 1f;
+        BlueMultiplier = 1f;
+
+        Maps = matchCreated.InitialMaps.ToList();
+
+        DiscardedMapCount = 0;
+        
+        InDiscardPhase = true;
     }
     
     private void HandleRoundResults(RoundResultsPacket results)
     {
-        Points[Team.Red] = results.RedPoints;
-        Points[Team.Blue] = results.BluePoints;
+        RedHealth = results.RedHealth;
+        BlueHealth = results.BlueHealth;
+        
+        RedMultiplier = results.RedMultiplier;
+        BlueMultiplier = results.BlueMultiplier;
     }
 
     public void Dispose()
     {
         _serverListener.OnMatchCreated -= HandleMatchCreated;
         _serverListener.OnRoundResults -= HandleRoundResults;
-        _serverListener.OnUserDisconnected -= HandleUserDisconnected;
-        _serverListener.OnDisconnected -= HandleDisconnect;
-    }
-
-    public enum Team
-    {
-        Red,
-        Blue
     }
 }

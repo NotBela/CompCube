@@ -55,8 +55,18 @@ namespace CompCube.UI.FlowCoordinators
             _opponentViewController.PopulateData(packet.Red, packet.Blue);
             _opponentViewController.UpdateRound(1);
             _opponentViewController.UpdatePoints(0, 0);
+
+            StartCoroutine(WaitForVotingScreenToPresent());
             
             _onMatchFinishedCallback = onMatchFinishedCallback;
+            return;
+            
+            IEnumerator WaitForVotingScreenToPresent()
+            {
+                yield return new WaitUntil(() => _votingScreenViewController.isActivated);
+                
+                _votingScreenViewController.PopulateData(packet.InitialMaps, 30);
+            }
         }
         
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -69,15 +79,8 @@ namespace CompCube.UI.FlowCoordinators
             ProvideInitialViewControllers(_votingScreenNavigationController, _gameplaySetupViewManager.ManagedController, bottomScreenViewController: _opponentViewController);
             _votingScreenNavigationController.PushViewController(_votingScreenViewController, null);
             
-            _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
-            _votingScreenViewController.RanOutOfTime += VotingScreenViewControllerOnRanOutOfTime;
-            
-            _serverListener.OnRoundStarted += OnRoundStarted;
-            _serverListener.OnBeginGameTransition += TransitionToGame;
-            _serverListener.OnRoundResults += OnRoundResults;
-            _serverListener.OnMatchResults += HandleMatchResults;
-            _serverListener.OnPlayerVoted += HandlePlayerVoted;
             _disconnectHandler.ShouldShowDisconnectScreen += HandleShouldShowDisconnectScreen;
+            _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
         }
 
         private void HandleShouldShowDisconnectScreen(string reason, bool matchOnly)
@@ -98,8 +101,8 @@ namespace CompCube.UI.FlowCoordinators
                 }
             });
         }
-
-        private void HandleVotingScreenMapSelected(VotingMap votingMap, List<VotingMap> votingMaps)
+        
+        private void HandleVotingScreenMapSelected(VotingMap votingMap)
         {
             if (!_standardLevelDetailViewManager.ManagedController.isActivated)
                 _votingScreenNavigationController.PushViewController(_standardLevelDetailViewManager.ManagedController,
@@ -110,143 +113,36 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, votingMaps, HandleVoteButtonPressed);
+            _standardLevelDetailViewManager.SetData(votingMap, HandleButtonPressed, "Discard", _matchStateManager.CanDiscardMaps);
             
             _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
         }
 
-        private async void HandleVoteButtonPressed(VotingMap votingMap, List<VotingMap> votingMaps, bool ranOutOfTime = false)
+        private async void HandleButtonPressed(VotingMap votingMap)
         {
             try
             {
-                _votingScreenNavigationController.PopViewController(() => {}, true);
-                this.ReplaceViewControllerSynchronously(_awaitingMapDecisionViewController);
-                
-                while (!_awaitingMapDecisionViewController.isActivated)
-                    await Task.Delay(25);
-                
-                _awaitingMapDecisionViewController.PopulateData(votingMap, votingMaps);
-                
+                _votingScreenNavigationController.PopViewController(() => {}, false);_votingScreenNavigationController.PopViewController(() => {}, false);
                 _soundEffectManager.CrossfadeToDefault();
-
-                if (!ranOutOfTime)
-                {
-                    await _serverListener.SendPacket(new VotePacket(votingMaps.IndexOf(votingMap)));
-                }
-            }
-            catch (Exception e)
-            {
-                _siraLog.Error(e);
-            }
-        }
-        
-        private void VotingScreenViewControllerOnRanOutOfTime(List<VotingMap> votingMaps)
-        {
-            HandleVoteButtonPressed(null!, votingMaps);
-        }
-
-        private void OnRoundResults(RoundResultsPacket results)
-        {
-            this.ReplaceViewControllerSynchronously(_roundResultsViewController);
-            
-            _roundResultsViewController.PopulateData(results);
-            
-            _opponentViewController.UpdatePoints(results.RedPoints, results.BluePoints);
-        }
-        
-        private void HandleMatchResults(MatchResultsPacket results)
-        {
-            // garbage
-            _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
-            
-            _opponentViewController.UpdatePoints(results.FinalRedScore, results.FinalBlueScore);
-            _opponentViewController.SetStatus("Match Concluded!");
-            
-            showBackButton = false;
-            this.ReplaceViewControllerSynchronously(_matchResultsViewController);
-            _matchResultsViewController.PopulateData(results.FinalRedScore, results.FinalBlueScore, results.MmrChange, () => _onMatchFinishedCallback?.Invoke());
-            
-            if ((results.FinalRedScore > results.FinalBlueScore && _matchStateManager.OwnTeam == MatchStateManager.Team.Red) || 
-                (results.FinalBlueScore > results.FinalRedScore && _matchStateManager.OwnTeam == MatchStateManager.Team.Blue))
-                _soundEffectManager.PlayWinningMusic();
-            
-            _serverListener.Disconnect();
-        }
-
-        private async void TransitionToGame(BeginGameTransitionPacket packet)
-        {
-            try
-            {
-                this.ReplaceViewControllerSynchronously(_waitingForMatchToStartViewController);
-                _waitingForMatchToStartViewController.SetPostParseCallback(() =>
-                {
-                    _waitingForMatchToStartViewController.PopulateData(packet.Map, DateTime.UtcNow.AddSeconds(packet.TransitionToGameTime));
-                });
+                _votingScreenViewController.ClearSelection();
                 
-                _soundEffectManager.PlayGongSoundEffect();
-            
-                await Task.Delay(packet.TransitionToGameTime * 1000);
-
-                if (!isActivated)
+                if (_matchStateManager.InDiscardPhase)
+                {
+                    _votingScreenViewController.DiscardMap(votingMap);
+                    await _serverListener.SendPacket(new DiscardMapPacket(votingMap));
                     return;
-            
-                _matchManager.StartMatch(packet.Map, DateTime.UtcNow.AddSeconds(packet.UnpauseTime), _gameplaySetupViewManager.ProMode,
-                    (results, so) =>
-                    {
-                        this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController, true);
-
-                        _serverListener.SendPacket(new ScoreSubmissionPacket(results.multipliedScore, ScoreModel.ComputeMaxMultipliedScoreForBeatmap(so.transformedBeatmapData), results.gameplayModifiers.proMode, results.notGoodCount, results.fullCombo));
-                    });
+                }
+                
+                
             }
             catch (Exception e)
             {
                 _siraLog.Error(e);
             }
-        }
-        
-        private void HandlePlayerVoted(PlayerVotedPacket packet)
-        {
-            StartCoroutine(WaitForPlayerToVote());
-            return;
-            
-            IEnumerator WaitForPlayerToVote()
-            {
-                yield return new WaitUntil(() => _awaitingMapDecisionViewController.isActivated);
-                
-                _awaitingMapDecisionViewController.PopulateOpponentVote(packet);
-            }
-        }
-
-        private void OnRoundStarted(RoundStartedPacket roundStartedPacket)
-        {
-            _votingScreenViewController.SetCountdownTime(DateTime.Now.AddSeconds(roundStartedPacket.VotingTime));
-            
-            _votingScreenViewController.SetActivationCallback(() =>
-            { 
-                _votingScreenViewController.PopulateData(roundStartedPacket.Maps);
-            });
-
-            if (!_roundResultsViewController.isActivated) 
-                return;
-            
-            _roundResultsViewController.SetContinueButtonCallback(() =>
-            {
-                ResetNavigationController();
-                this.ReplaceViewControllerSynchronously(_votingScreenNavigationController);
-            });
-                
-            _opponentViewController.UpdateRound(roundStartedPacket.Round);
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
-            _votingScreenViewController.MapSelected -= HandleVotingScreenMapSelected;
-            
-            _serverListener.OnRoundStarted -= OnRoundStarted;
-            _serverListener.OnBeginGameTransition -= TransitionToGame;
-            _serverListener.OnRoundResults -= OnRoundResults;
-            _serverListener.OnMatchResults -= HandleMatchResults;
-            _serverListener.OnPlayerVoted -= HandlePlayerVoted;
             _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
         }
 

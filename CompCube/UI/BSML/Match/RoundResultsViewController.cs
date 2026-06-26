@@ -19,21 +19,14 @@ namespace CompCube.UI.BSML.Match
         
         private Action? _onContinueButtonPressedCallback = null;
         
-        [UIValue("titleBgColor")] private string TitleBgColor { get; set; } = "#0000FF";
-        [UIValue("titleText")] private string TitleText { get; set; } = String.Empty;
+        [UIValue("redPlayerName")] private string RedPlayerName { get; set; } = "";
+        [UIValue("bluePlayerName")] private string BluePlayerName { get; set; } = "";
         
-        [UIValue("winnerScoreText")] private string WinnerScoreText { get; set; }
-        [UIValue("loserScoreText")] private string LoserScoreText { get; set; }
         
         public void PopulateData(RoundResultsPacket results)
         {
-            var scores = results.Scores.OrderByDescending(i => i.Value.Points)
-                .Select(i => new MatchScore(_matchStateManager.Players.First(j => j.Key.UserId == i.Key).Key, i.Value)).ToArray();
-
-            TitleText = $"{scores[0].User.Username} wins!";
-            
-            WinnerScoreText = FormatScore(scores[0], 1);
-            LoserScoreText = FormatScore(scores[1], 2);
+            RedPlayerName = _matchStateManager.RedPlayer.GetFormattedUserName();
+            BluePlayerName = _matchStateManager.BluePlayer.GetFormattedUserName();
             
             NotifyPropertyChanged(null);
         }

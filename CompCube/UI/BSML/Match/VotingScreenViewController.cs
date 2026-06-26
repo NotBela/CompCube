@@ -7,6 +7,7 @@ using CompCube_Models.Models.Packets.ServerPackets;
 using HMUI;
 using JetBrains.Annotations;
 using CompCube.Extensions;
+using CompCube.Game;
 using SiraUtil.Logging;
 using TMPro;
 using UnityEngine;
@@ -18,9 +19,10 @@ namespace CompCube.UI.BSML.Match;
 public class VotingScreenViewController : BSMLAutomaticViewController
 {
     [Inject] private readonly SiraLog _log = null!;
+    [Inject] private readonly MatchStateManager _matchStateManager = null!;
     
-    public event Action<VotingMap, List<VotingMap>>? MapSelected;
-    public event Action<List<VotingMap>>? RanOutOfTime;
+    public event Action<VotingMap>? MapSelected;
+    public event Action? RanOutOfTime;
 
     [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null!;
     private VotingListDataSource _votingListDataSource = null!;
@@ -28,8 +30,6 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     [UIComponent("voteStatusText")] private readonly TextMeshProUGUI _voteStatusText = null!;
     
     private Action? _activationCallback = null;
-    
-    private DateTime? _timeWhenCountdownWillEnd = null;
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
@@ -37,17 +37,6 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         
         _activationCallback?.Invoke();
         _activationCallback = null;
-    }
-
-    public void SetActivationCallback(Action callback)
-    {
-        if (isActivated)
-        {
-            callback?.Invoke();
-            return;
-        }
-        
-        _activationCallback = callback;
     }
 
     [UIAction("#post-parse")]
@@ -65,15 +54,21 @@ public class VotingScreenViewController : BSMLAutomaticViewController
 
     private void DidSelectCellWithIdxEvent(TableView tableView, int idx)
     {
-        MapSelected?.Invoke(_votingListDataSource.Data[idx], _votingListDataSource.Data);
+        MapSelected?.Invoke(_votingListDataSource.Data[idx]);
     }
 
-    public void SetCountdownTime(DateTime timeWhenCountdownWillEnd)
+    public void ClearSelection()
     {
-        _timeWhenCountdownWillEnd = timeWhenCountdownWillEnd;
+        _mapListTableData.TableView.ClearSelection();
+    }
+    public void DiscardMap(VotingMap map)
+    {
+        _votingListDataSource.Data.Remove(map);
+        _votingListDataSource.TableView.ReloadData();
+        _matchStateManager.DiscardMap(map);
     }
 
-    public void PopulateData(VotingMap[] maps)
+    public void PopulateData(VotingMap[] maps, int waitTime)
     {
         _log.Notice("Populating maps");
         StartCoroutine(PopulateDataCoroutine());
@@ -91,22 +86,21 @@ public class VotingScreenViewController : BSMLAutomaticViewController
 
         IEnumerator CountDown()
         {
+            var countdownFinishTime = DateTime.Now.AddSeconds(waitTime);
+            
             _log.Notice("Counting down");
             while (true)
             {
-                if (_timeWhenCountdownWillEnd == null)
-                    yield return null;
-                
-                var remaining = (_timeWhenCountdownWillEnd ?? DateTime.Now.AddSeconds(10)) - DateTime.Now;
+                var remaining = countdownFinishTime - DateTime.Now;
                 if (remaining.TotalSeconds <= 0)
                     break;
 
                 _voteStatusText.text =
-                    $"Please vote on a map to play!\nTime left: {Mathf.CeilToInt((float)remaining.TotalSeconds)}";
+                    $"Discard Phase\nDiscard up to two maps that you don't want to play!\nTime left: {Mathf.CeilToInt((float)remaining.TotalSeconds)}";
 
                 yield return null;
             }
-            RanOutOfTime?.Invoke(maps.ToList());
+            RanOutOfTime?.Invoke();
         }
     }
 }

@@ -17,20 +17,14 @@ public class MatchResultsViewController : BSMLAutomaticViewController
     [UIValue("titleText")] private string TitleText { get; set; } = "You Win";
 
     [UIValue("mmrChangeText")] private string MmrChangeText { get; set; } = "";
-    [UIValue("scoreText")] private string ScoreText { get; set; } = "";
     
     private Action? _continueButtonPressedCallback = null;
     
-    public void PopulateData(int redScore, int blueScore, int mmrChange, Action continueButtonPressedCallback)
+    public void PopulateData(bool won, int mmrChange, Action continueButtonPressedCallback)
     {
-        var winningTeam = redScore > blueScore ? MatchStateManager.Team.Red : MatchStateManager.Team.Blue;
-        
-        var won = winningTeam == _stateManager.OwnTeam;
         _continueButtonPressedCallback = continueButtonPressedCallback;
-        TitleText = won ? "You Win!" : "You Lose!";
+        TitleText = won ? "Victory!" : "Defeat!";
         TitleBgColor = won ? "#0000FF" : "#FF0000";
-        
-        ScoreText = $"{redScore} -  {blueScore}";
 
         MmrChangeText =
             $"You {(won ? "gained" : "lost")}: {mmrChange.ToString().FormatWithHtmlColor(won ? "#90EE90" : "#FF7F7F")} MMR";

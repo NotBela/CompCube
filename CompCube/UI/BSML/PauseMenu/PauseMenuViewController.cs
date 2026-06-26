@@ -41,11 +41,11 @@ public class PauseMenuViewController : BSMLAutomaticViewController, IInitializab
         _floatingScreen.gameObject.SetActive(true);
     }
 
-    public void PopulateData(DateTime time, CompCube_Models.Models.ClientData.UserInfo[] red, CompCube_Models.Models.ClientData.UserInfo[] blue, int redPoints, int bluePoints)
+    public void PopulateData(DateTime time, CompCube_Models.Models.ClientData.UserInfo red, CompCube_Models.Models.ClientData.UserInfo blue, int redPoints, int bluePoints)
     {
         _matchStartingTime = time;
         
-        OpponentText = $"{red[0].GetFormattedUserName()} vs. {blue[0].GetFormattedUserName()}";
+        OpponentText = $"{red.GetFormattedUserName()} vs. {blue.GetFormattedUserName()}";
         PointsText = $"{redPoints} - {bluePoints}";
         NotifyPropertyChanged(null);
     }
