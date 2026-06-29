@@ -1,7 +1,6 @@
 ﻿using CompCube_Models.Models.Match;
 using CompCube_Models.Models.Packets;
 using CompCube_Models.Models.Packets.ServerPackets;
-using CompCube_Models.Models.Packets.ServerPackets.Event;
 using CompCube_Models.Models.Packets.UserPackets;
 using CompCube.Interfaces;
 using SiraUtil.Logging;
@@ -14,24 +13,14 @@ public class DebugServerListener : IServerListener
     [Inject] private readonly SiraLog _siraLog = null!;
     
     public event Action<MatchCreatedPacket>? OnMatchCreated;
-    public event Action<PlayerVotedPacket>? OnPlayerVoted;
-    public event Action<BeginGameTransitionPacket>? OnBeginGameTransition;
+    public event Action<BeginGameTransitionPacket>? OnShouldBeginGameTransition;
+    public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
+    public event Action<MapSelectionPacket>? OnMapSelection;
     public event Action<RoundResultsPacket>? OnRoundResults;
-    public event Action<RoundStartedPacket>? OnRoundStarted;
-    public event Action<UserDisconnectedPacket>? OnUserDisconnected;
-    
-    public event Action<MatchResultsPacket>? OnMatchResults;
-    
-    public event Action? OnDisconnected;
+    public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
     public event Action? OnConnected;
-    public event Action<PrematureMatchEndPacket>? OnPrematureMatchEnd;
-    
-    public event Action<EventStartedPacket>? OnEventStarted;
-    
-    public event Action<EventMapSelected>? OnEventMapSelected;
-    public event Action<EventMatchStartedPacket>? OnEventMatchStarted;
-    public event Action<EventClosedPacket>? OnEventClosed;
-    public event Action<EventScoresUpdated>? OnEventScoresUpdated;
+    public event Action? OnDisconnected;
+
 
     private bool _isConnected;
 
@@ -53,6 +42,8 @@ public class DebugServerListener : IServerListener
 
     public async Task SendPacket(UserPacket packet)
     {
+        _siraLog.Info($"sent packet {packet.PacketType.ToString()}");
+        
         if (!_isConnected)
         {
             _siraLog.Info("tried to send packet when not connected!");
@@ -63,6 +54,9 @@ public class DebugServerListener : IServerListener
         {
             case UserPacket.UserPacketTypes.JoinRequest:
                 OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
+                break;
+            case UserPacket.UserPacketTypes.DiscardMap:
+                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps));
                 break;
         }
     }

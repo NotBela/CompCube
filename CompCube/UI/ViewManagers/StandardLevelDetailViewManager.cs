@@ -30,7 +30,12 @@ public class StandardLevelDetailViewManager : ViewManager
                 .Where(i => i.serializedName != "Standard")
                 .ToArray()
             );
-        _standardLevelDetailViewController._standardLevelDetailView.actionButton.interactable = buttonInteractable;
+        ChangeButtonInteractability(buttonInteractable);
+    }
+
+    public void ChangeButtonInteractability(bool interactable)
+    {
+        _standardLevelDetailViewController._standardLevelDetailView.actionButton.interactable = interactable;
     }
 
     protected override void SetupManagedController()

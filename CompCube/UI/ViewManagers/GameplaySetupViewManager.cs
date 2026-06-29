@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
 using HMUI;
-using CompCube.UI.FlowCoordinators;
-using CompCube.UI.FlowCoordinators.Events;
 using Zenject;
 
 namespace CompCube.UI.ViewManagers;

@@ -22,7 +22,7 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     [Inject] private readonly MatchStateManager _matchStateManager = null!;
     
     public event Action<VotingMap>? MapSelected;
-    public event Action? RanOutOfTime;
+    private Action? _ranOutOfTimeCallback = null;
 
     [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null!;
     private VotingListDataSource _votingListDataSource = null!;
@@ -68,10 +68,13 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         _matchStateManager.DiscardMap(map);
     }
 
-    public void PopulateData(VotingMap[] maps, int waitTime)
+    public void PopulateData(VotingMap[] maps, int waitTime, Action? timerRanOutCallback = null)
     {
         _log.Notice("Populating maps");
         StartCoroutine(PopulateDataCoroutine());
+        
+        _ranOutOfTimeCallback = timerRanOutCallback;
+        
         return;
         
         IEnumerator PopulateDataCoroutine()
@@ -100,7 +103,8 @@ public class VotingScreenViewController : BSMLAutomaticViewController
 
                 yield return null;
             }
-            RanOutOfTime?.Invoke();
+            _ranOutOfTimeCallback?.Invoke();
+            _ranOutOfTimeCallback = null;
         }
     }
 }

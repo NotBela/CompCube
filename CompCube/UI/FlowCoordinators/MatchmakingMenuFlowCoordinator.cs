@@ -2,7 +2,6 @@
 using CompCube.Interfaces;
 using CompCube.UI.BSML.Leaderboard;
 using CompCube.UI.BSML.Menu;
-using CompCube.UI.FlowCoordinators.Events;
 using HMUI;
 using CompCube.Extensions;
 using CompCube.UI.BSML.EarlyLeaveWarning;
@@ -23,8 +22,6 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         [Inject] private readonly CompCubeLeaderboardViewController _leaderboardViewController = null!;
         [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
-        
-        [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null!;
         
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -48,7 +45,6 @@ namespace CompCube.UI.FlowCoordinators
         {
             _serverListener.OnMatchCreated -= OnMatchCreated;
             _infoFlowCoordinator.OnBackButtonPressed -= OnInfoFlowCoordinatorBackButtonPressed;
-            _eventsFlowCoordinator.OnBackButtonPressed -= EventsFlowCoordinatorOnBackButtonPressed;
         }
         
         public void Initialize()
@@ -60,12 +56,7 @@ namespace CompCube.UI.FlowCoordinators
             
             _serverListener.OnMatchCreated += OnMatchCreated;
             _infoFlowCoordinator.OnBackButtonPressed += OnInfoFlowCoordinatorBackButtonPressed;
-            _eventsFlowCoordinator.OnBackButtonPressed += EventsFlowCoordinatorOnBackButtonPressed;
         }
-
-        private void EventsFlowCoordinatorOnBackButtonPressed() => DismissFlowCoordinator(_eventsFlowCoordinator);
-
-        private void OnEventsButtonClicked() => this.PresentFlowCoordinatorSynchronously(_eventsFlowCoordinator);
 
         private void OnInfoFlowCoordinatorBackButtonPressed() => DismissFlowCoordinator(_infoFlowCoordinator);
 

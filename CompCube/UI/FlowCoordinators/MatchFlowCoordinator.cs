@@ -22,7 +22,6 @@ namespace CompCube.UI.FlowCoordinators
     public class MatchFlowCoordinator : FlowCoordinator
     {
         [Inject] private readonly VotingScreenViewController _votingScreenViewController = null!;
-        [Inject] private readonly AwaitingMapDecisionViewController _awaitingMapDecisionViewController = null!;
         [Inject] private readonly WaitingForMatchToStartViewController _waitingForMatchToStartViewController = null!;
         [Inject] private readonly AwaitMatchEndViewController _awaitMatchEndViewController = null!;
         [Inject] private readonly RoundResultsViewController _roundResultsViewController = null!;
@@ -81,6 +80,27 @@ namespace CompCube.UI.FlowCoordinators
             
             _disconnectHandler.ShouldShowDisconnectScreen += HandleShouldShowDisconnectScreen;
             _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
+            _serverListener.OnPickPhaseStarted += OnPickPhaseStarted;
+        }
+
+        private void OnPickPhaseStarted(StartPickPhasePacket packet)
+        {
+            if (_matchStateManager.IsRedTeam)
+            {
+                StartCoroutine(PickMapCoroutine());
+                return;
+            }
+
+            return;
+            
+            IEnumerator PickMapCoroutine()
+            {
+                this.ReplaceViewControllerSynchronously(_votingScreenNavigationController);
+                
+                yield return new WaitUntil(() => _votingScreenViewController.isActivated);
+                
+                _votingScreenViewController.PopulateData(packet.AvailableMaps, 30);
+            }
         }
 
         private void HandleShouldShowDisconnectScreen(string reason, bool matchOnly)
@@ -113,7 +133,7 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, HandleButtonPressed, "Discard", _matchStateManager.CanDiscardMaps);
+            _standardLevelDetailViewManager.SetData(votingMap, HandleButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps);
             
             _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
         }
@@ -125,15 +145,16 @@ namespace CompCube.UI.FlowCoordinators
                 _votingScreenNavigationController.PopViewController(() => {}, false);_votingScreenNavigationController.PopViewController(() => {}, false);
                 _soundEffectManager.CrossfadeToDefault();
                 _votingScreenViewController.ClearSelection();
+                _votingScreenViewController.DiscardMap(votingMap);
                 
                 if (_matchStateManager.InDiscardPhase)
                 {
-                    _votingScreenViewController.DiscardMap(votingMap);
                     await _serverListener.SendPacket(new DiscardMapPacket(votingMap));
                     return;
                 }
                 
-                
+                await _serverListener.SendPacket(new MapSelectionPacket(votingMap));
+                _standardLevelDetailViewManager.ChangeButtonInteractability(false);
             }
             catch (Exception e)
             {

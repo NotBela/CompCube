@@ -18,9 +18,8 @@ public class MatchStateManager : IInitializable, IDisposable
 
     public int RedHealth { get; private set; } = 1000000;
     public int BlueHealth { get; private set; } = 1000000;
-    
-    public float RedMultiplier { get; private set; } = 1f;
-    public float BlueMultiplier { get; private set; } = 1f;
+
+    public float DamageMultiplier { get; private set; }= 1f;
     
     public int DiscardedMapCount { get; private set; } = 0;
 
@@ -42,6 +41,13 @@ public class MatchStateManager : IInitializable, IDisposable
     {
         _serverListener.OnMatchCreated += HandleMatchCreated;
         _serverListener.OnRoundResults += HandleRoundResults;
+        _serverListener.OnPickPhaseStarted += HandlePickPhaseStarted;
+    }
+
+    private void HandlePickPhaseStarted(StartPickPhasePacket packet)
+    {
+        Maps = packet.AvailableMaps.ToList();
+        InDiscardPhase = false;
     }
 
     private void HandleMatchCreated(MatchCreatedPacket matchCreated)
@@ -52,8 +58,7 @@ public class MatchStateManager : IInitializable, IDisposable
         RedHealth = 1000000;
         BlueHealth = 1000000;
 
-        RedMultiplier = 1f;
-        BlueMultiplier = 1f;
+        DamageMultiplier = 1.0f;
 
         Maps = matchCreated.InitialMaps.ToList();
 
@@ -66,14 +71,14 @@ public class MatchStateManager : IInitializable, IDisposable
     {
         RedHealth = results.RedHealth;
         BlueHealth = results.BlueHealth;
-        
-        RedMultiplier = results.RedMultiplier;
-        BlueMultiplier = results.BlueMultiplier;
+
+        DamageMultiplier = results.DamageMultiplier;
     }
 
     public void Dispose()
     {
         _serverListener.OnMatchCreated -= HandleMatchCreated;
         _serverListener.OnRoundResults -= HandleRoundResults;
+        _serverListener.OnPickPhaseStarted -= HandlePickPhaseStarted;
     }
 }
