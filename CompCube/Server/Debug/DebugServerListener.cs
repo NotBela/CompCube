@@ -58,6 +58,9 @@ public class DebugServerListener : IServerListener
             case UserPacket.UserPacketTypes.DiscardMap:
                 OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps));
                 break;
+            case UserPacket.UserPacketTypes.MapSelection:
+                
+                break;
         }
     }
 

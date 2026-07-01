@@ -28,6 +28,7 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly OpponentViewController _opponentViewController = null!;
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
         [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
+        [Inject] private readonly WaitingForOpponentsPickViewController _waitingForOpponentsPickViewController = null!;
          
         [Inject] private readonly IServerListener _serverListener = null!;
         [Inject] private readonly MatchManager _matchManager = null!;
@@ -91,6 +92,7 @@ namespace CompCube.UI.FlowCoordinators
                 return;
             }
 
+            StartCoroutine(WaitForMapToBePickedCoroutine());
             return;
             
             IEnumerator PickMapCoroutine()
@@ -100,6 +102,14 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
                 _votingScreenViewController.PopulateData(packet.AvailableMaps, 30);
+            }
+
+            IEnumerator WaitForMapToBePickedCoroutine()
+            {
+                yield return new WaitUntil(() => !_standardLevelDetailViewManager.ManagedController.isActivated);
+                
+                this.ReplaceViewControllerSynchronously(_waitingForOpponentsPickViewController);
+                _waitingForOpponentsPickViewController.PopulateData(_matchStateManager.Opponent.GetFormattedUserName());
             }
         }
 
@@ -133,7 +143,7 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, HandleButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps);
+            _standardLevelDetailViewManager.SetData(votingMap, HandleButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps || !_matchStateManager.InDiscardPhase);
             
             _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
         }
@@ -142,7 +152,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             try
             {
-                _votingScreenNavigationController.PopViewController(() => {}, false);_votingScreenNavigationController.PopViewController(() => {}, false);
+                _votingScreenNavigationController.PopViewController(() => {}, true);
                 _soundEffectManager.CrossfadeToDefault();
                 _votingScreenViewController.ClearSelection();
                 _votingScreenViewController.DiscardMap(votingMap);
@@ -154,11 +164,33 @@ namespace CompCube.UI.FlowCoordinators
                 }
                 
                 await _serverListener.SendPacket(new MapSelectionPacket(votingMap));
-                _standardLevelDetailViewManager.ChangeButtonInteractability(false);
+                ShowMapPreviewViewAndStartMatch(votingMap);
             }
             catch (Exception e)
             {
                 _siraLog.Error(e);
+            }
+        }
+
+        private void ShowMapPreviewViewAndStartMatch(VotingMap map)
+        {
+            StartCoroutine(WaitForSecondsAndStartMatch());
+            return;
+            
+            IEnumerator WaitForSecondsAndStartMatch()
+            {
+                this.ReplaceViewControllerSynchronously(_waitingForMatchToStartViewController);
+                
+                yield return new WaitUntil(() => _waitingForMatchToStartViewController.isActivated);
+                
+                _waitingForMatchToStartViewController.PopulateData(map, DateTime.Now.AddSeconds(15));
+                
+                yield return new WaitForSeconds(15);
+                
+                _matchManager.StartMatch(map, DateTime.Now.AddSeconds(25), _gameplaySetupViewManager.ProMode, (results, transitionSetupDataSo) =>
+                {
+                    this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController);
+                });
             }
         }
 

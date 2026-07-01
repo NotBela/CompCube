@@ -236,6 +236,8 @@
       <None Remove="UI\BSML\Events\EventLeaderboardView.bsml" />
       <None Remove="UI\BSML\EarlyLeaveWarning\EarlyLeaveWarningModalView.bsml" />
       <EmbeddedResource Include="UI\BSML\EarlyLeaveWarning\EarlyLeaveWarningModalView.bsml" />
+      <None Remove="UI\BSML\Match\WaitingForOpponentsPickView.bsml" />
+      <EmbeddedResource Include="UI\BSML\Match\WaitingForOpponentsPickView.bsml" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="CompCube.csproj.user" />

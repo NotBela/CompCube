@@ -16,7 +16,6 @@ public class DisconnectHandler : IInitializable, IDisposable
     public void Initialize()
     {
         _serverListener.OnDisconnected += OnDisconnect;
-        _serverListener.OnPrematureMatchEnd += OnPrematureMatchEnd;
     }
 
     private void EndLevelAndShowDisconnectScreen(string reason, bool matchOnly)
@@ -34,11 +33,6 @@ public class DisconnectHandler : IInitializable, IDisposable
         });
     }
 
-    private void OnPrematureMatchEnd(PrematureMatchEndPacket packet)
-    {
-        EndLevelAndShowDisconnectScreen(packet.Reason, true);
-    }
-
     private void OnDisconnect()
     {
         EndLevelAndShowDisconnectScreen("Disconnected", false);
@@ -47,6 +41,5 @@ public class DisconnectHandler : IInitializable, IDisposable
     public void Dispose()
     {
         _serverListener.OnDisconnected -= OnDisconnect;
-        _serverListener.OnPrematureMatchEnd -= OnPrematureMatchEnd;
     }
 }

@@ -42,6 +42,7 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<DisconnectedViewController>().FromNewComponentAsViewController()
                 .AsSingle();
             Container.BindInterfacesAndSelfTo<OpponentViewController>().FromNewComponentAsViewController().AsSingle();
+            Container.BindInterfacesAndSelfTo<WaitingForOpponentsPickViewController>().FromNewComponentAsViewController().AsSingle();
             
             Container.BindInterfacesAndSelfTo<ServerCheckingFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<InfoFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
