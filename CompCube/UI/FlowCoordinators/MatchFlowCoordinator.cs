@@ -179,17 +179,28 @@ namespace CompCube.UI.FlowCoordinators
             
             IEnumerator WaitForSecondsAndStartMatch()
             {
+                _soundEffectManager.PlayGongSoundEffect();
                 this.ReplaceViewControllerSynchronously(_waitingForMatchToStartViewController);
                 
                 yield return new WaitUntil(() => _waitingForMatchToStartViewController.isActivated);
                 
-                _waitingForMatchToStartViewController.PopulateData(map, DateTime.Now.AddSeconds(15));
+                _waitingForMatchToStartViewController.PopulateData(map, DateTime.UtcNow.AddSeconds(15));
                 
                 yield return new WaitForSeconds(15);
                 
-                _matchManager.StartMatch(map, DateTime.Now.AddSeconds(25), _gameplaySetupViewManager.ProMode, (results, transitionSetupDataSo) =>
+                _matchManager.StartMatch(map, DateTime.Now.AddSeconds(25), _gameplaySetupViewManager.ProMode, async void (results, transitionSetupDataSo) =>
                 {
-                    this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController);
+                    try
+                    {
+                        this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController, true);
+                        await _serverListener.SendPacket(new ScoreSubmissionPacket(results.multipliedScore,
+                            ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transitionSetupDataSo.transformedBeatmapData),
+                            results.gameplayModifiers.proMode, results.notGoodCount, results.fullCombo));
+                    }
+                    catch (Exception e)
+                    {
+                        _siraLog.Error(e);
+                    }
                 });
             }
         }
