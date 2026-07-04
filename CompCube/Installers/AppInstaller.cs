@@ -4,6 +4,7 @@ using CompCube.Game;
 using CompCube.Server;
 using CompCube.Server.Debug;
 using CompCube.Interfaces;
+using CompCube.UI;
 using Zenject;
 
 namespace CompCube.Installers
@@ -26,6 +27,8 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<MatchStateManager>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<UserModelWrapper>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<SharedCoroutineStarter>().FromNewComponentOnNewGameObject().AsSingle();
 
             if (_config.SkipServer)
             {

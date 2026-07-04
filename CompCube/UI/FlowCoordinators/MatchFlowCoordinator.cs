@@ -13,6 +13,7 @@ using CompCube.UI.ViewManagers;
 using HMUI;
 using CompCube.Extensions;
 using CompCube.UI.BSML.EarlyLeaveWarning;
+using CompCube.UI.BSML.Match.Modal;
 using SiraUtil.Logging;
 using UnityEngine;
 using Zenject;
@@ -29,6 +30,8 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
         [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
         [Inject] private readonly WaitingForOpponentsPickViewController _waitingForOpponentsPickViewController = null!;
+        
+        [Inject] private readonly PhasePopupViewController _phasePopupViewController = null!;
          
         [Inject] private readonly IServerListener _serverListener = null!;
         [Inject] private readonly MatchManager _matchManager = null!;
@@ -66,7 +69,15 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
                 _votingScreenViewController.PopulateData(packet.InitialMaps, 30);
+                StartCoroutine(ShowPhaseChangeModal("Discard Phase", "Discard maps that you don't want to play!"));
             }
+        }
+
+        private IEnumerator ShowPhaseChangeModal(string topText, string subText)
+        {
+            yield return new WaitUntil(() => !isInTransition && !topViewController.isInTransition);
+                
+            _phasePopupViewController.ParseOntoObject(topViewController.gameObject, topText, subText);
         }
         
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)

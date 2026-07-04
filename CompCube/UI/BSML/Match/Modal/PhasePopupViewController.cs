@@ -13,8 +13,8 @@ namespace CompCube.UI.BSML.Match.Modal;
 [ViewDefinition("CompCube.UI.BSML.Match.Modal.PhasePopupView.bsml")]
 public class PhasePopupViewController : BSMLAutomaticViewController
 {
-    [Inject] private readonly BSMLParserParams _parserParams = null!;
-    [Inject] private readonly BSMLParser _parser = null!;
+    [UIParams] private readonly BSMLParserParams _parserParams = null!;
+    [Inject] private readonly SharedCoroutineStarter _sharedCoroutineStarter = null!;
     
     [UIValue("mainText")] private string MainText { get; set; } = "";
     [UIValue("subText")] private string SubText { get; set; } = "";
@@ -25,14 +25,18 @@ public class PhasePopupViewController : BSMLAutomaticViewController
         SubText = subText;
         NotifyPropertyChanged(null);
 
-        _parser.Parse(
+        BSMLParser.Instance.Parse(
             Utilities.GetResourceContent(Assembly.GetExecutingAssembly(),
                 "CompCube.UI.BSML.Match.Modal.PhasePopupView.bsml"), go, this);
-        Show();
+        _sharedCoroutineStarter.Run(Show());
     }
 
-    private void Show()
+    private IEnumerator Show()
     {
         _parserParams.EmitEvent("show-event");
+
+        yield return new WaitForSeconds(2f);
+        
+        _parserParams.EmitEvent("hide-event");
     }
 }

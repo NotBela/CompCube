@@ -14,6 +14,7 @@ using CompCube.UI.FlowCoordinators;
 using CompCube.UI.Sound;
 using CompCube.UI.ViewManagers;
 using CompCube.UI.BSML.EarlyLeaveWarning;
+using CompCube.UI.BSML.Match.Modal;
 using Zenject;
 
 namespace CompCube.Installers
@@ -43,6 +44,8 @@ namespace CompCube.Installers
                 .AsSingle();
             Container.BindInterfacesAndSelfTo<OpponentViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<WaitingForOpponentsPickViewController>().FromNewComponentAsViewController().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<PhasePopupViewController>().FromNewComponentAsViewController().AsSingle();
             
             Container.BindInterfacesAndSelfTo<ServerCheckingFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<InfoFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();

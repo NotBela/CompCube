@@ -5,7 +5,7 @@
             <text text="~mainText" align="Midline" italics="true" font-size="5"/>
         </vertical>
         <vertical pref-height="-2">
-            <text italics="true" active="false" text="~subText"/>
+            <text italics="true" text="~subText"/>
         </vertical>
     </modal>
 </bg>
