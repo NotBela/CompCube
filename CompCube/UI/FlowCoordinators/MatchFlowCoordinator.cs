@@ -97,13 +97,16 @@ namespace CompCube.UI.FlowCoordinators
 
         private void OnPickPhaseStarted(StartPickPhasePacket packet)
         {
+            // make it so this swaps based on round count
             if (_matchStateManager.IsRedTeam)
             {
                 StartCoroutine(PickMapCoroutine());
+                StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.RedPlayer.GetFormattedUserName()}'s Pick"));
                 return;
             }
 
             StartCoroutine(WaitForMapToBePickedCoroutine());
+            StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.BluePlayer.GetFormattedUserName()}'s Pick"));
             return;
             
             IEnumerator PickMapCoroutine()

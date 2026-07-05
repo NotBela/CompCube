@@ -1,11 +1,11 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <modal size-delta-y="30" size-delta-x="50" move-to-center="true" clickerino-offerino-closerino="false" show-event="show-event" hide-event="hide-event">
-        <vertical pref-height="5">
+    <modal size-delta-y="30" size-delta-x="70" move-to-center="true" clickerino-offerino-closerino="false" show-event="show-event" hide-event="hide-event">
+        <vertical>
             <text text="~mainText" align="Midline" italics="true" font-size="5"/>
         </vertical>
-        <vertical pref-height="-2">
-            <text italics="true" text="~subText"/>
+        <vertical anchor-pos-y="-7.5">
+            <text italics="true" text="~subText" align="Midline"/>
         </vertical>
     </modal>
 </bg>
