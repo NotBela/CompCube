@@ -106,7 +106,7 @@ public class TransitionToLevelManager
                 
             diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime, _matchStateManager.RedPlayer, _matchStateManager.BluePlayer, 0, 0);
                 
-            var startingMenuController = diContainer.TryResolve<MatchStartUnpauseController>() ?? throw new Exception("Could not resolve StartingPauseMenuController");
+            var startingMenuController = diContainer.TryResolve<LevelStartUnpauseController>() ?? throw new Exception("Could not resolve StartingPauseMenuController");
                 
             await startingMenuController.UnpauseLevelAtTime(unpauseTime);
         }

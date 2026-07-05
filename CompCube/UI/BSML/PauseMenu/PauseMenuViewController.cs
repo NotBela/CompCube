@@ -13,7 +13,7 @@ namespace CompCube.UI.BSML.PauseMenu;
 public class PauseMenuViewController : BSMLAutomaticViewController, IInitializable, IDisposable, ITickable
 {
     [Inject] private readonly PauseController _pauseController = null!;
-    [Inject] private readonly MatchStartUnpauseController _matchStartUnpauseController = null!;
+    [Inject] private readonly LevelStartUnpauseController _levelStartUnpauseController = null!;
     
     private readonly FloatingScreen _floatingScreen = FloatingScreen.CreateFloatingScreen(new Vector2(50f, 50f), false, Vector3.zero, Quaternion.identity);
 
@@ -58,12 +58,12 @@ public class PauseMenuViewController : BSMLAutomaticViewController, IInitializab
     public void Tick()
     {
         // dog shit
-        if (!_matchStartUnpauseController.StillInStartingPauseMenu)
+        if (!_levelStartUnpauseController.StillInStartingPauseMenu)
             _matchStartingTimeText.gameObject.SetActive(false);
         
         if (_matchStartingTime == null) 
             return;
 
-        _matchStartingTimeText.text = $"Match starting in {(int) (_matchStartingTime - DateTime.UtcNow).Value.TotalSeconds + 1}";
+        _matchStartingTimeText.text = $"Match starting in {(int) (_matchStartingTime - DateTime.Now).Value.TotalSeconds + 1}";
     }
 }

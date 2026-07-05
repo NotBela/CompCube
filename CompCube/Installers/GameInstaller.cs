@@ -16,7 +16,7 @@ namespace CompCube.Installers
             if (!Container.Resolve<TransitionToLevelManager>().InLevel) 
                 return;
             
-            Container.BindInterfacesAndSelfTo<MatchStartUnpauseController>().AsSingle();
+            Container.BindInterfacesAndSelfTo<LevelStartUnpauseController>().AsSingle();
             Container.BindInterfacesAndSelfTo<PauseMenuViewController>().FromNewComponentAsViewController().AsSingle();
             
             // affinity patches

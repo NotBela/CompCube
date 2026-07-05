@@ -219,11 +219,12 @@ namespace CompCube.UI.FlowCoordinators
                 
                 yield return new WaitForSeconds(15);
                 
-                _transitionToLevelManager.StartLevel(map, DateTime.Now.AddSeconds(25), _gameplaySetupViewManager.ProMode, async void (results, transitionSetupDataSo) =>
+                _transitionToLevelManager.StartLevel(map, DateTime.Now.AddSeconds(10), _gameplaySetupViewManager.ProMode, async void (results, transitionSetupDataSo) =>
                 {
                     try
                     {
                         this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController, true);
+                        HideLeaderboard();
                         await _serverListener.SendPacket(new ScoreSubmissionPacket(results.multipliedScore,
                             ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transitionSetupDataSo.transformedBeatmapData),
                             results.gameplayModifiers.proMode, results.notGoodCount, results.fullCombo));

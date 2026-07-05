@@ -5,7 +5,7 @@ using Zenject;
 
 namespace CompCube.Game
 {
-    public class MatchStartUnpauseController
+    public class LevelStartUnpauseController
     {
         [Inject] private readonly PauseController _pauseController = null!;
         
@@ -13,7 +13,7 @@ namespace CompCube.Game
 
         public async Task UnpauseLevelAtTime(DateTime unpauseTime)
         {
-            await Task.Delay((int) Math.Max(0, (unpauseTime - DateTime.UtcNow).TotalMilliseconds));
+            await Task.Delay((int) Math.Max(0, (unpauseTime - DateTime.Now).TotalMilliseconds));
             
             StillInStartingPauseMenu = false;
             _pauseController.HandlePauseMenuManagerDidPressContinueButton();
