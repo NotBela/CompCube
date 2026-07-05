@@ -255,6 +255,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", () =>
             {
+                _soundEffectManager.CrossfadeToDefault();
                 _onMatchFinishedCallback?.Invoke();
             });
         }
