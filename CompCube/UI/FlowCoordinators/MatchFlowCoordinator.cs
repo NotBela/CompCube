@@ -34,7 +34,7 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly PhasePopupViewController _phasePopupViewController = null!;
          
         [Inject] private readonly IServerListener _serverListener = null!;
-        [Inject] private readonly MatchManager _matchManager = null!;
+        [Inject] private readonly TransitionToLevelManager _transitionToLevelManager = null!;
         [Inject] private readonly MatchStateManager _matchStateManager = null!;
         
         [Inject] private readonly SiraLog _siraLog = null!;
@@ -219,7 +219,7 @@ namespace CompCube.UI.FlowCoordinators
                 
                 yield return new WaitForSeconds(15);
                 
-                _matchManager.StartMatch(map, DateTime.Now.AddSeconds(25), _gameplaySetupViewManager.ProMode, async void (results, transitionSetupDataSo) =>
+                _transitionToLevelManager.StartLevel(map, DateTime.Now.AddSeconds(25), _gameplaySetupViewManager.ProMode, async void (results, transitionSetupDataSo) =>
                 {
                     try
                     {

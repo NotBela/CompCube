@@ -13,7 +13,7 @@ namespace CompCube.Installers
     {
         public override void InstallBindings()
         {
-            if (!Container.Resolve<MatchManager>().InMatch) 
+            if (!Container.Resolve<TransitionToLevelManager>().InLevel) 
                 return;
             
             Container.BindInterfacesAndSelfTo<MatchStartUnpauseController>().AsSingle();

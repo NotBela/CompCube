@@ -22,7 +22,7 @@ namespace CompCube.Installers
         {
             Container.BindInstance(_config);
             
-            Container.BindInterfacesAndSelfTo<MatchManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<TransitionToLevelManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<DisconnectHandler>().AsSingle();
             Container.BindInterfacesAndSelfTo<MatchStateManager>().AsSingle();
             

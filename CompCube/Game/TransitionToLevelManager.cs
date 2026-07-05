@@ -8,7 +8,7 @@ using Zenject;
 
 namespace CompCube.Game;
 
-public class MatchManager
+public class TransitionToLevelManager
 {
     [Inject] private readonly MenuTransitionsHelper _menuTransitionsHelper = null!;
     [Inject] private readonly PlayerDataModel _playerDataModel = null!;
@@ -17,22 +17,22 @@ public class MatchManager
         
     [Inject] private readonly MatchStateManager _matchStateManager = null!;
          
-    public bool InMatch { get; private set; } = false;
+    public bool InLevel { get; private set; } = false;
 
     private Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? _menuSwitchCallback;
         
-    public void StartMatch(
+    public void StartLevel(
         VotingMap level, 
         DateTime unpauseTime, 
         bool proMode,
         Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO> onLevelCompletedCallback)
     {
-        if (InMatch) 
+        if (InLevel) 
             return;
             
         _menuSwitchCallback = onLevelCompletedCallback;
             
-        InMatch = true;
+        InLevel = true;
             
         var beatmapLevel = level.GetBeatmapLevel() ?? throw new Exception("Could not get beatmap level!");
             
@@ -81,17 +81,17 @@ public class MatchManager
         );*/
     }
 
-    public void StopMatch(Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? menuSwitchCallback = null)
+    public void StopLevel(Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? menuSwitchCallback = null)
     {
         _menuSwitchCallback = menuSwitchCallback;
             
-        if (InMatch)
+        if (InLevel)
             _menuTransitionsHelper.StopStandardLevel();
     }
 
     private void AfterSceneSwitchToMenuCallback(StandardLevelScenesTransitionSetupDataSO standardLevelScenesTransitionSetupDataSo, LevelCompletionResults levelCompletionResults)
     {
-        InMatch = false;
+        InLevel = false;
             
         _menuSwitchCallback?.Invoke(levelCompletionResults, standardLevelScenesTransitionSetupDataSo);
         _menuSwitchCallback = null;

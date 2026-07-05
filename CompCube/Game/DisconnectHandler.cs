@@ -9,7 +9,7 @@ namespace CompCube.Game;
 public class DisconnectHandler : IInitializable, IDisposable
 {
     [Inject] private readonly IServerListener _serverListener = null!;
-    [Inject] private readonly MatchManager _matchManager = null!;
+    [Inject] private readonly TransitionToLevelManager _transitionToLevelManager = null!;
     
     [CanBeNull] public event Action<string, bool> ShouldShowDisconnectScreen;
     
@@ -27,7 +27,7 @@ public class DisconnectHandler : IInitializable, IDisposable
             return;
         }
         
-        _matchManager.StopMatch((levelDetails, sceneTransitionSetupData) =>
+        _transitionToLevelManager.StopLevel((levelDetails, sceneTransitionSetupData) =>
         {
             ShouldShowDisconnectScreen?.Invoke(reason, matchOnly);
         });
