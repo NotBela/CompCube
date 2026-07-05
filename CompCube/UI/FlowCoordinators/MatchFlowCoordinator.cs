@@ -48,6 +48,8 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly DisconnectedViewController _disconnectedViewController = null!;
         
         [Inject] private readonly SoundEffectManager _soundEffectManager = null!;
+        
+        [Inject] private readonly PlatformLeaderboardViewController _platformLeaderboardViewController = null!;
 
         private NavigationController _votingScreenNavigationController;
 
@@ -158,7 +160,7 @@ namespace CompCube.UI.FlowCoordinators
                     });
             
             _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps || !_matchStateManager.InDiscardPhase);
-            
+            ShowLeaderboard(votingMap);
             _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
         }
 
@@ -170,6 +172,7 @@ namespace CompCube.UI.FlowCoordinators
                 _soundEffectManager.CrossfadeToDefault();
                 _votingScreenViewController.ClearSelection();
                 _votingScreenViewController.DiscardMap(votingMap);
+                HideLeaderboard();
                 
                 if (_matchStateManager.InDiscardPhase)
                 {
@@ -186,6 +189,19 @@ namespace CompCube.UI.FlowCoordinators
             }
         }
 
+        # region Leaderboard Functions
+        private void ShowLeaderboard(VotingMap votingMap)
+        {
+            _platformLeaderboardViewController.SetData(votingMap.GetBeatmapKey());
+            SetRightScreenViewController(_platformLeaderboardViewController, ViewController.AnimationType.In);
+        }
+
+        private void HideLeaderboard()
+        {
+            SetRightScreenViewController(null, ViewController.AnimationType.Out);
+        }
+
+        #endregion
         private void ShowMapPreviewViewAndStartMatch(VotingMap map)
         {
             StartCoroutine(WaitForSecondsAndStartMatch());
@@ -193,6 +209,7 @@ namespace CompCube.UI.FlowCoordinators
             
             IEnumerator WaitForSecondsAndStartMatch()
             {
+                ShowLeaderboard(map);
                 _soundEffectManager.PlayGongSoundEffect();
                 this.ReplaceViewControllerSynchronously(_waitingForMatchToStartViewController);
                 
