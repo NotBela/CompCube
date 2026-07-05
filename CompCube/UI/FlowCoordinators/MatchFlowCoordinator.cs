@@ -161,7 +161,13 @@ namespace CompCube.UI.FlowCoordinators
             
             _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps || !_matchStateManager.InDiscardPhase);
             ShowLeaderboard(votingMap);
-            _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
+
+            var beatmap = votingMap.GetBeatmapLevel();
+
+            if (beatmap == null)
+                return;
+            
+            _soundEffectManager.PlayBeatmapLevelPreview(beatmap);
         }
 
         private async void HandleStandardLevelDetailButtonPressed(VotingMap votingMap)
