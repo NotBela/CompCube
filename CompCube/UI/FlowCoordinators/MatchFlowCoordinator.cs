@@ -196,9 +196,9 @@ namespace CompCube.UI.FlowCoordinators
             SetRightScreenViewController(_platformLeaderboardViewController, ViewController.AnimationType.In);
         }
 
-        private void HideLeaderboard()
+        private void HideLeaderboard(bool immediately = false)
         {
-            SetRightScreenViewController(null, ViewController.AnimationType.Out);
+            SetRightScreenViewController(null, immediately ? ViewController.AnimationType.None : ViewController.AnimationType.Out);
         }
 
         #endregion
@@ -224,7 +224,7 @@ namespace CompCube.UI.FlowCoordinators
                     try
                     {
                         this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController, true);
-                        HideLeaderboard();
+                        HideLeaderboard(true);
                         await _serverListener.SendPacket(new ScoreSubmissionPacket(results.multipliedScore,
                             ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transitionSetupDataSo.transformedBeatmapData),
                             results.gameplayModifiers.proMode, results.notGoodCount, results.fullCombo));
