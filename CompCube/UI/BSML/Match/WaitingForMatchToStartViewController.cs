@@ -142,7 +142,7 @@ namespace CompCube.UI.BSML.Match
             if (_startTime == null)
                 return;
             
-            MatchStartTimer = $"Starting in {((int) (_startTime.Value - DateTime.UtcNow).TotalSeconds + 1).ToString(CultureInfo.InvariantCulture)}...";
+            MatchStartTimer = $"Starting in {((int) (_startTime.Value - DateTime.Now).TotalSeconds + 1).ToString(CultureInfo.InvariantCulture)}...";
             
             NotifyPropertyChanged(nameof(MatchStartTimer));
         }

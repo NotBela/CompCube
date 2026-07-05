@@ -157,12 +157,12 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, HandleButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps || !_matchStateManager.InDiscardPhase);
+            _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps || !_matchStateManager.InDiscardPhase);
             
             _soundEffectManager.PlayBeatmapLevelPreview(votingMap.GetBeatmapLevel()!);
         }
 
-        private async void HandleButtonPressed(VotingMap votingMap)
+        private async void HandleStandardLevelDetailButtonPressed(VotingMap votingMap)
         {
             try
             {
@@ -198,7 +198,7 @@ namespace CompCube.UI.FlowCoordinators
                 
                 yield return new WaitUntil(() => _waitingForMatchToStartViewController.isActivated);
                 
-                _waitingForMatchToStartViewController.PopulateData(map, DateTime.UtcNow.AddSeconds(15));
+                _waitingForMatchToStartViewController.PopulateData(map, DateTime.Now.AddSeconds(15));
                 
                 yield return new WaitForSeconds(15);
                 
