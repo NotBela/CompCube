@@ -7,7 +7,7 @@ using Zenject;
 
 namespace CompCube.Game;
 
-public class MapDownloader
+public class BeatmapDownloader
 {
     [Inject] private readonly SiraLog _siraLog = null!;
     

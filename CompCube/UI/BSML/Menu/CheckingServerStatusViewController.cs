@@ -9,7 +9,7 @@ namespace CompCube.UI.BSML.Menu;
 [ViewDefinition("CompCube.UI.BSML.Menu.CheckingServerStatusView.bsml")]
 public class CheckingServerStatusViewController : BSMLAutomaticViewController, IInitializable, IDisposable
 {
-    [Inject] private readonly MapDownloader _mapDownloader = null;
+    [Inject] private readonly BeatmapDownloader _beatmapDownloader = null;
     [Inject] private readonly InitialServerChecker _initialServerChecker = null;
     
     [UIValue("stateText")] private string StateText { get; set; } = "placeholder";
@@ -29,16 +29,16 @@ public class CheckingServerStatusViewController : BSMLAutomaticViewController, I
                 break;
             case InitialServerChecker.ServerCheckingStates.DownloadingMaps:
                 StateText = "Downloading maps...";
-                _mapDownloader.OnMapDownloaded += OnMapDownloaded;
+                _beatmapDownloader.OnMapDownloaded += OnBeatmapDownloaded;
                 break;
         };
         NotifyPropertyChanged(nameof(StateText));
     }
 
-    private void OnMapDownloaded(int mapsDownloaded, int totalMaps)
+    private void OnBeatmapDownloaded(int mapsDownloaded, int totalMaps)
     {
         if (mapsDownloaded == totalMaps)
-            _mapDownloader.OnMapDownloaded -= OnMapDownloaded;
+            _beatmapDownloader.OnMapDownloaded -= OnBeatmapDownloaded;
         
         StateText = $"Downloading maps... ({mapsDownloaded}/{totalMaps})";
         

@@ -54,7 +54,7 @@ namespace CompCube.Installers
             
             Container.BindInterfacesAndSelfTo<BeatmapDifficultySegmentedControlPatch>().AsSingle();
             
-            Container.BindInterfacesAndSelfTo<MapDownloader>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BeatmapDownloader>().AsSingle();
             Container.BindInterfacesAndSelfTo<InitialServerChecker>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<MatchResultsViewController>().FromNewComponentAsViewController()

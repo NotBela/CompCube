@@ -21,7 +21,7 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
     [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
 
     [Inject] private readonly InitialServerChecker _serverChecker = null!;
-    [Inject] private readonly MapDownloader _mapDownloader = null!;
+    [Inject] private readonly BeatmapDownloader _beatmapDownloader = null!;
     
     [Inject] private readonly SiraLog _siraLog = null!;
     [Inject] private readonly PluginConfig _config = null!;
@@ -110,7 +110,7 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
             this.ReplaceViewControllerSynchronously(_checkingServerStatusViewController);
             _checkingServerStatusViewController.SetControllerState(InitialServerChecker.ServerCheckingStates.DownloadingMaps);
 
-            await _mapDownloader.DownloadMaps(missingMapHashes);
+            await _beatmapDownloader.DownloadMaps(missingMapHashes);
             
             showBackButton = true;
             Loader.Instance.RefreshSongs();
