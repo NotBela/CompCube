@@ -12,17 +12,19 @@ public class OpponentViewController : BSMLAutomaticViewController
     [UIValue("redText")] private string RedText { get; set; }
     [UIValue("blueText")] private string BlueText { get; set; }
     
+    [UIValue("multiplierText")] private string MultiplierText { get; set; }
+    
     public void PopulateData(CompCube_Models.Models.ClientData.UserInfo red, CompCube_Models.Models.ClientData.UserInfo blue)
     {
         RedText = red.GetFormattedUserName();
-        BlueText = red.GetFormattedUserName();
+        BlueText = blue.GetFormattedUserName();
         
         NotifyPropertyChanged(null);
     }
 
-    public void UpdatePoints(int redPoints, int bluePoints)
+    public void UpdatePoints(int redHealth, int blueHealth)
     {
-        PointsText = $"{redPoints} - {bluePoints}";
+        PointsText = $"{redHealth.ToString().FormatWithHtmlColor("#FF0000")} - {blueHealth.ToString().FormatWithHtmlColor("#0000FF")}";
         NotifyPropertyChanged(nameof(PointsText));
     }
 
@@ -30,6 +32,12 @@ public class OpponentViewController : BSMLAutomaticViewController
     {
         RoundText = $"Round {round}";
         NotifyPropertyChanged(nameof(RoundText));
+    }
+
+    public void UpdateMultiplier(float multiplier)
+    {
+        MultiplierText = $"{multiplier:F1}x";
+        NotifyPropertyChanged(nameof(MultiplierText));
     }
 
     public void SetStatus(string status)

@@ -25,6 +25,7 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<TransitionToLevelManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<DisconnectHandler>().AsSingle();
             Container.BindInterfacesAndSelfTo<MatchStateManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<MatchBeatmapManager>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<UserModelWrapper>().AsSingle();
 

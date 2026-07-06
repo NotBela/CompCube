@@ -10,7 +10,6 @@ namespace CompCube.Game;
 public class MatchStateManager : IInitializable, IDisposable
 {
     [Inject] private readonly IServerListener _serverListener = null!;
-    [Inject] private readonly SiraLog _siraLog = null!;
     [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
 
     public CompCube_Models.Models.ClientData.UserInfo RedPlayer { get; private set; }
@@ -20,12 +19,6 @@ public class MatchStateManager : IInitializable, IDisposable
     public int BlueHealth { get; private set; } = 1000000;
 
     public float DamageMultiplier { get; private set; }= 1f;
-    
-    public List<VotingMap?> DiscardedMaps { get; private set; } = [];
-
-    public bool InDiscardPhase { get; private set; } = true;
-
-    public List<VotingMap> Maps = [];
 
     public bool IsRedTeam => RedPlayer.UserId == _userModelWrapper.UserId;
     
@@ -33,26 +26,7 @@ public class MatchStateManager : IInitializable, IDisposable
     
     public CompCube_Models.Models.ClientData.UserInfo Self => !IsRedTeam ? RedPlayer : BluePlayer;
     
-    public bool CanDiscardMaps => InDiscardPhase && DiscardedMaps.Count < 2;
-
-    public event Action? CanNoLongerDiscardMaps;
-
-    public void DiscardMap(VotingMap? map)
-    {
-        if (map != null)
-            Maps.Remove(map);
-        
-        DiscardedMaps.Add(map);
-        
-        if (!CanDiscardMaps)
-            CanNoLongerDiscardMaps?.Invoke();
-    }
-
-    public void SkipDiscardingMaps()
-    {
-        while (DiscardedMaps.Count < 2)
-            DiscardMap(null);
-    }
+    public int CurrentRound { get; private set; } = 0;
     
     public void Initialize()
     {
@@ -63,8 +37,7 @@ public class MatchStateManager : IInitializable, IDisposable
 
     private void HandlePickPhaseStarted(StartPickPhasePacket packet)
     {
-        Maps = packet.AvailableMaps.ToList();
-        InDiscardPhase = false;
+        CurrentRound++;
     }
 
     private void HandleMatchCreated(MatchCreatedPacket matchCreated)
@@ -77,11 +50,7 @@ public class MatchStateManager : IInitializable, IDisposable
 
         DamageMultiplier = 1.0f;
 
-        Maps = matchCreated.InitialMaps.ToList();
-
-        DiscardedMaps = [];
-        
-        InDiscardPhase = true;
+        CurrentRound = 0;
     }
     
     private void HandleRoundResults(RoundResultsPacket results)

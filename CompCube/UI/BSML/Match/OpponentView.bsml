@@ -6,6 +6,11 @@
     <vertical anchor-pos-y="7">
         <text text="~pointsText" align="Center" italics="true" font-size="7"/>
     </vertical>
+    
+    <vertical anchor-pos-y="-4">
+        <text text="~multiplierText" align="Midline" italics="true" font-size="7"/>
+    </vertical>
+    
     <horizontal anchor-pos-y="0" horizontal-fit="PreferredSize" pref-width="30">
         <vertical horizontal-fit="PreferredSize" pref-width="10">
             <text text="~redText" italics="true" align="Right" font-size="7"/>

@@ -34,13 +34,12 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly IServerListener _serverListener = null!;
         [Inject] private readonly TransitionToLevelManager _transitionToLevelManager = null!;
         [Inject] private readonly MatchStateManager _matchStateManager = null!;
+        [Inject] private readonly MatchBeatmapManager _matchBeatmapManager = null!;
         
         [Inject] private readonly SiraLog _siraLog = null!;
         
         [Inject] private readonly StandardLevelDetailViewManager _standardLevelDetailViewManager = null!;
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
-        
-        [Inject] private readonly DisconnectHandler _disconnectHandler = null!;
         
         [Inject] private readonly SoundEffectManager _soundEffectManager = null!;
         
@@ -55,8 +54,8 @@ namespace CompCube.UI.FlowCoordinators
         public void PopulateData(MatchCreatedPacket packet, Action? onMatchFinishedCallback)
         {
             _opponentViewController.PopulateData(packet.Red, packet.Blue);
-            _opponentViewController.UpdateRound(1);
-            _opponentViewController.UpdatePoints(0, 0);
+            _opponentViewController.SetStatus("Discard Phase");
+            _opponentViewController.UpdatePoints(_matchStateManager.RedHealth, _matchStateManager.BlueHealth);
 
             StartCoroutine(WaitForVotingScreenToPresent());
             
@@ -75,7 +74,7 @@ namespace CompCube.UI.FlowCoordinators
         private void HandleSkippingDiscardPhase()
         {
             HideStandardLevelDetailControllerIfPresent();
-            _matchStateManager.SkipDiscardingMaps();
+            _matchBeatmapManager.SkipDiscardingMaps();
         }
 
         private IEnumerator ShowPhaseChangeModal(string topText, string subText)
@@ -99,7 +98,7 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnPickPhaseStarted += OnPickPhaseStarted;
             _serverListener.OnRoundResults += HandleRoundResults;
             _serverListener.OnPlayerSelectedMap += HandleOpponentSelectedMap;
-            _matchStateManager.CanNoLongerDiscardMaps += HandleCanNoLongerDiscardMaps;
+            _matchBeatmapManager.CanNoLongerDiscardMaps += HandleCanNoLongerDiscardMaps;
         }
 
         private async void HandleCanNoLongerDiscardMaps()
@@ -108,7 +107,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 this.ReplaceViewControllerSynchronously(_waitingViewController);
                 _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to finish discarding...");
-                await _serverListener.SendPacket(new DiscardMapsPacket(_matchStateManager.DiscardedMaps.ToArray()));
+                await _serverListener.SendPacket(new DiscardMapsPacket(_matchBeatmapManager.DiscardedMaps.ToArray()));
             }
             catch (Exception e)
             {
@@ -132,8 +131,10 @@ namespace CompCube.UI.FlowCoordinators
                 
                 _roundResultsViewController.PopulateData(results);
 
+                _opponentViewController.UpdatePoints(results.RedHealth, results.BlueHealth);
+                
                 yield return new WaitForSeconds(10f);
-
+                
                 _roundResultsAnimationInProgress = false;
             }
         }
@@ -147,6 +148,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
                 
+                _opponentViewController.UpdateRound(_matchStateManager.CurrentRound);
                 // make it so this swaps based on round count
                 if ((packet.RedPick && _matchStateManager.IsRedTeam) || (!packet.RedPick && !_matchStateManager.IsRedTeam))
                 {
@@ -188,13 +190,13 @@ namespace CompCube.UI.FlowCoordinators
         private void HandleVotingScreenTimerRanOutDuringPickPhase()
         {
             HideStandardLevelDetailControllerIfPresent();
-            HandleStandardLevelDetailButtonPressed(_matchStateManager.Maps[0]);
+            HandleStandardLevelDetailButtonPressed(_matchBeatmapManager.Maps[0]);
         }
 
         private void HandleVotingScreenTimerRanOutDuringDiscardPhase()
         {
             HideStandardLevelDetailControllerIfPresent();
-            _matchStateManager.SkipDiscardingMaps();
+            _matchBeatmapManager.SkipDiscardingMaps();
         }
 
         private void HandleVotingScreenMapSelected(VotingMap votingMap)
@@ -208,7 +210,7 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchStateManager.InDiscardPhase ? "Discard" : "Select", _matchStateManager.CanDiscardMaps || !_matchStateManager.InDiscardPhase);
+            _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchBeatmapManager.InDiscardPhase ? "Discard" : "Select", true);
             ShowLeaderboard(votingMap);
 
             var beatmap = votingMap.GetBeatmapLevel();
@@ -228,9 +230,9 @@ namespace CompCube.UI.FlowCoordinators
                 _votingScreenViewController.RemoveMapFromList(votingMap);
                 HideLeaderboard();
                 
-                if (_matchStateManager.InDiscardPhase)
+                if (_matchBeatmapManager.InDiscardPhase)
                 {
-                    _matchStateManager.DiscardMap(votingMap);
+                    _matchBeatmapManager.DiscardMap(votingMap);
                     return;
                 }
                 
@@ -299,7 +301,7 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnPickPhaseStarted -= OnPickPhaseStarted;
             _serverListener.OnRoundResults -= HandleRoundResults;
             _serverListener.OnPlayerSelectedMap -= HandleOpponentSelectedMap;
-            _matchStateManager.CanNoLongerDiscardMaps -= HandleCanNoLongerDiscardMaps;
+            _matchBeatmapManager.CanNoLongerDiscardMaps -= HandleCanNoLongerDiscardMaps;
         }
 
         private void HideStandardLevelDetailControllerIfPresent()
