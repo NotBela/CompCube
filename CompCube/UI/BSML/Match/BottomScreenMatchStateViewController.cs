@@ -4,8 +4,8 @@ using CompCube.Extensions;
 
 namespace CompCube.UI.BSML.Match;
 
-[ViewDefinition("CompCube.UI.BSML.Match.OpponentView.bsml")]
-public class OpponentViewController : BSMLAutomaticViewController
+[ViewDefinition("CompCube.UI.BSML.Match.BottomScreenMatchStateView.bsml")]
+public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
 {
     [UIValue("roundText")] private string RoundText { get; set; }
     [UIValue("pointsText")] private string PointsText { get; set; }

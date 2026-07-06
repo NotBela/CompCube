@@ -55,8 +55,7 @@ public class DebugServerListener : IServerListener
                 OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true));
                 break;
             case UserPacket.UserPacketTypes.MapSelection:
-                await Task.Delay(30000);
-                Disconnect();
+                
                 break;
             case UserPacket.UserPacketTypes.ScoreSubmission:
                 OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10, 10f));

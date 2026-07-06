@@ -25,7 +25,7 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly WaitingForMatchToStartViewController _waitingForMatchToStartViewController = null!;
         [Inject] private readonly WaitingViewController _waitingViewController = null!;
         [Inject] private readonly RoundResultsViewController _roundResultsViewController = null!;
-        [Inject] private readonly OpponentViewController _opponentViewController = null!;
+        [Inject] private readonly BottomScreenMatchStateViewController _bottomScreenMatchStateViewController = null!;
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
         [Inject] private readonly WarningModalViewController _warningModalViewController = null!;
         
@@ -53,9 +53,10 @@ namespace CompCube.UI.FlowCoordinators
 
         public void PopulateData(MatchCreatedPacket packet, Action? onMatchFinishedCallback)
         {
-            _opponentViewController.PopulateData(packet.Red, packet.Blue);
-            _opponentViewController.SetStatus("Discard Phase");
-            _opponentViewController.UpdatePoints(_matchStateManager.RedHealth, _matchStateManager.BlueHealth);
+            _bottomScreenMatchStateViewController.PopulateData(packet.Red, packet.Blue);
+            _bottomScreenMatchStateViewController.SetStatus("Discard Phase");
+            _bottomScreenMatchStateViewController.UpdatePoints(_matchStateManager.RedHealth, _matchStateManager.BlueHealth);
+            _bottomScreenMatchStateViewController.UpdateMultiplier(1f);
 
             StartCoroutine(WaitForVotingScreenToPresent());
             
@@ -91,7 +92,7 @@ namespace CompCube.UI.FlowCoordinators
             
             _votingScreenNavigationController = BeatSaberUI.CreateViewController<NavigationController>();
             
-            ProvideInitialViewControllers(_votingScreenNavigationController, _gameplaySetupViewManager.ManagedController, bottomScreenViewController: _opponentViewController);
+            ProvideInitialViewControllers(_votingScreenNavigationController, _gameplaySetupViewManager.ManagedController, bottomScreenViewController: _bottomScreenMatchStateViewController);
             _votingScreenNavigationController.PushViewController(_votingScreenViewController, null);
             
             _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
@@ -131,10 +132,11 @@ namespace CompCube.UI.FlowCoordinators
                 
                 _roundResultsViewController.PopulateData(results);
 
-                _opponentViewController.UpdatePoints(results.RedHealth, results.BlueHealth);
+                _bottomScreenMatchStateViewController.UpdatePoints(results.RedHealth, results.BlueHealth);
                 
                 yield return new WaitForSeconds(10f);
-                
+
+                _bottomScreenMatchStateViewController.UpdateMultiplier(results.DamageMultiplier);
                 _roundResultsAnimationInProgress = false;
             }
         }
@@ -148,7 +150,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
                 
-                _opponentViewController.UpdateRound(_matchStateManager.CurrentRound);
+                _bottomScreenMatchStateViewController.UpdateRound(_matchStateManager.CurrentRound);
                 // make it so this swaps based on round count
                 if ((packet.RedPick && _matchStateManager.IsRedTeam) || (!packet.RedPick && !_matchStateManager.IsRedTeam))
                 {
