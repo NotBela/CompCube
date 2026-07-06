@@ -3,7 +3,7 @@ using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube.Interfaces;
 using Zenject;
 
-namespace CompCube.Game;
+namespace CompCube.Game.MatchState;
 
 public class MatchBeatmapManager() : IInitializable, IDisposable
 {

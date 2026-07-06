@@ -1,10 +1,8 @@
-﻿using CompCube_Models.Models.Packets.ServerPackets;
-using CompCube.Interfaces;
-using JetBrains.Annotations;
+﻿using CompCube.Interfaces;
 using UnityEngine.SceneManagement;
 using Zenject;
 
-namespace CompCube.Game;
+namespace CompCube.Game.MatchState;
 
 public class DisconnectHandler : IInitializable, IDisposable
 {

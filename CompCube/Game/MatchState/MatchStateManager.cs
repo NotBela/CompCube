@@ -1,11 +1,8 @@
-﻿using CompCube_Models.Models.Map;
-using CompCube_Models.Models.Packets.ServerPackets;
+﻿using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube.Interfaces;
-using HarmonyLib;
-using SiraUtil.Logging;
 using Zenject;
 
-namespace CompCube.Game;
+namespace CompCube.Game.MatchState;
 
 public class MatchStateManager : IInitializable, IDisposable
 {
