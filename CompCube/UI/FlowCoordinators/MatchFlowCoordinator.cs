@@ -24,12 +24,11 @@ namespace CompCube.UI.FlowCoordinators
     {
         [Inject] private readonly VotingScreenViewController _votingScreenViewController = null!;
         [Inject] private readonly WaitingForMatchToStartViewController _waitingForMatchToStartViewController = null!;
-        [Inject] private readonly AwaitMatchEndViewController _awaitMatchEndViewController = null!;
+        [Inject] private readonly WaitingViewController _waitingViewController = null!;
         [Inject] private readonly RoundResultsViewController _roundResultsViewController = null!;
         [Inject] private readonly OpponentViewController _opponentViewController = null!;
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
         [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
-        [Inject] private readonly WaitingForOpponentsPickViewController _waitingForOpponentsPickViewController = null!;
         
         [Inject] private readonly PhasePopupViewController _phasePopupViewController = null!;
          
@@ -72,9 +71,15 @@ namespace CompCube.UI.FlowCoordinators
             {
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
-                _votingScreenViewController.PopulateData(packet.InitialMaps, 30);
+                _votingScreenViewController.PopulateData(packet.InitialMaps, 30, HandleSkippingDiscardPhase, HandleVotingScreenTimerRanOutDuringDiscardPhase);
                 StartCoroutine(ShowPhaseChangeModal("Discard Phase", "Discard maps that you don't want to play!"));
             }
+        }
+
+        private void HandleSkippingDiscardPhase()
+        {
+            HideStandardLevelDetailControllerIfPresent();
+            _matchStateManager.SkipDiscardingMaps();
         }
 
         private IEnumerator ShowPhaseChangeModal(string topText, string subText)
@@ -98,7 +103,26 @@ namespace CompCube.UI.FlowCoordinators
             _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
             _serverListener.OnPickPhaseStarted += OnPickPhaseStarted;
             _serverListener.OnRoundResults += HandleRoundResults;
+            _serverListener.OnPlayerSelectedMap += HandleOpponentSelectedMap;
+            _matchStateManager.CanNoLongerDiscardMaps += HandleCanNoLongerDiscardMaps;
         }
+
+        private async void HandleCanNoLongerDiscardMaps()
+        {
+            try
+            {
+                this.ReplaceViewControllerSynchronously(_waitingViewController);
+                _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to finish discarding...");
+                await _serverListener.SendPacket(new DiscardMapsPacket(_matchStateManager.DiscardedMaps.ToArray()));
+            }
+            catch (Exception e)
+            {
+                _siraLog.Error(e);
+            }
+        }
+
+        private void HandleOpponentSelectedMap(PlayerSelectedMapPacket packet) =>
+            ShowMapPreviewViewAndStartMatch(packet.Map);
 
         private void HandleRoundResults(RoundResultsPacket results)
         {
@@ -129,34 +153,53 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
                 
                 // make it so this swaps based on round count
-                if (_matchStateManager.IsRedTeam)
+                if ((packet.RedPick && _matchStateManager.IsRedTeam) || (!packet.RedPick && !_matchStateManager.IsRedTeam))
                 {
-                    StartCoroutine(PickMapCoroutine());
+                    yield return PickMapCoroutine();
                     yield break;
                 }
 
-                StartCoroutine(WaitForMapToBePickedCoroutine());
+                yield return WaitForMapToBePickedCoroutine();
             }
             
             IEnumerator PickMapCoroutine()
             {
+                yield return new WaitUntil(() => !_waitingViewController.isInTransition);
+                
                 this.ReplaceViewControllerSynchronously(_votingScreenNavigationController);
                 
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
-                _votingScreenViewController.PopulateData(packet.AvailableMaps, 30);
+                _votingScreenViewController.PopulateData(packet.AvailableMaps, 30, null, HandleVotingScreenTimerRanOutDuringPickPhase);
+
+                yield return new WaitUntil(() => !_votingScreenViewController.isInTransition);
                 
-                StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Self.GetFormattedUserName()}'s Pick"));
+                yield return ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Self.GetFormattedUserName()}'s Pick");
             }
 
             IEnumerator WaitForMapToBePickedCoroutine()
             {
                 yield return new WaitUntil(() => !_standardLevelDetailViewManager.ManagedController.isActivated);
                 
-                this.ReplaceViewControllerSynchronously(_waitingForOpponentsPickViewController);
-                _waitingForOpponentsPickViewController.PopulateData(_matchStateManager.Opponent.GetFormattedUserName());
-                StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Opponent.GetFormattedUserName()}'s Pick"));
+                this.ReplaceViewControllerSynchronously(_waitingViewController);
+                _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to pick a map...");
+
+                yield return new WaitUntil(() => _waitingViewController.isActivated);
+                
+                yield return ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Opponent.GetFormattedUserName()}'s Pick");
             }
+        }
+
+        private void HandleVotingScreenTimerRanOutDuringPickPhase()
+        {
+            HideStandardLevelDetailControllerIfPresent();
+            HandleStandardLevelDetailButtonPressed(_matchStateManager.Maps[0]);
+        }
+
+        private void HandleVotingScreenTimerRanOutDuringDiscardPhase()
+        {
+            HideStandardLevelDetailControllerIfPresent();
+            _matchStateManager.SkipDiscardingMaps();
         }
 
         private void HandleShouldShowDisconnectScreen(string reason, bool matchOnly)
@@ -204,15 +247,14 @@ namespace CompCube.UI.FlowCoordinators
         {
             try
             {
-                _votingScreenNavigationController.PopViewController(() => {}, true);
-                _soundEffectManager.CrossfadeToDefault();
+                HideStandardLevelDetailControllerIfPresent();
                 _votingScreenViewController.ClearSelection();
-                _votingScreenViewController.DiscardMap(votingMap);
+                _votingScreenViewController.RemoveMapFromList(votingMap);
                 HideLeaderboard();
                 
                 if (_matchStateManager.InDiscardPhase)
                 {
-                    await _serverListener.SendPacket(new DiscardMapPacket(votingMap));
+                    _matchStateManager.DiscardMap(votingMap);
                     return;
                 }
                 
@@ -259,7 +301,9 @@ namespace CompCube.UI.FlowCoordinators
                 {
                     try
                     {
-                        this.ReplaceViewControllerSynchronously(_awaitMatchEndViewController, true);
+                        this.ReplaceViewControllerSynchronously(_waitingViewController, true);
+                        _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to submit a score...");
+                        
                         HideLeaderboard(true);
                         await _serverListener.SendPacket(new ScoreSubmissionPacket(results.multipliedScore,
                             ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transitionSetupDataSo.transformedBeatmapData),
@@ -279,15 +323,17 @@ namespace CompCube.UI.FlowCoordinators
             _votingScreenViewController.MapSelected -= HandleVotingScreenMapSelected;
             _serverListener.OnPickPhaseStarted -= OnPickPhaseStarted;
             _serverListener.OnRoundResults -= HandleRoundResults;
+            _serverListener.OnPlayerSelectedMap -= HandleOpponentSelectedMap;
+            _matchStateManager.CanNoLongerDiscardMaps -= HandleCanNoLongerDiscardMaps;
         }
 
-        private void ResetNavigationController()
+        private void HideStandardLevelDetailControllerIfPresent()
         {
-            if (_votingScreenNavigationController)
-                Destroy(_votingScreenNavigationController);
-            _votingScreenNavigationController = BeatSaberUI.CreateViewController<NavigationController>();
-            _votingScreenNavigationController.PushViewController(
-                                                    _votingScreenViewController, null);
+            if (!_standardLevelDetailViewManager.ManagedController.isActivated)
+                return;
+                
+            _votingScreenNavigationController.PopViewController(() => {}, true);
+            _soundEffectManager.CrossfadeToDefault();
         }
 
         protected override void BackButtonWasPressed(ViewController viewController)

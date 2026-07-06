@@ -11,19 +11,15 @@ namespace CompCube.Server.Debug;
 public class DebugServerListener : IServerListener
 {
     [Inject] private readonly SiraLog _siraLog = null!;
-    
+
+    private bool _isConnected;
+
     public event Action<MatchCreatedPacket>? OnMatchCreated;
-    public event Action<BeginGameTransitionPacket>? OnShouldBeginGameTransition;
     public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
-    public event Action<MapSelectionPacket>? OnMapSelection;
     public event Action<RoundResultsPacket>? OnRoundResults;
     public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
     public event Action? OnConnected;
     public event Action? OnDisconnected;
-
-
-    private bool _isConnected;
-
     public bool Connected => _isConnected;
 
     public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback)
@@ -55,14 +51,22 @@ public class DebugServerListener : IServerListener
             case UserPacket.UserPacketTypes.JoinRequest:
                 OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
                 break;
-            case UserPacket.UserPacketTypes.DiscardMap:
-                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps));
+            case UserPacket.UserPacketTypes.DiscardMaps:
+                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true));
                 break;
             case UserPacket.UserPacketTypes.MapSelection:
                 
                 break;
             case UserPacket.UserPacketTypes.ScoreSubmission:
                 OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10, 10f));
+
+                await Task.Delay(500);
+                
+                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, false));
+
+                await Task.Delay(15000);
+                
+                OnPlayerSelectedMap?.Invoke(new PlayerSelectedMapPacket(DebugApi.Maps[0]));
                 break;
         }
     }

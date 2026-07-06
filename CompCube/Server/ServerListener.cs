@@ -23,7 +23,6 @@ namespace CompCube.Server
         private bool _shouldListenToServer = false;
         
         public event Action<MatchCreatedPacket>? OnMatchCreated;
-        public event Action<BeginGameTransitionPacket>? OnShouldBeginGameTransition;
         public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
         public event Action<RoundResultsPacket>? OnRoundResults;
         public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
@@ -150,9 +149,6 @@ namespace CompCube.Server
                     {
                         case ServerPacket.ServerPacketTypes.MatchCreated:
                             OnMatchCreated?.Invoke(packet as MatchCreatedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.BeginGameTransition:
-                            OnShouldBeginGameTransition?.Invoke(packet as BeginGameTransitionPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.PlayerSelectedMap:
                             OnPlayerSelectedMap?.Invoke(packet as PlayerSelectedMapPacket);

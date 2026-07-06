@@ -22,7 +22,7 @@ public static class FlowCoordinatorExtensions
     
     private static IEnumerator PresentViewControllerSynchronouslyCoroutine(FlowCoordinator flowCoordinator, ViewController viewController, bool immediately)
     {
-        yield return new WaitUntil(() => !flowCoordinator.isInTransition);
+        yield return new WaitUntil(() => !flowCoordinator.isInTransition && !flowCoordinator.topViewController.isInTransition);
         
         yield return new WaitForEndOfFrame();
         

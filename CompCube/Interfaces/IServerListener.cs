@@ -7,8 +7,6 @@ public interface IServerListener
 {
     public event Action<MatchCreatedPacket> OnMatchCreated;
     
-    public event Action<BeginGameTransitionPacket> OnShouldBeginGameTransition;
-    
     public event Action<PlayerSelectedMapPacket> OnPlayerSelectedMap;
     
     public event Action<RoundResultsPacket> OnRoundResults;

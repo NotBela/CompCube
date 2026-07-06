@@ -1,7 +1,7 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
     <vertical>
-        <text text="~mainText" italics="true" align="Center"/>
+        <text text="~waitingText" align="Midline" italics="true"/>
     </vertical>
     
     <vertical anchor-pos-y="-15">

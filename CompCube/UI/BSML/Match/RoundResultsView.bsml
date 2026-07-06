@@ -12,7 +12,7 @@
         </vertical>
     </horizontal>
 
-    <vertical anchor-pos-x="0" anchor-pos-y="-20" bg="round-rect-panel" pref-height="15" pref-width="45" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="4" pad="5">
+    <vertical anchor-pos-x="0" anchor-pos-y="-20" bg="round-rect-panel" pref-height="15" pref-width="45" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="6" pad="5">
         <text italics="true" text="Damage" align="Midline" underlined="true"/>
         <text text="~damageText" align="Midline" font-size="8" italics="true"/> 
     </vertical>

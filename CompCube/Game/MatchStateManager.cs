@@ -21,7 +21,7 @@ public class MatchStateManager : IInitializable, IDisposable
 
     public float DamageMultiplier { get; private set; }= 1f;
     
-    public int DiscardedMapCount { get; private set; } = 0;
+    public List<VotingMap?> DiscardedMaps { get; private set; } = [];
 
     public bool InDiscardPhase { get; private set; } = true;
 
@@ -33,12 +33,25 @@ public class MatchStateManager : IInitializable, IDisposable
     
     public CompCube_Models.Models.ClientData.UserInfo Self => !IsRedTeam ? RedPlayer : BluePlayer;
     
-    public bool CanDiscardMaps => InDiscardPhase && DiscardedMapCount < 2;
+    public bool CanDiscardMaps => InDiscardPhase && DiscardedMaps.Count < 2;
 
-    public void DiscardMap(VotingMap map)
+    public event Action? CanNoLongerDiscardMaps;
+
+    public void DiscardMap(VotingMap? map)
     {
-        Maps.Remove(map);
-        DiscardedMapCount++;
+        if (map != null)
+            Maps.Remove(map);
+        
+        DiscardedMaps.Add(map);
+        
+        if (!CanDiscardMaps)
+            CanNoLongerDiscardMaps?.Invoke();
+    }
+
+    public void SkipDiscardingMaps()
+    {
+        while (DiscardedMaps.Count < 2)
+            DiscardMap(null);
     }
     
     public void Initialize()
@@ -66,7 +79,7 @@ public class MatchStateManager : IInitializable, IDisposable
 
         Maps = matchCreated.InitialMaps.ToList();
 
-        DiscardedMapCount = 0;
+        DiscardedMaps = [];
         
         InDiscardPhase = true;
     }

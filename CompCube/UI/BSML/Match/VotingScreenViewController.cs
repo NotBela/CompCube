@@ -30,6 +30,10 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     [UIComponent("voteStatusText")] private readonly TextMeshProUGUI _voteStatusText = null!;
     
     private Action? _activationCallback = null;
+    
+    private Action? _skipButtonPressedCallback = null;
+    
+    [UIValue("showSkipButton")] private bool ShowSkipButton => _skipButtonPressedCallback != null;
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
@@ -37,6 +41,13 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         
         _activationCallback?.Invoke();
         _activationCallback = null;
+    }
+
+    protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+    {
+        base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+        
+        StopCountdown();
     }
 
     [UIAction("#post-parse")]
@@ -61,19 +72,30 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     {
         _mapListTableData.TableView.ClearSelection();
     }
-    public void DiscardMap(VotingMap map)
+    public void RemoveMapFromList(VotingMap map)
     {
         _votingListDataSource.Data.Remove(map);
         _votingListDataSource.TableView.ReloadData();
-        _matchStateManager.DiscardMap(map);
     }
 
-    public void PopulateData(VotingMap[] maps, int waitTime, Action? timerRanOutCallback = null)
+    public void StopCountdown() => _ranOutOfTimeCallback = null;
+
+    [UIAction("skipButtonClicked")]
+    private void SkipButtonClicked()
+    {
+        _skipButtonPressedCallback?.Invoke();
+        _skipButtonPressedCallback = null;
+    }
+
+    public void PopulateData(VotingMap[] maps, int waitTime, Action? skipButtonPressedCallback = null, Action? timerRanOutCallback = null)
     {
         _log.Notice("Populating maps");
         StartCoroutine(PopulateDataCoroutine());
         
         _ranOutOfTimeCallback = timerRanOutCallback;
+        _skipButtonPressedCallback = skipButtonPressedCallback;
+        
+        NotifyPropertyChanged(nameof(ShowSkipButton));
         
         return;
         
@@ -94,6 +116,9 @@ public class VotingScreenViewController : BSMLAutomaticViewController
             _log.Notice("Counting down");
             while (true)
             {
+                if (_ranOutOfTimeCallback == null)
+                    yield return null;
+                
                 var remaining = countdownFinishTime - DateTime.Now;
                 if (remaining.TotalSeconds <= 0)
                     break;
