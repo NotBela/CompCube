@@ -5,7 +5,6 @@ using CompCube.Game;
 using CompCube.Server;
 using CompCube.UI;
 using CompCube.UI.BSML.Components.CustomLevelBar;
-using CompCube.UI.BSML.Disconnect;
 using CompCube.UI.BSML.Info;
 using CompCube.UI.BSML.Match;
 using CompCube.UI.BSML.Menu;
@@ -40,8 +39,6 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<CantConnectToServerViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<CheckingServerStatusViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<MissingMapsViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.BindInterfacesAndSelfTo<DisconnectedViewController>().FromNewComponentAsViewController()
-                .AsSingle();
             Container.BindInterfacesAndSelfTo<OpponentViewController>().FromNewComponentAsViewController().AsSingle();
 
             Container.BindInterfacesAndSelfTo<PhasePopupViewController>().FromNewComponentAsViewController().AsSingle();
@@ -50,8 +47,6 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<InfoFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
 
             Container.BindInterfacesAndSelfTo<SoundEffectManager>().FromNewComponentOnNewGameObject().AsSingle();
-            
-            Container.BindInterfacesAndSelfTo<DisconnectFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             
             
             Container.BindInterfacesAndSelfTo<GameplaySetupViewManager>().FromNewComponentOnNewGameObject().AsSingle();
@@ -64,7 +59,7 @@ namespace CompCube.Installers
             
             Container.BindInterfacesAndSelfTo<MatchResultsViewController>().FromNewComponentAsViewController()
                 .AsSingle();
-            Container.BindInterfacesAndSelfTo<EarlyLeaveWarningModalViewController>().FromNewComponentAsViewController()
+            Container.BindInterfacesAndSelfTo<WarningModalViewController>().FromNewComponentAsViewController()
                 .AsSingle();
 
             Container.Bind<BSMLTag>().To<LevelBarTag>().AsSingle();

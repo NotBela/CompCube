@@ -6,7 +6,6 @@ using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube_Models.Models.Packets.UserPackets;
 using CompCube.Game;
 using CompCube.Interfaces;
-using CompCube.UI.BSML.Disconnect;
 using CompCube.UI.BSML.Match;
 using CompCube.UI.Sound;
 using CompCube.UI.ViewManagers;
@@ -28,7 +27,7 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly RoundResultsViewController _roundResultsViewController = null!;
         [Inject] private readonly OpponentViewController _opponentViewController = null!;
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
-        [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
+        [Inject] private readonly WarningModalViewController _warningModalViewController = null!;
         
         [Inject] private readonly PhasePopupViewController _phasePopupViewController = null!;
          
@@ -42,9 +41,6 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         
         [Inject] private readonly DisconnectHandler _disconnectHandler = null!;
-
-        [Inject] private readonly DisconnectFlowCoordinator _disconnectFlowCoordinator = null!;
-        [Inject] private readonly DisconnectedViewController _disconnectedViewController = null!;
         
         [Inject] private readonly SoundEffectManager _soundEffectManager = null!;
         
@@ -99,7 +95,6 @@ namespace CompCube.UI.FlowCoordinators
             ProvideInitialViewControllers(_votingScreenNavigationController, _gameplaySetupViewManager.ManagedController, bottomScreenViewController: _opponentViewController);
             _votingScreenNavigationController.PushViewController(_votingScreenViewController, null);
             
-            _disconnectHandler.ShouldShowDisconnectScreen += HandleShouldShowDisconnectScreen;
             _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
             _serverListener.OnPickPhaseStarted += OnPickPhaseStarted;
             _serverListener.OnRoundResults += HandleRoundResults;
@@ -202,25 +197,6 @@ namespace CompCube.UI.FlowCoordinators
             _matchStateManager.SkipDiscardingMaps();
         }
 
-        private void HandleShouldShowDisconnectScreen(string reason, bool matchOnly)
-        {
-            while (!isActivated);
-            
-            this.PresentFlowCoordinatorSynchronously(_disconnectFlowCoordinator);
-            
-            _disconnectedViewController.SetReason(reason, async void () =>
-            {
-                try
-                {
-                    await DismissChildFlowCoordinatorsRecursively();
-                }
-                catch(Exception e)
-                {
-                    _siraLog.Error(e);
-                }
-            });
-        }
-        
         private void HandleVotingScreenMapSelected(VotingMap votingMap)
         {
             if (!_standardLevelDetailViewManager.ManagedController.isActivated)
@@ -258,8 +234,8 @@ namespace CompCube.UI.FlowCoordinators
                     return;
                 }
                 
-                await _serverListener.SendPacket(new MapSelectionPacket(votingMap));
                 ShowMapPreviewViewAndStartMatch(votingMap);
+                await _serverListener.SendPacket(new MapSelectionPacket(votingMap));
             }
             catch (Exception e)
             {
@@ -319,7 +295,6 @@ namespace CompCube.UI.FlowCoordinators
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
-            _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
             _votingScreenViewController.MapSelected -= HandleVotingScreenMapSelected;
             _serverListener.OnPickPhaseStarted -= OnPickPhaseStarted;
             _serverListener.OnRoundResults -= HandleRoundResults;
@@ -338,11 +313,11 @@ namespace CompCube.UI.FlowCoordinators
 
         protected override void BackButtonWasPressed(ViewController viewController)
         {
-            _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", () =>
+            _warningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", () =>
             {
                 _soundEffectManager.CrossfadeToDefault();
                 _onMatchFinishedCallback?.Invoke();
-            });
+            }, _warningModalViewController.Hide);
         }
     }
 }

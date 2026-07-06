@@ -11,31 +11,31 @@ public class DisconnectHandler : IInitializable, IDisposable
     [Inject] private readonly IServerListener _serverListener = null!;
     [Inject] private readonly TransitionToLevelManager _transitionToLevelManager = null!;
     
-    [CanBeNull] public event Action<string, bool> ShouldShowDisconnectScreen;
+    public event Action<string>? ShouldShowDisconnectScreen;
     
     public void Initialize()
     {
         _serverListener.OnDisconnected += OnDisconnect;
     }
 
-    private void EndLevelAndShowDisconnectScreen(string reason, bool matchOnly)
+    private void EndLevelAndShowDisconnectScreen(string reason)
     {
 
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
-            ShouldShowDisconnectScreen?.Invoke(reason, matchOnly);
+            ShouldShowDisconnectScreen?.Invoke(reason);
             return;
         }
         
         _transitionToLevelManager.StopLevel((levelDetails, sceneTransitionSetupData) =>
         {
-            ShouldShowDisconnectScreen?.Invoke(reason, matchOnly);
+            ShouldShowDisconnectScreen?.Invoke(reason);
         });
     }
 
     private void OnDisconnect()
     {
-        EndLevelAndShowDisconnectScreen("Disconnected", false);
+        EndLevelAndShowDisconnectScreen("Disconnected");
     }
 
     public void Dispose()
