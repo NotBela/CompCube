@@ -54,6 +54,8 @@ namespace CompCube.UI.FlowCoordinators
         private NavigationController _votingScreenNavigationController;
 
         private Action? _onMatchFinishedCallback = null;
+        
+        private bool _roundResultsAnimationInProgress = false;
 
         public void PopulateData(MatchCreatedPacket packet, Action? onMatchFinishedCallback)
         {
@@ -95,21 +97,46 @@ namespace CompCube.UI.FlowCoordinators
             _disconnectHandler.ShouldShowDisconnectScreen += HandleShouldShowDisconnectScreen;
             _votingScreenViewController.MapSelected += HandleVotingScreenMapSelected;
             _serverListener.OnPickPhaseStarted += OnPickPhaseStarted;
+            _serverListener.OnRoundResults += HandleRoundResults;
+        }
+
+        private void HandleRoundResults(RoundResultsPacket results)
+        {
+            StartCoroutine(HandleRoundResultsCoroutine());
+
+            return;
+            
+            IEnumerator HandleRoundResultsCoroutine()
+            {
+                _roundResultsAnimationInProgress = true;
+                this.ReplaceViewControllerSynchronously(_roundResultsViewController);
+                
+                _roundResultsViewController.PopulateData(results);
+
+                yield return new WaitForSeconds(10f);
+
+                _roundResultsAnimationInProgress = false;
+            }
         }
 
         private void OnPickPhaseStarted(StartPickPhasePacket packet)
         {
-            // make it so this swaps based on round count
-            if (_matchStateManager.IsRedTeam)
-            {
-                StartCoroutine(PickMapCoroutine());
-                StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.RedPlayer.GetFormattedUserName()}'s Pick"));
-                return;
-            }
-
-            StartCoroutine(WaitForMapToBePickedCoroutine());
-            StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.BluePlayer.GetFormattedUserName()}'s Pick"));
+            StartCoroutine(OnPickPhaseStartedCoroutine());
             return;
+
+            IEnumerator OnPickPhaseStartedCoroutine()
+            {
+                yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
+                
+                // make it so this swaps based on round count
+                if (_matchStateManager.IsRedTeam)
+                {
+                    StartCoroutine(PickMapCoroutine());
+                    yield break;
+                }
+
+                StartCoroutine(WaitForMapToBePickedCoroutine());
+            }
             
             IEnumerator PickMapCoroutine()
             {
@@ -118,6 +145,8 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
                 _votingScreenViewController.PopulateData(packet.AvailableMaps, 30);
+                
+                StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Self.GetFormattedUserName()}'s Pick"));
             }
 
             IEnumerator WaitForMapToBePickedCoroutine()
@@ -126,6 +155,7 @@ namespace CompCube.UI.FlowCoordinators
                 
                 this.ReplaceViewControllerSynchronously(_waitingForOpponentsPickViewController);
                 _waitingForOpponentsPickViewController.PopulateData(_matchStateManager.Opponent.GetFormattedUserName());
+                StartCoroutine(ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Opponent.GetFormattedUserName()}'s Pick"));
             }
         }
 
@@ -246,6 +276,9 @@ namespace CompCube.UI.FlowCoordinators
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
+            _votingScreenViewController.MapSelected -= HandleVotingScreenMapSelected;
+            _serverListener.OnPickPhaseStarted -= OnPickPhaseStarted;
+            _serverListener.OnRoundResults -= HandleRoundResults;
         }
 
         private void ResetNavigationController()

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿﻿using System.Collections;
 using System.Globalization;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -17,36 +17,38 @@ namespace CompCube.UI.BSML.Match
     {
         [Inject] private readonly MatchStateManager _matchStateManager = null!;
         
-        private Action? _onContinueButtonPressedCallback = null;
+        [UIValue("titleBgColor")] private string TitleBgColor { get; set; } = "#FFA500";
+        [UIValue("titleText")] private string TitleText { get; set; } = "";
+
+        [UIValue("winnerScoreText")] private string WinnerScoreText { get; set; } = "";
+        [UIValue("loserScoreText")] private string LoserScoreText { get; set; } = "";
         
-        [UIValue("redPlayerName")] private string RedPlayerName { get; set; } = "";
-        [UIValue("bluePlayerName")] private string BluePlayerName { get; set; } = "";
-        
+        [UIValue("damageText")] private string DamageText { get; set; } = "";
         
         public void PopulateData(RoundResultsPacket results)
         {
-            RedPlayerName = _matchStateManager.RedPlayer.GetFormattedUserName();
-            BluePlayerName = _matchStateManager.BluePlayer.GetFormattedUserName();
+            TitleText = "Results";
+            
+            var redWon = results.RedScore.Points >= results.BlueScore.Points;
+            
+            var winnerScore = redWon ? results.RedScore : results.BlueScore;
+            var loserScore = redWon ? results.BlueScore : results.RedScore;
+            
+            var winner = redWon ? _matchStateManager.RedPlayer : _matchStateManager.BluePlayer;
+            var loser = redWon ? _matchStateManager.BluePlayer : _matchStateManager.RedPlayer;
+            
+            WinnerScoreText = FormatScore(winnerScore, winner, 1);
+            LoserScoreText = FormatScore(loserScore, loser, 2);
+            
+            DamageText = Math.Abs(results.BlueScore.Points - results.RedScore.Points).ToString("N0", CultureInfo.InvariantCulture);
             
             NotifyPropertyChanged(null);
         }
 
-        public void SetContinueButtonCallback(Action? onContinueButtonPressedCallback)
-        {
-            _onContinueButtonPressedCallback = onContinueButtonPressedCallback;
-        }
-
-        private string FormatScore(MatchScore score, int placement) => 
-            $"{(placement)}. {score.User.GetFormattedUserName()} - " +
-            $"{(score.Score?.RelativeScore * 100):F}% " +
-            $"{(score.Score.FullCombo ? "FC".FormatWithHtmlColor("#90EE90") : $"{score.Score.Misses}x".FormatWithHtmlColor("#FF7F7F"))}" +
-            $"{(score.Score.ProMode ? " (PM)" : "")}";
-
-        [UIAction("continueButtonClicked")]
-        private void ContinueButtonClicked()
-        {
-            _onContinueButtonPressedCallback?.Invoke();
-            _onContinueButtonPressedCallback = null;
-        }
+        private string FormatScore(Score score,CompCube_Models.Models.ClientData.UserInfo user, int placement) => 
+            $"{(placement)}. {user.GetFormattedUserName()} - " +
+            $"{(score.RelativeScore * 100):F}% " +
+            $"{(score.FullCombo ? "FC".FormatWithHtmlColor("#90EE90") : $"{score.Misses}x".FormatWithHtmlColor("#FF7F7F"))}" +
+            $"{(score.ProMode ? " (PM)" : "")}";
     }
 }

@@ -61,6 +61,9 @@ public class DebugServerListener : IServerListener
             case UserPacket.UserPacketTypes.MapSelection:
                 
                 break;
+            case UserPacket.UserPacketTypes.ScoreSubmission:
+                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10, 10f));
+                break;
         }
     }
 
