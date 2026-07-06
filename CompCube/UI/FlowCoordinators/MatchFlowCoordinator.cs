@@ -190,7 +190,7 @@ namespace CompCube.UI.FlowCoordinators
         private void HandleVotingScreenTimerRanOutDuringPickPhase()
         {
             HideStandardLevelDetailControllerIfPresent();
-            HandleStandardLevelDetailButtonPressed(_matchBeatmapManager.Maps[0]);
+            HandleStandardLevelDetailButtonPressed(_matchBeatmapManager.AvailablePicks[0]);
         }
 
         private void HandleVotingScreenTimerRanOutDuringDiscardPhase()
