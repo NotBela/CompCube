@@ -27,6 +27,7 @@ namespace CompCube.Server
         public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
         public event Action<RoundResultsPacket>? OnRoundResults;
         public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
+        public event Action<MatchFinishedPacket>? OnMatchFinished;
         public event Action? OnConnected;
         public event Action? OnDisconnected;
 
@@ -159,6 +160,9 @@ namespace CompCube.Server
                             break;
                         case ServerPacket.ServerPacketTypes.StartPickPhase:
                             OnPickPhaseStarted?.Invoke(packet as StartPickPhasePacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.MatchFinished:
+                            OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
                             break;
                         default:
                             throw new Exception("Could not get packet type!");

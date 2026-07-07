@@ -18,6 +18,8 @@ public class DebugServerListener : IServerListener
     public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
     public event Action<RoundResultsPacket>? OnRoundResults;
     public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
+    
+    public event Action<MatchFinishedPacket>? OnMatchFinished;
     public event Action? OnConnected;
     public event Action? OnDisconnected;
     public bool Connected => _isConnected;
