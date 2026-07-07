@@ -76,6 +76,7 @@ namespace CompCube.UI.FlowCoordinators
         private void HandleSkippingDiscardPhase()
         {
             HideStandardLevelDetailControllerIfPresent();
+            HideLeaderboard();
             _matchBeatmapManager.SkipDiscardingMaps();
         }
 
