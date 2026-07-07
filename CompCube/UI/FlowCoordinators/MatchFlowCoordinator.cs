@@ -127,6 +127,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 this.ReplaceViewControllerSynchronously(_waitingViewController);
                 _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to finish discarding...");
+                
                 await _serverListener.SendPacket(new DiscardMapsPacket(_matchBeatmapManager.DiscardedMaps.ToArray()));
             }
             catch (Exception e)

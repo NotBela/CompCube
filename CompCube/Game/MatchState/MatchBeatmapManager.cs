@@ -9,7 +9,7 @@ public class MatchBeatmapManager() : IInitializable, IDisposable
 {
     [Inject] private readonly IServerListener _serverListener = null!;
     
-    private List<VotingMap?> _discardedMaps = [];
+    private List<VotingMap> _discardedMaps = [];
     
     public IReadOnlyList<VotingMap?> DiscardedMaps => _discardedMaps;
 
@@ -19,14 +19,15 @@ public class MatchBeatmapManager() : IInitializable, IDisposable
 
     public IReadOnlyList<VotingMap> AvailablePicks => _maps;
     
-    public bool CanDiscardMaps => InDiscardPhase && DiscardedMaps.Count < 2;
+    public bool CanDiscardMaps => InDiscardPhase && DiscardedMaps.Count < 2 && !DiscardPhaseWasSkipped;
+
+    public bool DiscardPhaseWasSkipped { get; private set; } = false;
 
     public event Action? CanNoLongerDiscardMaps;
 
-    public void DiscardMap(VotingMap? map)
+    public void DiscardMap(VotingMap map)
     {
-        if (map != null)
-            _maps.Remove(map);
+        _maps.Remove(map);
         
         _discardedMaps.Add(map);
         
@@ -36,8 +37,8 @@ public class MatchBeatmapManager() : IInitializable, IDisposable
 
     public void SkipDiscardingMaps()
     {
-        while (DiscardedMaps.Count < 2)
-            DiscardMap(null);
+        DiscardPhaseWasSkipped = true;
+        CanNoLongerDiscardMaps?.Invoke();
     }
 
     public void Initialize()
@@ -58,6 +59,7 @@ public class MatchBeatmapManager() : IInitializable, IDisposable
         _discardedMaps = [];
         
         InDiscardPhase = true;
+        DiscardPhaseWasSkipped = false;
     }
 
     public void Dispose()
