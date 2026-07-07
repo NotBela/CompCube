@@ -145,7 +145,7 @@ namespace CompCube.Server
                     if (!Connected)
                         return;
                     
-                    var data = new byte[1024];
+                    var data = new byte[4096];
 
                     var bytesRead = _client.GetStream().Read(data, 0, data.Length);
                     Array.Resize(ref data, bytesRead);
