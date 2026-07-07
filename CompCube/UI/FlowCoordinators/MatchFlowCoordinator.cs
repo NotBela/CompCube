@@ -115,7 +115,7 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
                 
                 this.ReplaceViewControllerSynchronously(_matchResultsViewController);
-                _matchResultsViewController.PopulateData(packet.RedWon && _matchStateManager.IsRedTeam || !packet.RedWon && !_matchStateManager.IsRedTeam, packet.EloChange, () => _onMatchFinishedCallback?.Invoke());
+                _matchResultsViewController.PopulateData(packet.Won, packet.EloChange, () => _onMatchFinishedCallback?.Invoke());
                 
                 SetBottomScreenViewController(null, ViewController.AnimationType.Out);
                 SetLeftScreenViewController(null, ViewController.AnimationType.Out);
@@ -157,7 +157,6 @@ namespace CompCube.UI.FlowCoordinators
                 
                 yield return new WaitForSeconds(10f);
 
-                _bottomScreenMatchStateViewController.UpdateMultiplier(results.DamageMultiplier);
                 _roundResultsAnimationInProgress = false;
             }
         }
@@ -172,8 +171,9 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
                 
                 _bottomScreenMatchStateViewController.UpdateRound(_matchStateManager.CurrentRound);
-                // make it so this swaps based on round count
-                if ((packet.RedPick && _matchStateManager.IsRedTeam) || (!packet.RedPick && !_matchStateManager.IsRedTeam))
+                _bottomScreenMatchStateViewController.UpdateMultiplier(packet.NewMultiplier);
+                
+                if (packet.IsOwnPick)
                 {
                     yield return PickMapCoroutine();
                     yield break;

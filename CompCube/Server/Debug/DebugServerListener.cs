@@ -58,13 +58,13 @@ public class DebugServerListener : IServerListener
                 OnAbruptDisconnect?.Invoke("test");
                 break;
             case UserPacket.UserPacketTypes.DiscardMaps:
-                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true));
+                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true, 10f));
                 break;
             case UserPacket.UserPacketTypes.MapSelection:
                 
                 break;
             case UserPacket.UserPacketTypes.ScoreSubmission:
-                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10, 10f));
+                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10));
 
                 await Task.Delay(500);
                 

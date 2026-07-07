@@ -35,6 +35,7 @@ public class MatchStateManager : IInitializable, IDisposable
     private void HandlePickPhaseStarted(StartPickPhasePacket packet)
     {
         CurrentRound++;
+        DamageMultiplier = packet.NewMultiplier;
     }
 
     private void HandleMatchCreated(MatchCreatedPacket matchCreated)
@@ -54,8 +55,6 @@ public class MatchStateManager : IInitializable, IDisposable
     {
         RedHealth = results.RedHealth;
         BlueHealth = results.BlueHealth;
-
-        DamageMultiplier = results.DamageMultiplier;
     }
 
     public void Dispose()
