@@ -23,7 +23,7 @@ public class BeatmapDownloader
         
         foreach (var mapHash in hashesWithoutDuplicates)
         {
-            if (Loader.GetLevelByHash(mapHash) != null)
+            if (SongCore.Collections.songWithHashPresent(mapHash))
                 continue;
             
             var map = await _beatSaver.BeatmapByHash(mapHash);
@@ -32,8 +32,18 @@ public class BeatmapDownloader
                 _siraLog.Error($"Could not find map {mapHash}!");
                 continue;
             }
+            
+            var version =
+                map.Versions.FirstOrDefault(i => string.Equals(i.Hash, mapHash, StringComparison.OrdinalIgnoreCase));
 
-            var beatmapData = await map.LatestVersion.DownloadZIP();
+            if (version == null)
+            {
+                _siraLog.Error("Map not found in beatsaver versions!");
+                continue;
+            }
+
+            _siraLog.Notice($"Downloading...");
+            var beatmapData = await version.DownloadZIP();
             
             var zippedBeatmap = new ZipArchive(new MemoryStream(beatmapData ?? throw new Exception("Beatmap data is null!")), ZipArchiveMode.Read);
             zippedBeatmap.ExtractToDirectory(Path.Combine(UnityGame.InstallPath, "Beat Saber_Data", "CustomLevels", Path.GetInvalidFileNameChars().Aggregate($"{map.Name} ({map.ID})", (current, c) => current.Replace(c.ToString(), string.Empty))));
@@ -41,5 +51,7 @@ public class BeatmapDownloader
             mapsDownloaded++;
             OnMapDownloaded?.Invoke(mapsDownloaded, mapHashes.Length);
         }
+        
+        Loader.Instance.RefreshSongs();
     }
 }

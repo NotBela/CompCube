@@ -113,7 +113,6 @@ public class ServerCheckingFlowCoordinator : FlowCoordinator
             await _beatmapDownloader.DownloadMaps(missingMapHashes);
             
             showBackButton = true;
-            Loader.Instance.RefreshSongs();
 
             while (Loader.AreSongsLoading)
                 await Task.Delay(25);
