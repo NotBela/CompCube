@@ -15,6 +15,7 @@ public class BeatmapDownloader
     
     public event Action<int, int>? OnMapDownloaded;
 
+    // if maps hashes provided by the server are outdated then THIS WILL BREAK
     public async Task DownloadMaps(string[] mapHashes)
     {
         var mapsDownloaded = 0;
