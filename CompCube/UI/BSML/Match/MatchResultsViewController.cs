@@ -21,14 +21,14 @@ public class MatchResultsViewController : BSMLAutomaticViewController
     
     private Action? _continueButtonPressedCallback = null;
     
-    public void PopulateData(bool won, int mmrChange, Action continueButtonPressedCallback)
+    public void PopulateData(bool won, int eloChange, Action continueButtonPressedCallback)
     {
         _continueButtonPressedCallback = continueButtonPressedCallback;
-        TitleText = won ? "Victory!" : "Defeat!";
+        TitleText = won ? "Victory!" : "Defeat";
         TitleBgColor = won ? "#0000FF" : "#FF0000";
 
         MmrChangeText =
-            $"You {(won ? "gained" : "lost")}: {mmrChange.ToString().FormatWithHtmlColor(won ? "#90EE90" : "#FF7F7F")} MMR";
+            $"You {(won ? "gained" : "lost")}: {eloChange.ToString().FormatWithHtmlColor(won ? "#90EE90" : "#FF7F7F")} ELO";
             
         NotifyPropertyChanged(null);
     }

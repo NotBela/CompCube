@@ -30,6 +30,7 @@ namespace CompCube.Server
         public event Action<MatchFinishedPacket>? OnMatchFinished;
         public event Action? OnConnected;
         public event Action? OnDisconnected;
+        public event Action<string>? OnAbruptDisconnect;
 
 
         [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
@@ -114,14 +115,25 @@ namespace CompCube.Server
             await _client.GetStream().WriteAsync(bytes, 0, bytes.Length);
         }
 
+        public void DisconnectAbruptly(string reason)
+        {
+            StopListeningToServer();
+            OnAbruptDisconnect?.Invoke(reason);
+        }
+
         public void Disconnect()
+        {
+            StopListeningToServer();
+            OnDisconnected?.Invoke();
+        }
+
+        private void StopListeningToServer()
         {
             if (!Connected)
                 return;
             
             _shouldListenToServer = false;
             _client.Close();
-            OnDisconnected?.Invoke();
         }
 
         private void ListenToServer()
@@ -171,7 +183,7 @@ namespace CompCube.Server
                 catch (Exception e)
                 {
                     _siraLog.Error(e);
-                    Disconnect();
+                    DisconnectAbruptly("Unhandled exception, please check your logs!");
                 }
             }
         }

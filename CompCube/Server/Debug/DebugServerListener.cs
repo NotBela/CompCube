@@ -18,10 +18,11 @@ public class DebugServerListener : IServerListener
     public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
     public event Action<RoundResultsPacket>? OnRoundResults;
     public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
-    
     public event Action<MatchFinishedPacket>? OnMatchFinished;
+    
     public event Action? OnConnected;
     public event Action? OnDisconnected;
+    public event Action<string>? OnAbruptDisconnect;
     public bool Connected => _isConnected;
 
     public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback)
@@ -51,7 +52,10 @@ public class DebugServerListener : IServerListener
         switch (packet.PacketType)
         {
             case UserPacket.UserPacketTypes.JoinRequest:
-                OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
+                // OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
+
+                await Task.Delay(2000);
+                OnAbruptDisconnect?.Invoke("test");
                 break;
             case UserPacket.UserPacketTypes.DiscardMaps:
                 OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true));
@@ -64,13 +68,17 @@ public class DebugServerListener : IServerListener
 
                 await Task.Delay(500);
                 
-                OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, false));
-
-                await Task.Delay(15000);
-                
-                OnPlayerSelectedMap?.Invoke(new PlayerSelectedMapPacket(DebugApi.Maps[0]));
+                OnMatchFinished?.Invoke(new MatchFinishedPacket(100, true));
                 break;
         }
+    }
+
+    public void DisconnectAbruptly(string reason)
+    {
+        if (!_isConnected) return;
+        _isConnected = false;
+        
+        OnAbruptDisconnect?.Invoke(reason);
     }
 
     public void Disconnect()

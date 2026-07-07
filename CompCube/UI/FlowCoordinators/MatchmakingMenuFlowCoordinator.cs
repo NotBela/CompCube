@@ -43,7 +43,6 @@ namespace CompCube.UI.FlowCoordinators
             _matchFlowCoordinator.PopulateData(packet, () =>
             {
                 DismissFlowCoordinator(_matchFlowCoordinator);
-                _serverListener.Disconnect();
             });
         }
 
@@ -51,6 +50,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             _serverListener.OnMatchCreated -= OnMatchCreated;
             _infoFlowCoordinator.OnBackButtonPressed -= OnInfoFlowCoordinatorBackButtonPressed;
+            _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
         }
         
         public void Initialize()
@@ -72,12 +72,12 @@ namespace CompCube.UI.FlowCoordinators
             
             IEnumerator HandleShouldShowDisconnectScreenCoroutine()
             {
-                Plugin.Log.Info("coroutine started");
                 // this will break if the flow coordinator hierarchy ever gets more than 1 deeper after this flow coordinator
-                DismissFlowCoordinator(childFlowCoordinator);
+                if (childFlowCoordinator)
+                    DismissFlowCoordinator(childFlowCoordinator);
                 
                 yield return new WaitUntil(() => isActivated && !isInTransition);
-                Plugin.Log.Info("finished waiting");
+                
                 _warningModalViewController.ParseOntoGameObject(topViewController, $"Disconnected from server.\nReason: {reason}", _warningModalViewController.Hide);
             }
         }

@@ -18,6 +18,8 @@ public interface IServerListener
     public event Action OnConnected;
     
     public event Action OnDisconnected;
+
+    public event Action<string> OnAbruptDisconnect;
     
     public bool Connected { get; }
 
@@ -26,4 +28,6 @@ public interface IServerListener
     public Task SendPacket(UserPacket packet);
 
     public void Disconnect();
+    
+    public void DisconnectAbruptly(string reason);
 }

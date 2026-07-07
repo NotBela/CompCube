@@ -101,6 +101,24 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnRoundResults += HandleRoundResults;
             _serverListener.OnPlayerSelectedMap += HandleOpponentSelectedMap;
             _matchBeatmapManager.CanNoLongerDiscardMaps += HandleCanNoLongerDiscardMaps;
+            _serverListener.OnMatchFinished += HandleMatchFinished;
+        }
+
+        private void HandleMatchFinished(MatchFinishedPacket packet)
+        {
+            StartCoroutine(HandleMatchFinishedCoroutine());
+            return;
+            
+            IEnumerator HandleMatchFinishedCoroutine()
+            {
+                yield return new WaitUntil(() => !_roundResultsAnimationInProgress);
+                
+                this.ReplaceViewControllerSynchronously(_matchResultsViewController);
+                _matchResultsViewController.PopulateData(packet.RedWon && _matchStateManager.IsRedTeam || !packet.RedWon && !_matchStateManager.IsRedTeam, packet.EloChange, () => _onMatchFinishedCallback?.Invoke());
+                
+                SetBottomScreenViewController(null, ViewController.AnimationType.Out);
+                SetLeftScreenViewController(null, ViewController.AnimationType.Out);
+            }
         }
 
         private async void HandleCanNoLongerDiscardMaps()
@@ -305,6 +323,7 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnRoundResults -= HandleRoundResults;
             _serverListener.OnPlayerSelectedMap -= HandleOpponentSelectedMap;
             _matchBeatmapManager.CanNoLongerDiscardMaps -= HandleCanNoLongerDiscardMaps;
+            _serverListener.OnMatchFinished -= HandleMatchFinished;
         }
 
         private void HideStandardLevelDetailControllerIfPresent()

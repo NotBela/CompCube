@@ -15,7 +15,7 @@ using Zenject;
 namespace CompCube.UI.BSML.Menu
 {
     [ViewDefinition("CompCube.UI.BSML.Menu.MatchmakingMenuView.bsml")]
-    public class MatchmakingMenuViewController : BSMLAutomaticViewController, IInitializable
+    public class MatchmakingMenuViewController : BSMLAutomaticViewController, IInitializable, IDisposable
     {
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly IServerListener _serverListener = null!;
@@ -104,6 +104,18 @@ namespace CompCube.UI.BSML.Menu
                 return;
             
             _queueOptions.Add(new QueueOptionTab("Debug", "debug"));
+            
+            _serverListener.OnAbruptDisconnect += HandleAbruptDisconnect;
+        }
+
+        private void HandleAbruptDisconnect(string reason)
+        {
+            SetState(false);
+        }
+
+        public void Dispose()
+        {
+            _serverListener.OnAbruptDisconnect -= HandleAbruptDisconnect;
         }
     }
 }

@@ -9,6 +9,6 @@
     </vertical>
 
     <horizontal anchor-pos-x="0" anchor-pos-y="-37.5">
-        <primary-button text="Skip" on-click="skipButtonClicked" pref-width='34' pref-height='10' active="~showSkipButton"/>
+        <button text="Skip" on-click="skipButtonClicked" pref-width='34' pref-height='10' active="~showSkipButton"/>
     </horizontal>
 </bg>

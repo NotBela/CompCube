@@ -13,12 +13,11 @@ public class DisconnectHandler : IInitializable, IDisposable
     
     public void Initialize()
     {
-        _serverListener.OnDisconnected += OnDisconnect;
+        _serverListener.OnAbruptDisconnect += OnAbruptDisconnect;
     }
 
     private void EndLevelAndShowDisconnectScreen(string reason)
     {
-
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
             ShouldShowDisconnectScreen?.Invoke(reason);
@@ -31,13 +30,13 @@ public class DisconnectHandler : IInitializable, IDisposable
         });
     }
 
-    private void OnDisconnect()
+    private void OnAbruptDisconnect(string reason)
     {
-        EndLevelAndShowDisconnectScreen("Disconnected");
+        EndLevelAndShowDisconnectScreen(reason);
     }
 
     public void Dispose()
     {
-        _serverListener.OnDisconnected -= OnDisconnect;
+        _serverListener.OnAbruptDisconnect -= OnAbruptDisconnect;
     }
 }
