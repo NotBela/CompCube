@@ -17,4 +17,6 @@ public interface IApi
     public Task<string[]?> GetMapHashes();
     
     public Task<EventData[]?> GetEvents();
+
+    public Task<byte[]?> DownloadBeatmap(string hash);
 }

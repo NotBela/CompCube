@@ -69,4 +69,10 @@ public class DebugApi : IApi
         await Task.Delay(500);
         return [];
     }
+
+    public async Task<byte[]?> DownloadBeatmap(string hash)
+    {
+        await Task.Delay(500);
+        return [];
+    }
 }
