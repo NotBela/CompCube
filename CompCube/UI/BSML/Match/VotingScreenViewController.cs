@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Globalization;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -27,6 +28,8 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     private Action? _ranOutOfTimeCallback = null;
 
     [UIComponent("voteStatusText")] private readonly TextMeshProUGUI _voteStatusText = null!;
+    [UIValue("timerText")] private string TimerText { get; set; } = "";
+    [UIValue("votingText")] private string VotingText { get; set; } = "Discard up to two cards to be replaced!";
     
     private Action? _activationCallback = null;
     
@@ -103,8 +106,8 @@ public class VotingScreenViewController : BSMLAutomaticViewController
                 if (remaining.TotalSeconds <= 0)
                     break;
 
-                _voteStatusText.text =
-                    $"Discard Phase\nDiscard up to two maps that you don't want to play!\nTime left: {Mathf.CeilToInt((float)remaining.TotalSeconds)}";
+                TimerText = $"{remaining.TotalSeconds.ToString("00", CultureInfo.InvariantCulture)}.{Mathf.CeilToInt(remaining.Milliseconds).ToString("D", CultureInfo.InvariantCulture)}";
+                NotifyPropertyChanged(nameof(TimerText));
 
                 yield return null;
             }

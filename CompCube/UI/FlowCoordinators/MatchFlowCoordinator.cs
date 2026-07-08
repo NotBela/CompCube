@@ -28,6 +28,7 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly RoundResultsViewController _roundResultsViewController = null!;
         [Inject] private readonly BottomScreenMatchStateViewController _bottomScreenMatchStateViewController = null!;
         [Inject] private readonly MatchResultsViewController _matchResultsViewController = null!;
+        [Inject] private readonly WaitingForDiscardPhaseToFinishViewController _waitingForDiscardPhaseToFinishViewController = null!;
         [Inject] private readonly WarningModalViewController _warningModalViewController = null!;
         
         [Inject] private readonly PhasePopupViewController _phasePopupViewController = null!;
@@ -52,6 +53,8 @@ namespace CompCube.UI.FlowCoordinators
         
         private bool _roundResultsAnimationInProgress = false;
 
+        private bool _hasShownFinalCardsToPlayer = false;
+
         public void PopulateData(MatchCreatedPacket packet, Action? onMatchFinishedCallback)
         {
             _bottomScreenMatchStateViewController.PopulateData(packet.Red, packet.Blue);
@@ -69,7 +72,7 @@ namespace CompCube.UI.FlowCoordinators
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
                 _votingScreenViewController.PopulateData(packet.InitialMaps, 30, HandleSkippingDiscardPhase, HandleVotingScreenTimerRanOutDuringDiscardPhase);
-                StartCoroutine(ShowPhaseChangeModal("Discard Phase", "Discard maps that you don't want to play!"));
+                StartCoroutine(ShowPhaseChangeModal("Discard Phase", ""));
             }
         }
 
@@ -103,6 +106,14 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnPlayerSelectedMap += HandleOpponentSelectedMap;
             _matchBeatmapManager.CanNoLongerDiscardMaps += HandleCanNoLongerDiscardMaps;
             _serverListener.OnMatchFinished += HandleMatchFinished;
+            _serverListener.OnCardsUpdated += HandleCardsUpdated;
+        }
+
+        private void HandleCardsUpdated(UpdateCardsPacket packet)
+        {
+            this.ReplaceViewControllerSynchronously(_waitingForDiscardPhaseToFinishViewController);
+            
+            _waitingForDiscardPhaseToFinishViewController.PopulateData(packet.Maps);
         }
 
         private void HandleMatchFinished(MatchFinishedPacket packet)
@@ -128,9 +139,6 @@ namespace CompCube.UI.FlowCoordinators
         {
             try
             {
-                this.ReplaceViewControllerSynchronously(_waitingViewController);
-                _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to finish discarding...");
-                
                 await _serverListener.SendPacket(new DiscardMapsPacket(_matchBeatmapManager.DiscardedMaps.ToArray()));
             }
             catch (Exception e)
@@ -174,6 +182,11 @@ namespace CompCube.UI.FlowCoordinators
                 
                 _bottomScreenMatchStateViewController.UpdateRound(_matchStateManager.CurrentRound);
                 _bottomScreenMatchStateViewController.UpdateMultiplier(packet.NewMultiplier);
+
+                if (!_hasShownFinalCardsToPlayer)
+                {
+                    yield return ShowFinalCardsToPlayerCoroutine();
+                }
                 
                 if (packet.IsOwnPick)
                 {
@@ -182,6 +195,16 @@ namespace CompCube.UI.FlowCoordinators
                 }
 
                 yield return WaitForMapToBePickedCoroutine();
+            }
+
+            IEnumerator ShowFinalCardsToPlayerCoroutine()
+            {
+                this.ReplaceViewControllerSynchronously(_waitingForDiscardPhaseToFinishViewController);
+                _waitingForDiscardPhaseToFinishViewController.PopulateData(packet.AvailableMaps, false);
+
+                yield return new WaitForSeconds(4f);
+                
+                _hasShownFinalCardsToPlayer = true;
             }
             
             IEnumerator PickMapCoroutine()

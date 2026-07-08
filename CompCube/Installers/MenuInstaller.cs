@@ -39,6 +39,8 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<CantConnectToServerViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<CheckingServerStatusViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<MissingMapsViewController>().FromNewComponentAsViewController().AsSingle();
+            Container.BindInterfacesAndSelfTo<WaitingForDiscardPhaseToFinishViewController>()
+                .FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<BottomScreenMatchStateViewController>().FromNewComponentAsViewController().AsSingle();
 
             Container.BindInterfacesAndSelfTo<PhasePopupViewController>().FromNewComponentAsViewController().AsSingle();

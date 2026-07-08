@@ -28,6 +28,8 @@ namespace CompCube.Server
         public event Action<RoundResultsPacket>? OnRoundResults;
         public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
         public event Action<MatchFinishedPacket>? OnMatchFinished;
+        
+        public event Action<UpdateCardsPacket>? OnCardsUpdated; 
         public event Action? OnConnected;
         public event Action? OnDisconnected;
         public event Action<string>? OnAbruptDisconnect;
@@ -175,6 +177,9 @@ namespace CompCube.Server
                             break;
                         case ServerPacket.ServerPacketTypes.MatchFinished:
                             OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.UpdateCards:
+                            OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
                             break;
                         default:
                             throw new Exception("Could not get packet type!");

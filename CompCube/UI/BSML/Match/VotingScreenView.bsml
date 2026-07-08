@@ -1,7 +1,10 @@
 <bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical anchor-pos-y="20">
-        <text text="Please vote on a map to play!" id="voteStatusText" align="Center" italics="true"/>
+    <vertical anchor-pos-y="20" vertical-fit="PreferredSize">
+        <text text="~votingText" align="Center" italics="true"/>
+    </vertical>
+    <vertical anchor-pos-y="16" preferred-width="10" horizontal-fit="PreferredSize">
+        <text text="~timerText" align="MidlineLeft" italics="true"/>
     </vertical>
 
     <horizontal anchor-pos-x="0" anchor-pos-y="-37.5">

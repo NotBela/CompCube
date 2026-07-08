@@ -246,6 +246,8 @@
       <EmbeddedResource Include="UI\BSML\Match\BottomScreenMatchStateView.bsml" />
       <None Remove="UI\BSML\Components\CustomMapList\CustomMapList.bsml" />
       <EmbeddedResource Include="UI\BSML\Components\CustomMapList\CustomMapList.bsml" />
+      <None Remove="UI\BSML\Match\WaitingForDiscardPhaseToFinishViewController.bsml" />
+      <EmbeddedResource Include="UI\BSML\Match\WaitingForDiscardPhaseToFinishView.bsml" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="CompCube.csproj.user" />
