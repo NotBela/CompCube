@@ -244,6 +244,8 @@
       <EmbeddedResource Include="UI\BSML\Modal\WarningModalView.bsml" />
       <None Remove="UI\BSML\Match\BottomScreenMatchStateView.bsml" />
       <EmbeddedResource Include="UI\BSML\Match\BottomScreenMatchStateView.bsml" />
+      <None Remove="UI\BSML\Components\CustomMapList\CustomMapList.bsml" />
+      <EmbeddedResource Include="UI\BSML\Components\CustomMapList\CustomMapList.bsml" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="CompCube.csproj.user" />

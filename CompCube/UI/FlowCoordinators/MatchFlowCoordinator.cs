@@ -235,7 +235,7 @@ namespace CompCube.UI.FlowCoordinators
                             _standardLevelDetailViewManager.ManagedController.transform.position.z);
                     });
             
-            _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchBeatmapManager.InDiscardPhase ? "Discard" : "Select", true);
+            _standardLevelDetailViewManager.SetData(votingMap, HandleStandardLevelDetailButtonPressed, _matchBeatmapManager.InDiscardPhase ? "Discard" : "Select");
             ShowLeaderboard(votingMap);
 
             var beatmap = votingMap.GetBeatmapLevel();

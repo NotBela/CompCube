@@ -3,12 +3,8 @@
     <vertical anchor-pos-y="20">
         <text text="Please vote on a map to play!" id="voteStatusText" align="Center" italics="true"/>
     </vertical>
-    
-    <vertical anchor-pos-y="-10">
-        <list id="mapList" visible-cells="3" list-style="Simple" show-scrollbar="true" align-to-center="true"/>
-    </vertical>
 
     <horizontal anchor-pos-x="0" anchor-pos-y="-37.5">
-        <button text="Skip" on-click="skipButtonClicked" pref-width='34' pref-height='10' active="~showSkipButton"/>
+        <button text="Hold" on-click="skipButtonClicked" pref-width='34' pref-height='10' active="~showSkipButton"/>
     </horizontal>
 </bg>

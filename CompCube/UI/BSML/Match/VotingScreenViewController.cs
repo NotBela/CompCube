@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using CompCube.Extensions;
 using CompCube.Game;
 using CompCube.Game.MatchState;
+using CompCube.UI.BSML.Components.CustomMapList;
 using SiraUtil.Logging;
 using TMPro;
 using UnityEngine;
@@ -25,9 +26,6 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     public event Action<VotingMap>? MapSelected;
     private Action? _ranOutOfTimeCallback = null;
 
-    [UIComponent("mapList")] private readonly CustomListTableData _mapListTableData = null!;
-    private VotingListDataSource _votingListDataSource = null!;
-
     [UIComponent("voteStatusText")] private readonly TextMeshProUGUI _voteStatusText = null!;
     
     private Action? _activationCallback = null;
@@ -35,6 +33,8 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     private Action? _skipButtonPressedCallback = null;
     
     [UIValue("showSkipButton")] private bool ShowSkipButton => _skipButtonPressedCallback != null;
+    
+    private CustomMapListController _customMapListController;
 
     protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
     {
@@ -52,31 +52,9 @@ public class VotingScreenViewController : BSMLAutomaticViewController
     }
 
     [UIAction("#post-parse")]
-    void PostParse()
+    private void PostParse()
     {
-        _votingListDataSource = gameObject.AddComponent<VotingListDataSource>();
-        _mapListTableData.TableView.SetDataSource(_votingListDataSource, true);
-        
-        _votingListDataSource.Init(_mapListTableData.TableView);
-        
-        Destroy(_mapListTableData);
-        
-        _votingListDataSource.TableView.didSelectCellWithIdxEvent += DidSelectCellWithIdxEvent;
-    }
-
-    private void DidSelectCellWithIdxEvent(TableView tableView, int idx)
-    {
-        MapSelected?.Invoke(_votingListDataSource.Data[idx]);
-    }
-
-    public void ClearSelection()
-    {
-        _mapListTableData.TableView.ClearSelection();
-    }
-    public void RemoveMapFromList(VotingMap map)
-    {
-        _votingListDataSource.Data.Remove(map);
-        _votingListDataSource.TableView.ReloadData();
+        _customMapListController = CustomMapListController.ParseOntoViewController(this, (map) => MapSelected?.Invoke(map), 0, -10);
     }
 
     public void StopCountdown() => _ranOutOfTimeCallback = null;
@@ -88,27 +66,28 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         _skipButtonPressedCallback = null;
     }
 
+    public void ClearSelection()
+    {
+        _customMapListController.ClearSelection();
+    }
+
+    public void RemoveMapFromList(VotingMap map)
+    {
+        _customMapListController.SetMaps(_customMapListController.MapsInList.Where(i => i != map).ToArray());
+    }
+
     public void PopulateData(VotingMap[] maps, int waitTime, Action? skipButtonPressedCallback = null, Action? timerRanOutCallback = null)
     {
         _log.Notice("Populating maps");
-        StartCoroutine(PopulateDataCoroutine());
+        StartCoroutine(CountDown());
+        
+        _customMapListController.SetMaps(maps);
         
         _ranOutOfTimeCallback = timerRanOutCallback;
         _skipButtonPressedCallback = skipButtonPressedCallback;
         
         NotifyPropertyChanged(nameof(ShowSkipButton));
-        
         return;
-        
-        IEnumerator PopulateDataCoroutine()
-        {
-            yield return new WaitForEndOfFrame();
-            
-            _votingListDataSource.SetData(maps.ToList());
-            _votingListDataSource.TableView.ClearSelection();
-
-            yield return CountDown();
-        }
 
         IEnumerator CountDown()
         {
@@ -132,58 +111,5 @@ public class VotingScreenViewController : BSMLAutomaticViewController
             _ranOutOfTimeCallback?.Invoke();
             _ranOutOfTimeCallback = null;
         }
-    }
-}
-    
-public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
-{
-    public TableView TableView { get; private set; }
-        
-    public List<VotingMap> Data { get; private set; } = new();
-
-    private LevelListTableCell _tableCellPrefab;
-
-    private LevelListTableCell CreateTableCellPrefab()
-    {
-        var gameObj = Instantiate(
-            Resources.FindObjectsOfTypeAll<LevelCollectionViewController>()
-                .First()
-                .transform
-                .Find("LevelsTableView/TableView/Viewport/Content/LevelListTableCell")
-                .gameObject);
-            
-        gameObj.name = "MyListCell";
-
-        var cell = gameObj.GetComponent<LevelListTableCell>();
-        return cell;
-    }
-        
-    public void Init(TableView tableView) => TableView = tableView;
-
-    public void SetData(List<VotingMap> maps)
-    {
-        Data = maps;
-        TableView.ReloadData();
-    }
-
-    public float CellSize(int idx) => 8.5f;
-
-    public int NumberOfCells() => Data.Count;
-
-    public TableCell CellForIdx(TableView tableView, int idx)
-    {
-        var cell = (LevelListTableCell) tableView.DequeueReusableCellForIdentifier("VotingListTableCell");
-
-        if (cell is null)
-        {
-            _tableCellPrefab ??= CreateTableCellPrefab();
-            cell = Instantiate(_tableCellPrefab);
-            cell.reuseIdentifier = "VotingListTableCell";
-        }
-
-        var info = Data[idx];
-        cell.SetDataFromLevelAsync(info.GetBeatmapLevel(), false,false, false, true);
-
-        return cell;
     }
 }
