@@ -103,7 +103,10 @@ namespace CompCube.Server
                     _shouldListenToServer = true;
                     _listenerThread.Start();
                     OnConnected?.Invoke();
+                    return;
                 }
+                
+                Disconnect();
             }
             catch (Exception e)
             {
@@ -119,8 +122,9 @@ namespace CompCube.Server
 
         public void DisconnectAbruptly(string reason)
         {
-            StopListeningToServer();
+            _siraLog.Info("disconnected abruptly");
             OnAbruptDisconnect?.Invoke(reason);
+            StopListeningToServer();
         }
 
         public void Disconnect()
@@ -181,6 +185,11 @@ namespace CompCube.Server
                         case ServerPacket.ServerPacketTypes.UpdateCards:
                             OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
                             break;
+                        case ServerPacket.ServerPacketTypes.AbruptDisconnection:
+                            var disconnectPacket = packet as AbruptDisconnectionPacket;
+                            
+                            DisconnectAbruptly(disconnectPacket.Reason);
+                            break;
                         default:
                             throw new Exception("Could not get packet type!");
                     }
@@ -188,7 +197,7 @@ namespace CompCube.Server
                 catch (SocketException e)
                 {
                     if (e.SocketErrorCode == SocketError.WouldBlock)
-                        continue;
+                        return;
                     _siraLog.Error(e);
                 }
                 catch (Exception e)

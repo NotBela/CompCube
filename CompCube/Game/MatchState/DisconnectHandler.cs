@@ -32,6 +32,7 @@ public class DisconnectHandler : IInitializable, IDisposable
 
     private void OnAbruptDisconnect(string reason)
     {
+        Plugin.Log.Info("here");
         EndLevelAndShowDisconnectScreen(reason);
     }
 

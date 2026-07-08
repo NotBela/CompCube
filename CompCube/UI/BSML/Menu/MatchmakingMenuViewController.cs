@@ -7,7 +7,9 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube.Configuration;
 using CompCube.Interfaces;
+using CompCube.Server;
 using CompCube.UI.BSML.Components;
+using CompCube.UI.BSML.EarlyLeaveWarning;
 using SiraUtil.Logging;
 using UnityEngine.UI;
 using Zenject;
@@ -19,6 +21,8 @@ namespace CompCube.UI.BSML.Menu
     {
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly IServerListener _serverListener = null!;
+        [Inject] private readonly ServerChecker _serverChecker = null!;
+        [Inject] private readonly WarningModalViewController _warningModalViewController = null!;
         [Inject] private readonly SiraLog _siraLog = null!;
 
         [UIParams] private readonly BSMLParserParams _parserParams = null!;
@@ -41,20 +45,38 @@ namespace CompCube.UI.BSML.Menu
         [UIValue("failedToConnectReason")] private string FailedToConnectReason { get; set; } = "";
 
         [UIAction("joinMatchmakingPoolButtonOnClick")]
-        private void HandleJoinMatchmakingPoolClicked()
+        private async void HandleJoinMatchmakingPoolClicked()
         {
-            SetState(true);
-            
-            _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
+            try
             {
-                if (response.Successful) 
+                SetState(true);
+
+                var canConnectToServer = await _serverChecker.CanConnectToServer();
+
+                if (!canConnectToServer.CanConnect)
+                {
+                    ShowFailedToConnectModal(canConnectToServer.Reason);
                     return;
-                
-                _parserParams.EmitEvent("failedToConnectModalShow");
-                FailedToConnectReason = $"Reason: {response.Message}";
-                NotifyPropertyChanged(nameof(FailedToConnectReason));
-                SetState(false);
-            });
+                }
+            
+                await _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
+                {
+                    if (response.Successful) 
+                        return;
+                        
+                    ShowFailedToConnectModal(response.Message);
+                });
+            }
+            catch (Exception e)
+            {
+                _siraLog.Error(e);
+            }
+        }
+
+        private void ShowFailedToConnectModal(string reason)
+        {
+            SetState(false);
+            _warningModalViewController.ParseOntoGameObject(this, $"Failed to connect to server\nReason: {reason}", _warningModalViewController.Hide);
         }
 
         [UIComponent("join-pool-button")] private readonly Button _joinPoolButton = null!;

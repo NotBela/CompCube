@@ -36,16 +36,12 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<SettingsViewController>().FromNewComponentAsViewController()
                 .AsSingle();
             Container.BindInterfacesAndSelfTo<UI.BSML.Leaderboard.CompCubeLeaderboardViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.BindInterfacesAndSelfTo<CantConnectToServerViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.BindInterfacesAndSelfTo<CheckingServerStatusViewController>().FromNewComponentAsViewController().AsSingle();
-            Container.BindInterfacesAndSelfTo<MissingMapsViewController>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<WaitingForDiscardPhaseToFinishViewController>()
                 .FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<BottomScreenMatchStateViewController>().FromNewComponentAsViewController().AsSingle();
 
             Container.BindInterfacesAndSelfTo<PhasePopupViewController>().FromNewComponentAsViewController().AsSingle();
             
-            Container.BindInterfacesAndSelfTo<ServerCheckingFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
             Container.BindInterfacesAndSelfTo<InfoFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
 
             Container.BindInterfacesAndSelfTo<SoundEffectManager>().FromNewComponentOnNewGameObject().AsSingle();
@@ -57,7 +53,7 @@ namespace CompCube.Installers
             Container.BindInterfacesAndSelfTo<BeatmapDifficultySegmentedControlPatch>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<BeatmapDownloader>().AsSingle();
-            Container.BindInterfacesAndSelfTo<InitialServerChecker>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ServerChecker>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<MatchResultsViewController>().FromNewComponentAsViewController()
                 .AsSingle();

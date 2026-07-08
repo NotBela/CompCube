@@ -210,11 +210,8 @@
       <None Remove="UI\BSML\Leaderboard\LeaderboardPanelView.bsml" />
       <None Remove="UI\BSML\Leaderboard\LoungeSaberLeaderboardView.bsml" />
       <None Remove="UI\BSML\Menu\CheckingServerStatusView.bsml" />
-      <EmbeddedResource Include="UI\BSML\Menu\CheckingServerStatusView.bsml" />
       <None Remove="UI\BSML\Menu\MissingMapsView.bsml" />
-      <EmbeddedResource Include="UI\BSML\Menu\MissingMapsView.bsml" />
       <None Remove="UI\BSML\Menu\CantConnectToServerView.bsml" />
-      <EmbeddedResource Include="UI\BSML\Menu\CantConnectToServerView.bsml" />
       <None Remove="UI\BSML\Match\VotingListView.bsml" />
       <None Remove="UI\BSML\Info\InfoView.bsml" />
       <EmbeddedResource Include="UI\BSML\Info\InfoView.bsml" />
