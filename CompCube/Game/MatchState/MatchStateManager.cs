@@ -15,7 +15,7 @@ public class MatchStateManager : IInitializable, IDisposable
     public int RedHealth { get; private set; } = 1000000;
     public int BlueHealth { get; private set; } = 1000000;
 
-    public float DamageMultiplier { get; private set; }= 1f;
+    public float DamageMultiplier { get; private set; } = 1f;
 
     public bool IsRedTeam => RedPlayer.UserId == _userModelWrapper.UserId;
     

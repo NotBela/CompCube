@@ -105,7 +105,7 @@ public class TransitionToLevelManager
             if (!_config.ScoreSubmission)
                 diContainer.Resolve<Submission>().DisableScoreSubmission("CompCube");
                 
-            diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime, _matchStateManager.RedPlayer, _matchStateManager.BluePlayer, 0, 0);
+            diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime);
                 
             var startingMenuController = diContainer.TryResolve<LevelStartUnpauseController>() ?? throw new Exception("Could not resolve StartingPauseMenuController");
                 

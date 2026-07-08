@@ -3,12 +3,4 @@
     <vertical>
         <text id="matchStartingTimeText" italics="true" align="Midline"/>
     </vertical>
-
-    <vertical anchor-pos-y="-12">
-        <text text="~pointsText" align="Midline" italics="true"/>
-    </vertical>
-    
-    <vertical anchor-pos-y="-16">
-        <text text="~opponentText" align="Midline" italics="true"/>
-    </vertical>
 </bg>
