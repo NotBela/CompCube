@@ -26,7 +26,7 @@ namespace CompCube.UI.BSML.Match
         
         [UIValue("damageText")] private string DamageText { get; set; } = "";
         
-        public void PopulateData(RoundResultsPacket results)
+        public void PopulateData(RoundResultsPacket results, float multiplier)
         {
             TitleText = "Results";
             
@@ -41,7 +41,7 @@ namespace CompCube.UI.BSML.Match
             WinnerScoreText = FormatScore(winnerScore, winner, 1);
             LoserScoreText = FormatScore(loserScore, loser, 2);
             
-            DamageText = Math.Abs(results.BlueScore.Points - results.RedScore.Points).ToString("N0", CultureInfo.InvariantCulture);
+            DamageText = ((int) Math.Round(Math.Abs(results.BlueScore.Points - results.RedScore.Points) * multiplier, MidpointRounding.AwayFromZero)).ToString("N0", CultureInfo.InvariantCulture);
             
             NotifyPropertyChanged(null);
         }

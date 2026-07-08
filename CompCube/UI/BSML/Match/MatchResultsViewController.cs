@@ -1,4 +1,5 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using System.Collections;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube.Extensions;
 using CompCube.Game;
@@ -24,7 +25,7 @@ public class MatchResultsViewController : BSMLAutomaticViewController
     public void PopulateData(bool won, int eloChange, Action continueButtonPressedCallback)
     {
         _continueButtonPressedCallback = continueButtonPressedCallback;
-        TitleText = won ? "Victory!" : "Defeat";
+        TitleText = won ? "Victory!" : "Defeat...";
         TitleBgColor = won ? "#0000FF" : "#FF0000";
 
         MmrChangeText =

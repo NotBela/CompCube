@@ -144,17 +144,17 @@ namespace CompCube.Server
                 {
                     if (!Connected)
                         return;
-                    
+
                     var data = new byte[4096];
 
                     var bytesRead = _client.GetStream().Read(data, 0, data.Length);
                     Array.Resize(ref data, bytesRead);
 
                     var json = Encoding.UTF8.GetString(data);
-                    
-                    if (json == "") 
+
+                    if (json == "")
                         continue;
-                    
+
                     _siraLog.Info(json);
 
                     var packet = ServerPacket.Deserialize(json);
@@ -179,6 +179,12 @@ namespace CompCube.Server
                         default:
                             throw new Exception("Could not get packet type!");
                     }
+                }
+                catch (SocketException e)
+                {
+                    if (e.SocketErrorCode == SocketError.WouldBlock)
+                        continue;
+                    _siraLog.Error(e);
                 }
                 catch (Exception e)
                 {

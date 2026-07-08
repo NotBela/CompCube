@@ -119,6 +119,8 @@ namespace CompCube.UI.FlowCoordinators
                 
                 SetBottomScreenViewController(null, ViewController.AnimationType.Out);
                 SetLeftScreenViewController(null, ViewController.AnimationType.Out);
+                
+                _serverListener.Disconnect();
             }
         }
 
@@ -151,7 +153,7 @@ namespace CompCube.UI.FlowCoordinators
                 _roundResultsAnimationInProgress = true;
                 this.ReplaceViewControllerSynchronously(_roundResultsViewController);
                 
-                _roundResultsViewController.PopulateData(results);
+                _roundResultsViewController.PopulateData(results, _matchStateManager.DamageMultiplier);
 
                 _bottomScreenMatchStateViewController.UpdatePoints(results.RedHealth, results.BlueHealth);
                 
@@ -271,8 +273,15 @@ namespace CompCube.UI.FlowCoordinators
         # region Leaderboard Functions
         private void ShowLeaderboard(VotingMap votingMap)
         {
-            _platformLeaderboardViewController.SetData(votingMap.GetBeatmapKey());
-            SetRightScreenViewController(_platformLeaderboardViewController, ViewController.AnimationType.In);
+            StartCoroutine(ShowLeaderboardCoroutine());
+            return;
+            
+            IEnumerator ShowLeaderboardCoroutine()
+            {
+                _platformLeaderboardViewController.SetData(votingMap.GetBeatmapKey());
+                yield return new WaitForEndOfFrame();
+                SetRightScreenViewController(_platformLeaderboardViewController, ViewController.AnimationType.In);
+            }
         }
 
         private void HideLeaderboard(bool immediately = false)

@@ -52,10 +52,10 @@ public class DebugServerListener : IServerListener
         switch (packet.PacketType)
         {
             case UserPacket.UserPacketTypes.JoinRequest:
-                // OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
+                OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
 
-                await Task.Delay(2000);
-                OnAbruptDisconnect?.Invoke("test");
+                // await Task.Delay(2000);
+                //OnAbruptDisconnect?.Invoke("test");
                 break;
             case UserPacket.UserPacketTypes.DiscardMaps:
                 OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true, 10f));
@@ -68,7 +68,7 @@ public class DebugServerListener : IServerListener
 
                 await Task.Delay(500);
                 
-                OnMatchFinished?.Invoke(new MatchFinishedPacket(100, true));
+                OnMatchFinished?.Invoke(new MatchFinishedPacket(100, false));
                 break;
         }
     }
