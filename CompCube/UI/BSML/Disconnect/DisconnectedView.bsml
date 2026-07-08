@@ -1,7 +1,0 @@
-﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical>
-        <text text="You have been disconnected from the server." align="Midline" italics="true"/>
-        <text text="~reasonText" align="Midline" italics="true"/>
-        <primary-button text="Ok" on-click="okButtonOnClick" pref-width="34" pref-height="10"/>
-    </vertical>
-</bg>

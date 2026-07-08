@@ -1,7 +1,5 @@
-﻿using BeatSaberMarkupLanguage;
-using CompCube.UI.FlowCoordinators;
+﻿using CompCube.UI.FlowCoordinators;
 using HMUI;
-using CompCube.UI.FlowCoordinators.Events;
 using UnityEngine;
 using Zenject;
 
@@ -11,8 +9,8 @@ public abstract class ViewManager : MonoBehaviour, IInitializable, IDisposable
 {
     public abstract ViewController ManagedController { get; }
     
-    [Inject] private readonly MatchmakingMenuFlowCoordinator _matchmakingMenuFlowCoordinator = null;
-    [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null;
+    [Inject] private readonly MatchmakingMenuFlowCoordinator _matchmakingMenuFlowCoordinator = null!;
+    [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
 
     public void Initialize()
     {

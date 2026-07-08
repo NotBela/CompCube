@@ -2,13 +2,14 @@
 using CompCube.Configuration;
 using CompCube.UI.BSML.PauseMenu;
 using CompCube.Extensions;
+using CompCube.Game.MatchState;
 using SiraUtil.Logging;
 using SiraUtil.Submissions;
 using Zenject;
 
 namespace CompCube.Game;
 
-public class MatchManager
+public class TransitionToLevelManager
 {
     [Inject] private readonly MenuTransitionsHelper _menuTransitionsHelper = null!;
     [Inject] private readonly PlayerDataModel _playerDataModel = null!;
@@ -17,22 +18,22 @@ public class MatchManager
         
     [Inject] private readonly MatchStateManager _matchStateManager = null!;
          
-    public bool InMatch { get; private set; } = false;
+    public bool InLevel { get; private set; } = false;
 
     private Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? _menuSwitchCallback;
         
-    public void StartMatch(
+    public void StartLevel(
         VotingMap level, 
         DateTime unpauseTime, 
         bool proMode,
         Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO> onLevelCompletedCallback)
     {
-        if (InMatch) 
+        if (InLevel) 
             return;
             
         _menuSwitchCallback = onLevelCompletedCallback;
             
-        InMatch = true;
+        InLevel = true;
             
         var beatmapLevel = level.GetBeatmapLevel() ?? throw new Exception("Could not get beatmap level!");
             
@@ -81,17 +82,17 @@ public class MatchManager
         );*/
     }
 
-    public void StopMatch(Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? menuSwitchCallback = null)
+    public void StopLevel(Action<LevelCompletionResults, StandardLevelScenesTransitionSetupDataSO>? menuSwitchCallback = null)
     {
         _menuSwitchCallback = menuSwitchCallback;
             
-        if (InMatch)
+        if (InLevel)
             _menuTransitionsHelper.StopStandardLevel();
     }
 
     private void AfterSceneSwitchToMenuCallback(StandardLevelScenesTransitionSetupDataSO standardLevelScenesTransitionSetupDataSo, LevelCompletionResults levelCompletionResults)
     {
-        InMatch = false;
+        InLevel = false;
             
         _menuSwitchCallback?.Invoke(levelCompletionResults, standardLevelScenesTransitionSetupDataSo);
         _menuSwitchCallback = null;
@@ -104,9 +105,9 @@ public class MatchManager
             if (!_config.ScoreSubmission)
                 diContainer.Resolve<Submission>().DisableScoreSubmission("CompCube");
                 
-            diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime, _matchStateManager.RedTeam.ToArray(), _matchStateManager.BlueTeam.ToArray(), _matchStateManager.Points[MatchStateManager.Team.Red], _matchStateManager.Points[MatchStateManager.Team.Blue]);
+            diContainer.Resolve<PauseMenuViewController>().PopulateData(unpauseTime);
                 
-            var startingMenuController = diContainer.TryResolve<MatchStartUnpauseController>() ?? throw new Exception("Could not resolve StartingPauseMenuController");
+            var startingMenuController = diContainer.TryResolve<LevelStartUnpauseController>() ?? throw new Exception("Could not resolve StartingPauseMenuController");
                 
             await startingMenuController.UnpauseLevelAtTime(unpauseTime);
         }

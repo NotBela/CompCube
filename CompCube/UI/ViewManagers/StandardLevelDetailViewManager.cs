@@ -7,32 +7,35 @@ namespace CompCube.UI.ViewManagers;
 
 public class StandardLevelDetailViewManager : ViewManager
 {
-    [Inject] private readonly StandardLevelDetailViewController _standardLevelDetailViewController = null;
+    [Inject] private readonly StandardLevelDetailViewController _standardLevelDetailViewController = null!;
     
     public override ViewController ManagedController => _standardLevelDetailViewController;
     
-    private Action<VotingMap, List<VotingMap>, bool>? _votedCallback;
-
-    private List<VotingMap> _votingMaps;
+    private Action<VotingMap>? _buttonPressedCallback;
     public VotingMap CurrentVotingMap { get; private set; }
     
-    public void SetData(VotingMap votingMap, List<VotingMap> votingMaps, Action<VotingMap, List<VotingMap>, bool> voteClickedCallback)
+    public void SetData(VotingMap votingMap, Action<VotingMap> buttonPressedCallback, string buttonText, bool buttonInteractable = true)
     {
         CurrentVotingMap = votingMap;
-        _votingMaps = votingMaps;
         
-        _votedCallback = voteClickedCallback;
+        _buttonPressedCallback = buttonPressedCallback;
         
         _standardLevelDetailViewController.SetData(
             votingMap.GetBeatmapLevel(), 
             true, 
-            "Vote", 
+            buttonText, 
             votingMap.GetBaseGameDifficultyTypeMask(), 
             votingMap.GetBeatmapLevel()?.beatmapBasicData.Keys
                 .Select(i => i.characteristic)
                 .Where(i => i.serializedName != "Standard")
                 .ToArray()
             );
+        ChangeButtonInteractability(buttonInteractable);
+    }
+
+    public void ChangeButtonInteractability(bool interactable)
+    {
+        _standardLevelDetailViewController._standardLevelDetailView.actionButton.interactable = interactable;
     }
 
     protected override void SetupManagedController()
@@ -42,8 +45,8 @@ public class StandardLevelDetailViewManager : ViewManager
 
     private void OnActionButtonPressed()
     {
-        _votedCallback?.Invoke(CurrentVotingMap, _votingMaps, false);
-        _votedCallback = null;
+        _buttonPressedCallback?.Invoke(CurrentVotingMap);
+        _buttonPressedCallback = null;
     }
 
     protected override void ResetManagedController()

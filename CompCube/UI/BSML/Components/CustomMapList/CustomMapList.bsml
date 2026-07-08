@@ -1,0 +1,6 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
+    <vertical anchor-pos-y="~anchorPosY" anchor-pos-x="~anchorPosX" vertical-fit="PreferredSize" pref-height="45">
+        <list id="mapList" visible-cells="3" list-style="Simple" show-scrollbar="true"/>
+    </vertical>
+</bg>

@@ -1,12 +1,15 @@
-﻿using CompCube_Models.Models.Packets.ServerPackets;
+﻿using System.Collections;
+using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube.Interfaces;
 using CompCube.UI.BSML.Leaderboard;
 using CompCube.UI.BSML.Menu;
-using CompCube.UI.FlowCoordinators.Events;
 using HMUI;
 using CompCube.Extensions;
+using CompCube.Game;
+using CompCube.Game.MatchState;
 using CompCube.UI.BSML.EarlyLeaveWarning;
 using CompCube.UI.ViewManagers;
+using UnityEngine;
 using Zenject;
 
 namespace CompCube.UI.FlowCoordinators
@@ -22,9 +25,9 @@ namespace CompCube.UI.FlowCoordinators
 
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         [Inject] private readonly CompCubeLeaderboardViewController _leaderboardViewController = null!;
-        [Inject] private readonly EarlyLeaveWarningModalViewController _earlyLeaveWarningModalViewController = null!;
+        [Inject] private readonly WarningModalViewController _warningModalViewController = null!;
         
-        [Inject] private readonly EventsFlowCoordinator _eventsFlowCoordinator = null!;
+        [Inject] private readonly DisconnectHandler _disconnectHandler = null!;
         
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -40,7 +43,6 @@ namespace CompCube.UI.FlowCoordinators
             _matchFlowCoordinator.PopulateData(packet, () =>
             {
                 DismissFlowCoordinator(_matchFlowCoordinator);
-                _serverListener.Disconnect();
             });
         }
 
@@ -48,7 +50,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             _serverListener.OnMatchCreated -= OnMatchCreated;
             _infoFlowCoordinator.OnBackButtonPressed -= OnInfoFlowCoordinatorBackButtonPressed;
-            _eventsFlowCoordinator.OnBackButtonPressed -= EventsFlowCoordinatorOnBackButtonPressed;
+            _disconnectHandler.ShouldShowDisconnectScreen -= HandleShouldShowDisconnectScreen;
         }
         
         public void Initialize()
@@ -60,12 +62,27 @@ namespace CompCube.UI.FlowCoordinators
             
             _serverListener.OnMatchCreated += OnMatchCreated;
             _infoFlowCoordinator.OnBackButtonPressed += OnInfoFlowCoordinatorBackButtonPressed;
-            _eventsFlowCoordinator.OnBackButtonPressed += EventsFlowCoordinatorOnBackButtonPressed;
+            _disconnectHandler.ShouldShowDisconnectScreen += HandleShouldShowDisconnectScreen;
         }
 
-        private void EventsFlowCoordinatorOnBackButtonPressed() => DismissFlowCoordinator(_eventsFlowCoordinator);
-
-        private void OnEventsButtonClicked() => this.PresentFlowCoordinatorSynchronously(_eventsFlowCoordinator);
+        private void HandleShouldShowDisconnectScreen(string reason)
+        {
+            StartCoroutine(HandleShouldShowDisconnectScreenCoroutine());
+            return;
+            
+            IEnumerator HandleShouldShowDisconnectScreenCoroutine()
+            {
+                // this will break if the flow coordinator hierarchy ever gets more than 1 deeper after this flow coordinator
+                if (childFlowCoordinator)
+                    DismissFlowCoordinator(childFlowCoordinator);
+                
+                yield return new WaitUntil(() => isActivated && !isInTransition);
+                
+                Plugin.Log.Info("here 2");
+                
+                _warningModalViewController.ParseOntoGameObject(topViewController, $"Disconnected from server.\nReason: {reason}", _warningModalViewController.Hide);
+            }
+        }
 
         private void OnInfoFlowCoordinatorBackButtonPressed() => DismissFlowCoordinator(_infoFlowCoordinator);
 
@@ -78,15 +95,15 @@ namespace CompCube.UI.FlowCoordinators
         {
             if (_serverListener.Connected)
             {
-                _earlyLeaveWarningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the matchmaking queue?", () =>
+                _warningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the matchmaking queue?", () =>
                 {
                     _serverListener.Disconnect();
-                    _mainFlowCoordinator.DismissAllChildFlowCoordinators();
-                });
+                    _mainFlowCoordinator.DismissFlowCoordinator(this);
+                }, _warningModalViewController.Hide);
                 return;
             }
                 
-            _mainFlowCoordinator.DismissAllChildFlowCoordinators();
+            _mainFlowCoordinator.DismissFlowCoordinator(this);
         }
     }
 }  

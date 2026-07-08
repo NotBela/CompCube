@@ -3,10 +3,10 @@ using System.Net.Sockets;
 using System.Text;
 using CompCube_Models.Models.Packets;
 using CompCube_Models.Models.Packets.ServerPackets;
-using CompCube_Models.Models.Packets.ServerPackets.Event;
 using CompCube_Models.Models.Packets.UserPackets;
 using CompCube.Configuration;
 using CompCube.Game;
+using CompCube.Game.MatchState;
 using CompCube.Interfaces;
 using SiraUtil.Logging;
 using Zenject;
@@ -24,22 +24,16 @@ namespace CompCube.Server
         private bool _shouldListenToServer = false;
         
         public event Action<MatchCreatedPacket>? OnMatchCreated;
-        public event Action<PlayerVotedPacket>? OnPlayerVoted;
-        public event Action<BeginGameTransitionPacket>? OnBeginGameTransition;
+        public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
         public event Action<RoundResultsPacket>? OnRoundResults;
-        public event Action<RoundStartedPacket>? OnRoundStarted;
-        public event Action<UserDisconnectedPacket>? OnUserDisconnected;
-        public event Action<MatchResultsPacket>? OnMatchResults;
-
-        public event Action? OnDisconnected;
-        public event Action? OnConnected;
-        public event Action<PrematureMatchEndPacket>? OnPrematureMatchEnd;
+        public event Action<StartPickPhasePacket>? OnPickPhaseStarted;
+        public event Action<MatchFinishedPacket>? OnMatchFinished;
         
-        public event Action<EventStartedPacket>? OnEventStarted;
-        public event Action<EventMapSelected>? OnEventMapSelected;
-        public event Action<EventMatchStartedPacket>? OnEventMatchStarted;
-        public event Action<EventClosedPacket>? OnEventClosed;
-        public event Action<EventScoresUpdated>? OnEventScoresUpdated;
+        public event Action<UpdateCardsPacket>? OnCardsUpdated; 
+        public event Action? OnConnected;
+        public event Action? OnDisconnected;
+        public event Action<string>? OnAbruptDisconnect;
+
 
         [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
 
@@ -109,7 +103,10 @@ namespace CompCube.Server
                     _shouldListenToServer = true;
                     _listenerThread.Start();
                     OnConnected?.Invoke();
+                    return;
                 }
+                
+                Disconnect();
             }
             catch (Exception e)
             {
@@ -123,14 +120,26 @@ namespace CompCube.Server
             await _client.GetStream().WriteAsync(bytes, 0, bytes.Length);
         }
 
+        public void DisconnectAbruptly(string reason)
+        {
+            _siraLog.Info("disconnected abruptly");
+            OnAbruptDisconnect?.Invoke(reason);
+            StopListeningToServer();
+        }
+
         public void Disconnect()
+        {
+            StopListeningToServer();
+            OnDisconnected?.Invoke();
+        }
+
+        private void StopListeningToServer()
         {
             if (!Connected)
                 return;
             
             _shouldListenToServer = false;
             _client.Close();
-            OnDisconnected?.Invoke();
         }
 
         private void ListenToServer()
@@ -141,17 +150,17 @@ namespace CompCube.Server
                 {
                     if (!Connected)
                         return;
-                    
-                    var data = new byte[1024];
+
+                    var data = new byte[4096];
 
                     var bytesRead = _client.GetStream().Read(data, 0, data.Length);
                     Array.Resize(ref data, bytesRead);
 
                     var json = Encoding.UTF8.GetString(data);
-                    
-                    if (json == "") 
+
+                    if (json == "")
                         continue;
-                    
+
                     _siraLog.Info(json);
 
                     var packet = ServerPacket.Deserialize(json);
@@ -161,50 +170,40 @@ namespace CompCube.Server
                         case ServerPacket.ServerPacketTypes.MatchCreated:
                             OnMatchCreated?.Invoke(packet as MatchCreatedPacket);
                             break;
-                        case ServerPacket.ServerPacketTypes.OpponentVoted:
-                            OnPlayerVoted?.Invoke(packet as PlayerVotedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.RoundStarted:
-                            OnRoundStarted?.Invoke(packet as RoundStartedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.MatchResults:
-                            OnMatchResults?.Invoke(packet as MatchResultsPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.PrematureMatchEnd:
-                            OnPrematureMatchEnd?.Invoke(packet as PrematureMatchEndPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.EventStarted:
-                            OnEventStarted?.Invoke(packet as EventStartedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.EventMapSelected:
-                            OnEventMapSelected?.Invoke(packet as EventMapSelected);
-                            break;
-                        case ServerPacket.ServerPacketTypes.EventMatchStarted:
-                            OnEventMatchStarted?.Invoke(packet as EventMatchStartedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.EventClosed:
-                            OnEventClosed?.Invoke(packet as EventClosedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.EventScoresUpdated:
-                            OnEventScoresUpdated?.Invoke(packet as EventScoresUpdated);
-                            break;
-                        case ServerPacket.ServerPacketTypes.UserDisconnected:
-                            OnUserDisconnected?.Invoke(packet as UserDisconnectedPacket);
+                        case ServerPacket.ServerPacketTypes.PlayerSelectedMap:
+                            OnPlayerSelectedMap?.Invoke(packet as PlayerSelectedMapPacket);
                             break;
                         case ServerPacket.ServerPacketTypes.RoundResults:
                             OnRoundResults?.Invoke(packet as RoundResultsPacket);
                             break;
-                        case ServerPacket.ServerPacketTypes.BeginGameTransition:
-                            OnBeginGameTransition?.Invoke(packet as BeginGameTransitionPacket);
+                        case ServerPacket.ServerPacketTypes.StartPickPhase:
+                            OnPickPhaseStarted?.Invoke(packet as StartPickPhasePacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.MatchFinished:
+                            OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.UpdateCards:
+                            OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
+                            break;
+                        case ServerPacket.ServerPacketTypes.AbruptDisconnection:
+                            var disconnectPacket = packet as AbruptDisconnectionPacket;
+                            
+                            DisconnectAbruptly(disconnectPacket.Reason);
                             break;
                         default:
                             throw new Exception("Could not get packet type!");
                     }
                 }
+                catch (SocketException e)
+                {
+                    if (e.SocketErrorCode == SocketError.WouldBlock)
+                        return;
+                    _siraLog.Error(e);
+                }
                 catch (Exception e)
                 {
                     _siraLog.Error(e);
-                    Disconnect();
+                    DisconnectAbruptly("Unhandled exception, please check your logs!");
                 }
             }
         }

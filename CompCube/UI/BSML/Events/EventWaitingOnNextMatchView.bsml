@@ -1,9 +1,0 @@
-<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical bg="round-rect-panel" anchor-pos-y="30"  vertical-fit="PreferredSize" pad="3">
-        <text text="Event Room" align="Midline" font-size="8"/>
-    </vertical>
-    
-    <vertical bg="round-rect-panel" anchor-pos-y="0" vertical-fit="PreferredSize" pad="3">
-        <text text="~centerText" italics="true" font-size="5" align="Midline"/>
-    </vertical>
-</bg>

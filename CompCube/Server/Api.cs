@@ -66,5 +66,15 @@ namespace CompCube.Server
             var response = await _client.GetAsync("/api/events/events");
             return JsonConvert.DeserializeObject<EventData[]>(await response.Content.ReadAsStringAsync());
         }
+
+        public async Task<byte[]?> DownloadBeatmap(string hash)
+        {
+            var response  = await _client.GetAsync($"/api/maps/download/{hash}");
+            
+            if (!response.IsSuccessStatusCode)
+                return null;
+            
+            return await response.Content.ReadAsByteArrayAsync();
+        }
     }
 }

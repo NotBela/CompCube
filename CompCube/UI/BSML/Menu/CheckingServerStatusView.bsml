@@ -1,9 +1,0 @@
-﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-    xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical>
-        <text text="~stateText" align="Midline" italics="true"/>
-        <vertical pref-height="10" pref-width="10">
-            <loading preserve-aspect="true"/>
-        </vertical>
-    </vertical>
-</bg>

@@ -13,17 +13,13 @@ namespace CompCube.UI.BSML.PauseMenu;
 public class PauseMenuViewController : BSMLAutomaticViewController, IInitializable, IDisposable, ITickable
 {
     [Inject] private readonly PauseController _pauseController = null!;
-    [Inject] private readonly MatchStartUnpauseController _matchStartUnpauseController = null!;
+    [Inject] private readonly LevelStartUnpauseController _levelStartUnpauseController = null!;
     
     private readonly FloatingScreen _floatingScreen = FloatingScreen.CreateFloatingScreen(new Vector2(50f, 50f), false, Vector3.zero, Quaternion.identity);
 
     [UIComponent("matchStartingTimeText")] private readonly TextMeshProUGUI _matchStartingTimeText = null!;
 
     private DateTime? _matchStartingTime;
-    
-    [UIValue("opponentText")] private string OpponentText { get; set; }
-    
-    [UIValue("pointsText")] private string PointsText { get; set; }
     
     public void Initialize()
     {
@@ -41,13 +37,9 @@ public class PauseMenuViewController : BSMLAutomaticViewController, IInitializab
         _floatingScreen.gameObject.SetActive(true);
     }
 
-    public void PopulateData(DateTime time, CompCube_Models.Models.ClientData.UserInfo[] red, CompCube_Models.Models.ClientData.UserInfo[] blue, int redPoints, int bluePoints)
+    public void PopulateData(DateTime time)
     {
         _matchStartingTime = time;
-        
-        OpponentText = $"{red[0].GetFormattedUserName()} vs. {blue[0].GetFormattedUserName()}";
-        PointsText = $"{redPoints} - {bluePoints}";
-        NotifyPropertyChanged(null);
     }
 
     public void Dispose()
@@ -58,12 +50,12 @@ public class PauseMenuViewController : BSMLAutomaticViewController, IInitializab
     public void Tick()
     {
         // dog shit
-        if (!_matchStartUnpauseController.StillInStartingPauseMenu)
+        if (!_levelStartUnpauseController.StillInStartingPauseMenu)
             _matchStartingTimeText.gameObject.SetActive(false);
         
         if (_matchStartingTime == null) 
             return;
 
-        _matchStartingTimeText.text = $"Match starting in {(int) (_matchStartingTime - DateTime.UtcNow).Value.TotalSeconds + 1}";
+        _matchStartingTimeText.text = $"Match starting in {(int) (_matchStartingTime - DateTime.Now).Value.TotalSeconds + 1}";
     }
 }

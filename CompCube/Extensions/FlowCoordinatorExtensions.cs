@@ -22,7 +22,7 @@ public static class FlowCoordinatorExtensions
     
     private static IEnumerator PresentViewControllerSynchronouslyCoroutine(FlowCoordinator flowCoordinator, ViewController viewController, bool immediately)
     {
-        yield return new WaitUntil(() => !flowCoordinator.isInTransition);
+        yield return new WaitUntil(() => !flowCoordinator.isInTransition && !flowCoordinator.topViewController.isInTransition);
         
         yield return new WaitForEndOfFrame();
         
@@ -31,18 +31,15 @@ public static class FlowCoordinatorExtensions
         // flowCoordinator.ReplaceTopViewController(viewController, animationType: immediately ? ViewController.AnimationType.None : ViewController.AnimationType.In);
     }
 
-    extension(FlowCoordinator flowCoordinator)
+    public static void SetBackButtonInteractivity(this FlowCoordinator flowCoordinator, bool interactable)
     {
-        public void SetBackButtonInteractivity(bool interactable)
-        {
-            var screenSystem = flowCoordinator.GetField<ScreenSystem, FlowCoordinator>("_screenSystem");
-            screenSystem.GetField<Button, ScreenSystem>("_backButton").interactable = interactable;
-        }
+        var screenSystem = flowCoordinator.GetField<ScreenSystem, FlowCoordinator>("_screenSystem");
+        screenSystem.GetField<Button, ScreenSystem>("_backButton").interactable = interactable;
+    }
 
-        public void PresentFlowCoordinatorSynchronously(FlowCoordinator flowCoordinator1, bool immediately = false)
-        {
-            flowCoordinator.StartCoroutine(PresentFlowCoordinatorCoroutine(flowCoordinator, flowCoordinator1, immediately));
-        }
+    public static void PresentFlowCoordinatorSynchronously(this FlowCoordinator parent, FlowCoordinator flowCoordinator, bool immediately = false)
+    {
+        flowCoordinator.StartCoroutine(PresentFlowCoordinatorCoroutine(parent, flowCoordinator, immediately));
     }
 
     private static IEnumerator PresentFlowCoordinatorCoroutine(FlowCoordinator parent, FlowCoordinator flowCoordinator, bool immediately)

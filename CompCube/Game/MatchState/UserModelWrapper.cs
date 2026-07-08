@@ -1,9 +1,8 @@
 ﻿using CompCube.Configuration;
-using CompCube.Interfaces;
 using CompCube.Server.Debug;
 using Zenject;
 
-namespace CompCube.Game;
+namespace CompCube.Game.MatchState;
 
 public class UserModelWrapper
 {

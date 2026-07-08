@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using BeatSaverSharp;
+using CompCube.Interfaces;
 using IPA.Utilities;
 using SiraUtil.Logging;
 using SongCore;
@@ -7,11 +8,10 @@ using Zenject;
 
 namespace CompCube.Game;
 
-public class MapDownloader
+public class BeatmapDownloader
 {
     [Inject] private readonly SiraLog _siraLog = null!;
-    
-    private readonly BeatSaver _beatSaver = new("CompCube", Version.Parse(IPA.Loader.PluginManager.GetPlugin("CompCube").HVersion.ToString()));
+    [Inject] private readonly IApi _api = null!;
     
     public event Action<int, int>? OnMapDownloaded;
 
@@ -23,23 +23,23 @@ public class MapDownloader
         
         foreach (var mapHash in hashesWithoutDuplicates)
         {
-            if (Loader.GetLevelByHash(mapHash) != null)
+            if (Collections.songWithHashPresent(mapHash))
                 continue;
-            
-            var map = await _beatSaver.BeatmapByHash(mapHash);
-            if (map == null)
-            {
-                _siraLog.Error($"Could not find map {mapHash}!");
-                continue;
-            }
 
-            var beatmapData = await map.LatestVersion.DownloadZIP();
+            _siraLog.Notice($"Attempting to download {mapHash}...");
+            
+            var beatmapData = await _api.DownloadBeatmap(mapHash);
+
+            if (beatmapData == null)
+                throw new Exception($"Failed to download {mapHash}!");
             
             var zippedBeatmap = new ZipArchive(new MemoryStream(beatmapData ?? throw new Exception("Beatmap data is null!")), ZipArchiveMode.Read);
-            zippedBeatmap.ExtractToDirectory(Path.Combine(UnityGame.InstallPath, "Beat Saber_Data", "CustomLevels", Path.GetInvalidFileNameChars().Aggregate($"{map.Name} ({map.ID})", (current, c) => current.Replace(c.ToString(), string.Empty))));
+            zippedBeatmap.ExtractToDirectory(Path.Combine(UnityGame.InstallPath, "Beat Saber_Data", "CustomLevels", mapHash));
             
             mapsDownloaded++;
             OnMapDownloaded?.Invoke(mapsDownloaded, mapHashes.Length);
         }
+        
+        Loader.Instance.RefreshSongs();
     }
 }

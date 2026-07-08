@@ -9,7 +9,7 @@ namespace CompCube.UI
     public class MenuButtonManager : IInitializable, IDisposable
     {
         [Inject] private readonly MainFlowCoordinator _mainFlowCoordinator = null!;
-        [Inject] private readonly ServerCheckingFlowCoordinator _serverCheckingFlowCoordinator = null!;
+        [Inject] private readonly MatchmakingMenuFlowCoordinator _matchmakingMenuFlowCoordinator = null!;
         [Inject] private readonly MenuButtons _menuButtons = null!;
         
         private readonly MenuButton _menuButton;
@@ -19,7 +19,7 @@ namespace CompCube.UI
             _menuButton = new MenuButton("CompCube", OnClick);
         }
 
-        private void OnClick() => _mainFlowCoordinator.PresentFlowCoordinator(_serverCheckingFlowCoordinator);
+        private void OnClick() => _mainFlowCoordinator.PresentFlowCoordinator(_matchmakingMenuFlowCoordinator);
 
         public void Initialize() => _menuButtons.RegisterButton(_menuButton);
 

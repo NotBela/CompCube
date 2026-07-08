@@ -9,6 +9,7 @@ using HMUI;
 using CompCube.Extensions;
 using SiraUtil.Logging;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace CompCube.UI.BSML.Match
@@ -72,41 +73,49 @@ namespace CompCube.UI.BSML.Match
         
         public void PopulateData(VotingMap votingMap, DateTime? startTime)
         {
-            _startTime = startTime;
-            
-            _customLevelBar?.Setup(votingMap);
+            StartCoroutine(PopulateDataCoroutine());
 
-            var beatmap = votingMap.GetBeatmapLevel();
-            var key = votingMap.GetBeatmapKey();
-
-            // var data = beatmapDataLoader.LoadBeatmapData();
-            // var basicData = beatmapDataLoader.LoadBasicBeatmapData();
-            
-            _siraLog.Info(key.beatmapCharacteristic.serializedName + " " + key.difficulty);
-
-            var bpm = beatmap?.beatsPerMinute ?? 0;
-            // var njs = 
-            // var offset = 
-            
-            SongDurationText = $"{(int) beatmap?.songDuration! / 60}:{(int) beatmap?.songDuration % 60}";
-            SongBpmText = Mathf.RoundToInt(bpm).ToString();
-            // SongNjsText = $"{njs}";
-            // SongNpsText = $"{(data?.cuttableNotesCount / beatmap.songDuration)::F1}";
-            // SongJdText = $"{GetJumpDistance(bpm, njs, startOffset)}";
-            // SongNoteCountText = $"{data?.cuttableNotesCount}";
-            // SongWallCountText = $"{data?.obstaclesCount}";
-            // SongBombCountText = $"{data?.bombsCount}";
-            
-            NotifyPropertyChanged(null);
-
-            if (startTime == null)
+            IEnumerator PopulateDataCoroutine()
             {
-                MatchStartTimer = "Starting soon. Please wait!";
+                while (CanvasUpdateRegistry.IsRebuildingLayout())
+                    yield return null;
+                
+                yield return new WaitForEndOfFrame();
+                
+                _startTime = startTime;
+            
+                _customLevelBar?.Setup(votingMap);
+
+                var beatmap = votingMap.GetBeatmapLevel();
+                var key = votingMap.GetBeatmapKey();
+
+                // var data = beatmapDataLoader.LoadBeatmapData();
+                // var basicData = beatmapDataLoader.LoadBasicBeatmapData();
+            
+                _siraLog.Info(key.beatmapCharacteristic.serializedName + " " + key.difficulty);
+
+                var bpm = beatmap?.beatsPerMinute ?? 0;
+                // var njs = 
+                // var offset = 
+            
+                SongDurationText = $"{(int) beatmap?.songDuration! / 60}:{(int) beatmap?.songDuration % 60}";
+                SongBpmText = Mathf.RoundToInt(bpm).ToString();
+                // SongNjsText = $"{njs}";
+                // SongNpsText = $"{(data?.cuttableNotesCount / beatmap.songDuration)::F1}";
+                // SongJdText = $"{GetJumpDistance(bpm, njs, startOffset)}";
+                // SongNoteCountText = $"{data?.cuttableNotesCount}";
+                // SongWallCountText = $"{data?.obstaclesCount}";
+                // SongBombCountText = $"{data?.bombsCount}";
+            
+                NotifyPropertyChanged(null);
+
+                if (startTime == null)
+                {
+                    MatchStartTimer = "Starting soon. Please wait!";
+                }
+
+                yield return UpdateTexts();
             }
-
-            StartCoroutine(UpdateTexts());
-
-            return;
 
             IEnumerator UpdateTexts()
             {
@@ -142,7 +151,7 @@ namespace CompCube.UI.BSML.Match
             if (_startTime == null)
                 return;
             
-            MatchStartTimer = $"Starting in {((int) (_startTime.Value - DateTime.UtcNow).TotalSeconds + 1).ToString(CultureInfo.InvariantCulture)}...";
+            MatchStartTimer = $"Starting in {((int) (_startTime.Value - DateTime.Now).TotalSeconds + 1).ToString(CultureInfo.InvariantCulture)}...";
             
             NotifyPropertyChanged(nameof(MatchStartTimer));
         }
