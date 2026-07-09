@@ -14,9 +14,12 @@ public class BeatmapDownloader
     [Inject] private readonly IApi _api = null!;
     
     public event Action<int, int>? OnMapDownloaded;
+    
+    public bool IsDownloadingBeatmaps { get; private set; } = false;
 
     public async Task DownloadMaps(string[] mapHashes)
     {
+        IsDownloadingBeatmaps = true;
         var mapsDownloaded = 0;
 
         var hashesWithoutDuplicates = mapHashes.Distinct().ToArray();
@@ -33,13 +36,18 @@ public class BeatmapDownloader
             if (beatmapData == null)
                 throw new Exception($"Failed to download {mapHash}!");
             
-            var zippedBeatmap = new ZipArchive(new MemoryStream(beatmapData ?? throw new Exception("Beatmap data is null!")), ZipArchiveMode.Read);
+            var zippedBeatmap = new ZipArchive(new MemoryStream(beatmapData), ZipArchiveMode.Read);
             zippedBeatmap.ExtractToDirectory(Path.Combine(UnityGame.InstallPath, "Beat Saber_Data", "CustomLevels", mapHash));
             
             mapsDownloaded++;
             OnMapDownloaded?.Invoke(mapsDownloaded, mapHashes.Length);
         }
         
-        Loader.Instance.RefreshSongs();
+        Loader.Instance.RefreshSongs(false);
+
+        while (Loader.AreSongsLoading)
+            await Task.Delay(25);
+        
+        IsDownloadingBeatmaps = false;
     }
 }

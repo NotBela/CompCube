@@ -15,7 +15,7 @@ using Zenject;
 namespace CompCube.UI.BSML.Match
 {
     [ViewDefinition("CompCube.UI.BSML.Match.WaitingForMatchToStartView.bsml")]
-    public class WaitingForMatchToStartViewController(BeatmapDataLoader beatmapDataLoader) : BSMLAutomaticViewController, ITickable
+    public class WaitingForMatchToStartViewController : BSMLAutomaticViewController, ITickable
     {
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly SiraLog _siraLog = null!;
