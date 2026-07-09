@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube.Extensions;
+using CompCube.UI.BSML.Components.EnergyBar;
 
 namespace CompCube.UI.BSML.Match;
 
@@ -13,6 +14,12 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
     [UIValue("blueText")] private string BlueText { get; set; }
     
     [UIValue("multiplierText")] private string MultiplierText { get; set; }
+
+    [UIAction("#post-parse")]
+    void PostParse()
+    {
+        EnergyBar.ParseOntoViewController(this);
+    }
     
     public void PopulateData(CompCube_Models.Models.ClientData.UserInfo red, CompCube_Models.Models.ClientData.UserInfo blue)
     {
