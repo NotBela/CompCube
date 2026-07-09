@@ -7,6 +7,7 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube_Models.Models.Map;
 using CompCube.Extensions;
 using HMUI;
+using SongCore;
 using UnityEngine;
 using Zenject;
 
@@ -45,7 +46,7 @@ public class CustomMapListController : BSMLAutomaticViewController
         return controller;
     }
 
-    public void SetPos(float x, float y)
+    private void SetPos(float x, float y)
     {
         AnchorPosX = x;
         AnchorPosY = y;
@@ -149,6 +150,9 @@ public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
         }
 
         var info = Data[idx];
+        
+        if (info.GetBeatmapLevel() == null)
+            Plugin.Log.Info($"null");
         cell.SetDataFromLevelAsync(info.GetBeatmapLevel(), false,false, false, true);
 
         return cell;

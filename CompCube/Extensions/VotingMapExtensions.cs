@@ -6,8 +6,7 @@ namespace CompCube.Extensions;
 
 public static class VotingMapExtensions
 {
-    [CanBeNull]
-    public static BeatmapLevel GetBeatmapLevel(this VotingMap votingMap)
+    public static BeatmapLevel? GetBeatmapLevel(this VotingMap votingMap)
     {
         return Loader.GetLevelByHash(votingMap.Hash);
     }

@@ -15,6 +15,7 @@ using CompCube.Game.MatchState;
 using CompCube.UI.BSML.EarlyLeaveWarning;
 using CompCube.UI.BSML.Match.Modal;
 using SiraUtil.Logging;
+using SongCore;
 using UnityEngine;
 using Zenject;
 
@@ -44,6 +45,7 @@ namespace CompCube.UI.FlowCoordinators
         [Inject] private readonly GameplaySetupViewManager _gameplaySetupViewManager = null!;
         
         [Inject] private readonly SoundEffectManager _soundEffectManager = null!;
+        [Inject] private readonly BeatmapDownloader _beatmapDownloader = null!;
         
         [Inject] private readonly PlatformLeaderboardViewController _platformLeaderboardViewController = null!;
 
@@ -68,6 +70,16 @@ namespace CompCube.UI.FlowCoordinators
             return;
             
             IEnumerator WaitForVotingScreenToPresent()
+            {
+                yield return new WaitUntil(() => !isInTransition && isActivated);
+                
+                yield return new WaitUntil(() => !_votingScreenViewController.isInTransition && _votingScreenViewController.isActivated);
+                
+                DownloadingBeatmapsModal.DownloadLevelsAndParseModalOntoGameObject(_votingScreenViewController,
+                    packet.InitialMaps.Select(i => i.Hash).ToArray(), () => StartCoroutine(PopulateDataCoroutine()));
+            }
+
+            IEnumerator PopulateDataCoroutine()
             {
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
@@ -111,9 +123,16 @@ namespace CompCube.UI.FlowCoordinators
 
         private void HandleCardsUpdated(UpdateCardsPacket packet)
         {
-            this.ReplaceViewControllerSynchronously(_waitingForDiscardPhaseToFinishViewController);
-            
-            _waitingForDiscardPhaseToFinishViewController.PopulateData(packet.Maps);
+            DownloadingBeatmapsModal.DownloadLevelsAndParseModalOntoGameObject(_waitingForDiscardPhaseToFinishViewController,
+                packet.Maps.Select(i => i.Hash).ToArray(), () => StartCoroutine(PopulateDataCoroutine()));
+            return;
+
+            IEnumerator PopulateDataCoroutine()
+            {
+                this.ReplaceViewControllerSynchronously(_waitingForDiscardPhaseToFinishViewController); 
+                yield return new WaitUntil(() => Loader.AreSongsLoaded);
+                _waitingForDiscardPhaseToFinishViewController.PopulateData(packet.Maps);
+            }
         }
 
         private void HandleMatchFinished(MatchFinishedPacket packet)
@@ -147,8 +166,18 @@ namespace CompCube.UI.FlowCoordinators
             }
         }
 
-        private void HandleOpponentSelectedMap(PlayerSelectedMapPacket packet) =>
-            ShowMapPreviewViewAndStartMatch(packet.Map);
+        private void HandleOpponentSelectedMap(PlayerSelectedMapPacket packet)
+        {
+            StartCoroutine(HandleOpponentSelectedMapCoroutine());
+            
+            IEnumerator HandleOpponentSelectedMapCoroutine()
+            {
+                yield return new WaitForEndOfFrame();
+                
+                DownloadingBeatmapsModal.DownloadLevelsAndParseModalOntoGameObject(_waitingViewController, 
+                    [packet.Map.Hash], ()=> StartCoroutine(ShowMapPreviewViewAndStartMatch(packet.Map)));
+            }
+        }
 
         private void HandleRoundResults(RoundResultsPacket results)
         {
@@ -199,6 +228,9 @@ namespace CompCube.UI.FlowCoordinators
 
             IEnumerator ShowFinalCardsToPlayerCoroutine()
             {
+                DownloadingBeatmapsModal.DownloadLevelsAndParseModalOntoGameObject(topViewController, packet.AvailableMaps.Select(i => i.Hash).ToArray());
+                yield return new WaitUntil(() => !_beatmapDownloader.IsDownloadingBeatmaps);
+                
                 this.ReplaceViewControllerSynchronously(_waitingForDiscardPhaseToFinishViewController);
                 _waitingForDiscardPhaseToFinishViewController.PopulateData(packet.AvailableMaps, false);
 
@@ -284,7 +316,7 @@ namespace CompCube.UI.FlowCoordinators
                     return;
                 }
                 
-                ShowMapPreviewViewAndStartMatch(votingMap);
+                StartCoroutine(ShowMapPreviewViewAndStartMatch(votingMap));
                 await _serverListener.SendPacket(new MapSelectionPacket(votingMap));
             }
             catch (Exception e)
@@ -313,10 +345,12 @@ namespace CompCube.UI.FlowCoordinators
         }
 
         #endregion
-        private void ShowMapPreviewViewAndStartMatch(VotingMap map)
+        private IEnumerator ShowMapPreviewViewAndStartMatch(VotingMap map)
         {
-            StartCoroutine(WaitForSecondsAndStartMatch());
-            return;
+            yield return new WaitForEndOfFrame();
+            
+            DownloadingBeatmapsModal.DownloadLevelsAndParseModalOntoGameObject(topViewController, [map.Hash], () => StartCoroutine(WaitForSecondsAndStartMatch()));
+            yield break;
             
             IEnumerator WaitForSecondsAndStartMatch()
             {
