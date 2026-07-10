@@ -32,7 +32,10 @@ public class CustomEnergyBar(GameObject energyBarGameObject, bool depleteFromLef
 
     public void SetEnergy(float energy)
     {
-        _energyBarImage.rectTransform.anchorMax = new Vector2(energy, 1f);
+        if (!_energyBarImage)
+            return;
+        
+        // _energyBarImage.rectTransform.anchorMax = new Vector2(energy, 1f);
     }
 
     private static GameObject LoadEnergyBarGameObject()

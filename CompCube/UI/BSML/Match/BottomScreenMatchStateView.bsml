@@ -4,15 +4,15 @@
         <text text="~roundText" align="Center" italics="true" font-size="5"/>
     </vertical>
 
-    <vertical anchor-pos-y="-6">
+    <vertical anchor-pos-y="-28.5">
         <text text="~multiplierText" align="Midline" italics="true" font-size="7"/>
     </vertical>
     
-    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="50" anchor-pos-y="-2">
+    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="-40" anchor-pos-y="-28.5">
             <text text="~redText" italics="true" align="Right" font-size="4" color="#FF746C"/>
     </vertical>
 
-    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="-50" anchor-pos-y="-2">
+    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="40" anchor-pos-y="-28.5">
             <text text="~blueText" italics="true" align="Left" font-size="4" color="#90D5FF"/>
     </vertical>
 </bg>
