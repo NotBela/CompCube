@@ -14,6 +14,8 @@ using CompCube.UI.Sound;
 using CompCube.UI.ViewManagers;
 using CompCube.UI.BSML.EarlyLeaveWarning;
 using CompCube.UI.BSML.Match.Modal;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 using Zenject;
 
 namespace CompCube.Installers
@@ -62,6 +64,9 @@ namespace CompCube.Installers
 
             Container.Bind<BSMLTag>().To<LevelBarTag>().AsSingle();
             Container.Bind<TypeHandler<CustomLevelBar>>().To<LevelBarHandler>().AsSingle();
+            
+            // im doing this here! fuck you!
+            Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/UI/BatteryLifeSegment.prefab");
         }
     }
 }
