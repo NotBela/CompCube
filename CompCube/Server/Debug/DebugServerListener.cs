@@ -56,7 +56,6 @@ public class DebugServerListener : IServerListener
                 OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
 
                 // await Task.Delay(2000);
-                //OnAbruptDisconnect?.Invoke("test");
                 break;
             case UserPacket.UserPacketTypes.DiscardMaps:
                 OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true, 10f));
