@@ -61,7 +61,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             _bottomScreenMatchStateViewController.PopulateData(packet.Red, packet.Blue);
             _bottomScreenMatchStateViewController.SetStatus("Discard Phase");
-            _bottomScreenMatchStateViewController.UpdatePoints(_matchStateManager.RedHealth, _matchStateManager.BlueHealth);
+            _bottomScreenMatchStateViewController.UpdateHealth(_matchStateManager.RedHealth, _matchStateManager.BlueHealth);
             _bottomScreenMatchStateViewController.UpdateMultiplier(1f);
 
             StartCoroutine(WaitForVotingScreenToPresent());
@@ -191,10 +191,12 @@ namespace CompCube.UI.FlowCoordinators
                 this.ReplaceViewControllerSynchronously(_roundResultsViewController);
                 
                 _roundResultsViewController.PopulateData(results, _matchStateManager.DamageMultiplier);
-
-                _bottomScreenMatchStateViewController.UpdatePoints(results.RedHealth, results.BlueHealth);
                 
-                yield return new WaitForSeconds(10f);
+                yield return new WaitForSeconds(3f);
+
+                _bottomScreenMatchStateViewController.UpdateHealth(results.RedHealth, results.BlueHealth);
+                
+                yield return new WaitForSeconds(3f);
 
                 _roundResultsAnimationInProgress = false;
             }

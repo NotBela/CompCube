@@ -1,28 +1,29 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical anchor-pos-y="15">
+    <vertical anchor-pos-y="-10">
         <text text="~roundText" align="Center" italics="true" font-size="5"/>
     </vertical>
-    <vertical anchor-pos-y="7">
-        <text text="~pointsText" align="Center" italics="true" font-size="7"/>
-    </vertical>
 
-    <vertical anchor-pos-y="-6">
+    <vertical anchor-pos-y="-28.5" spacing="-2" vertical-fit="PreferredSize">
+        <text text="Damage Multiplier" italics="true" align="Midline" font-size="3"/>
         <text text="~multiplierText" align="Midline" italics="true" font-size="7"/>
     </vertical>
+    
+    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="-52.5" anchor-pos-y="-28.5">
+            <text text="~redHealthText" italics="true" align="Left" font-size="4" color="#FF746C"/>
+    </vertical>
 
-    <horizontal anchor-pos-y="0" horizontal-fit="PreferredSize" pref-width="30">
-        <vertical horizontal-fit="PreferredSize" pref-width="10">
-            <text text="~redText" italics="true" align="Right" font-size="7"/>
-        </vertical>
+    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="52.5" anchor-pos-y="-28.5">
+            <text text="~blueHealthText" italics="true" align="Right" font-size="4" color="#90D5FF"/>
+    </vertical>
+    
+    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="-52.5" anchor-pos-y="-20" vertical-fit="PreferredSize" pref-height="9">
+        <image id="redImage" pref-width="40" preserve-aspect="true"/>
+        <text text="~redPlayerText" align="BottomLeft" italics="true" font-size="4"/>
+    </horizontal>
 
-        <vertical pad="1">
-            <text text="vs." italics="true" align="Center" font-size="7"/>
-        </vertical>
-
-        <vertical horizontal-fit="PreferredSize" pref-width="10">
-            <text text="~blueText" italics="true" align="Left" font-size="7"/>
-        </vertical>
-
+    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="52.5" anchor-pos-y="-20" vertical-fit="PreferredSize" pref-height="9">
+        <text text="~bluePlayerText" align="BottomRight" italics="true" font-size="4"/>
+        <image id="blueImage" pref-width="40" preserve-aspect="true"/>
     </horizontal>
 </bg>

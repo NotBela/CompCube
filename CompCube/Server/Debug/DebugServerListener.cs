@@ -56,7 +56,6 @@ public class DebugServerListener : IServerListener
                 OnMatchCreated?.Invoke(new MatchCreatedPacket(DebugApi.Self, DebugApi.DebugOpponent, DebugApi.Maps));
 
                 // await Task.Delay(2000);
-                //OnAbruptDisconnect?.Invoke("test");
                 break;
             case UserPacket.UserPacketTypes.DiscardMaps:
                 OnPickPhaseStarted?.Invoke(new StartPickPhasePacket(DebugApi.Maps, true, 10f));
@@ -65,7 +64,7 @@ public class DebugServerListener : IServerListener
                 
                 break;
             case UserPacket.UserPacketTypes.ScoreSubmission:
-                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10));
+                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 500000, 500000));
 
                 await Task.Delay(500);
                 
