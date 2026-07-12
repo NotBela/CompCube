@@ -19,9 +19,9 @@ public class MatchStateManager : IInitializable, IDisposable
 
     public bool IsRedTeam => RedPlayer.UserId == _userModelWrapper.UserId;
     
-    public CompCube_Models.Models.ClientData.UserInfo Opponent => IsRedTeam ? RedPlayer : BluePlayer;
+    public CompCube_Models.Models.ClientData.UserInfo Opponent => !IsRedTeam ? RedPlayer : BluePlayer;
     
-    public CompCube_Models.Models.ClientData.UserInfo Self => !IsRedTeam ? RedPlayer : BluePlayer;
+    public CompCube_Models.Models.ClientData.UserInfo Self => IsRedTeam ? RedPlayer : BluePlayer;
     
     public int CurrentRound { get; private set; } = 0;
     
