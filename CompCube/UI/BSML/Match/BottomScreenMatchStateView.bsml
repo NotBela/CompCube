@@ -1,18 +1,29 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
     xsi:noNamespaceSchemaLocation='https://monkeymanboy.github.io/BSML-Docs/BSMLSchema.xsd'>
-    <vertical anchor-pos-y="15">
+    <vertical anchor-pos-y="-10">
         <text text="~roundText" align="Center" italics="true" font-size="5"/>
     </vertical>
 
-    <vertical anchor-pos-y="-28.5">
+    <vertical anchor-pos-y="-28.5" spacing="-2" vertical-fit="PreferredSize">
+        <text text="Damage Multiplier" italics="true" align="Midline" font-size="3"/>
         <text text="~multiplierText" align="Midline" italics="true" font-size="7"/>
     </vertical>
     
-    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="-40" anchor-pos-y="-28.5">
-            <text text="~redText" italics="true" align="Right" font-size="4" color="#FF746C"/>
+    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="-52.5" anchor-pos-y="-28.5">
+            <text text="~redHealthText" italics="true" align="Left" font-size="4" color="#FF746C"/>
     </vertical>
 
-    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="40" anchor-pos-y="-28.5">
-            <text text="~blueText" italics="true" align="Left" font-size="4" color="#90D5FF"/>
+    <vertical horizontal-fit="PreferredSize" pref-width="10" anchor-pos-x="52.5" anchor-pos-y="-28.5">
+            <text text="~blueHealthText" italics="true" align="Right" font-size="4" color="#90D5FF"/>
     </vertical>
+    
+    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="-52.5" anchor-pos-y="-22.5">
+        <image id="redImage" pref-width="5" preserve-aspect="true" pref-height="5"/>
+        <text text="~redPlayerText" align="Left" italics="true"/>
+    </horizontal>
+
+    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="52.5" anchor-pos-y="-22.5">
+        <text text="~bluePlayerText" align="Right" italics="true"/>
+        <image id="blueImage" pref-width="5" preserve-aspect="true" pref-height="5"/>
+    </horizontal>
 </bg>

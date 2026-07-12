@@ -64,7 +64,7 @@ public class DebugServerListener : IServerListener
                 
                 break;
             case UserPacket.UserPacketTypes.ScoreSubmission:
-                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 1000, 10));
+                OnRoundResults?.Invoke(new RoundResultsPacket(Score.Empty, Score.Empty, 500000, 500000));
 
                 await Task.Delay(500);
                 

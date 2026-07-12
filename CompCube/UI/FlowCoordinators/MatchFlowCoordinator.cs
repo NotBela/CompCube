@@ -191,10 +191,12 @@ namespace CompCube.UI.FlowCoordinators
                 this.ReplaceViewControllerSynchronously(_roundResultsViewController);
                 
                 _roundResultsViewController.PopulateData(results, _matchStateManager.DamageMultiplier);
+                
+                yield return new WaitForSeconds(3f);
 
                 _bottomScreenMatchStateViewController.UpdateHealth(results.RedHealth, results.BlueHealth);
                 
-                yield return new WaitForSeconds(10f);
+                yield return new WaitForSeconds(3f);
 
                 _roundResultsAnimationInProgress = false;
             }

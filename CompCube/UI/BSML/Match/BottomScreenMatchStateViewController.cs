@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Globalization;
+using System.Net.Http;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube.Extensions;
 using CompCube.UI.BSML.Components.EnergyBar;
+using SiraUtil.Logging;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace CompCube.UI.BSML.Match;
@@ -12,30 +15,77 @@ namespace CompCube.UI.BSML.Match;
 [ViewDefinition("CompCube.UI.BSML.Match.BottomScreenMatchStateView.bsml")]
 public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
 {
+    [Inject] private readonly SiraLog _siraLog = null!;
     [Inject] private readonly SharedCoroutineStarter _sharedCoroutineStarter = null!;
     
     private CustomEnergyBar _redEnergyBar;
     private CustomEnergyBar _blueEnergyBar;
+
+    [UIValue("roundText")] private string RoundText { get; set; } = "";
     
-    [UIValue("roundText")] private string RoundText { get; set; }
-    [UIValue("redText")] private string RedText { get; set; }
-    [UIValue("blueText")] private string BlueText { get; set; }
+    [UIValue("redHealthText")] private string RedHealthText { get; set; } = "";
+    [UIValue("blueHealthText")] private string BlueHealthText { get; set; } = "";
+
+    [UIValue("multiplierText")] private string MultiplierText { get; set; } = "";
+
+    [UIValue("redPlayerText")] private string RedPlayerText { get; set; } = "";
+    [UIValue("bluePlayerText")] private string BluePlayerText { get; set; } = "";
+
+    [UIComponent("redImage")] private readonly Image _redImage = null!;
+    [UIComponent("blueImage")] private readonly Image _blueImage = null!;
     
-    [UIValue("multiplierText")] private string MultiplierText { get; set; }
+    private readonly HttpClient _client = new();
 
     [UIAction("#post-parse")]
     void PostParse()
     {
-        _redEnergyBar = CustomEnergyBar.ParseOntoViewController(this, new Vector3(-10f, -25f), false, new Color(1f, .4549f, .4235f));
-        _blueEnergyBar = CustomEnergyBar.ParseOntoViewController(this, new Vector3(10f, -25f), true, new Color(.565f, .835f, 1f));
+        _redEnergyBar = CustomEnergyBar.InstantiateOntoViewController(this, new Vector3(-60f, -25f), false, new Color(1f, .4549f, .4235f));
+        _blueEnergyBar = CustomEnergyBar.InstantiateOntoViewController(this, new Vector3(60f, -25f), true, new Color(.565f, .835f, 1f));
+        
+        var material = Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "UINoGlowRoundEdge");
+        
+        _redImage.material = material;
+        _blueImage.material = material;
     }
     
     public void PopulateData(CompCube_Models.Models.ClientData.UserInfo red, CompCube_Models.Models.ClientData.UserInfo blue)
     {
-        // RedText = red.GetFormattedUserName();
-        // BlueText = blue.GetFormattedUserName();
+        RedPlayerText = red.GetFormattedUserName();
+        BluePlayerText = blue.GetFormattedUserName();
         
         NotifyPropertyChanged(null);
+
+        StartCoroutine(PopulateImagesCoroutine());
+        return;
+
+        IEnumerator PopulateImagesCoroutine()
+        {
+            yield return new WaitUntil(() => _redImage && _blueImage);
+            
+            SetSpriteImageFromUrl(red.ProfilePictureLink, _redImage);
+            SetSpriteImageFromUrl(blue.ProfilePictureLink, _blueImage);
+        }
+    }
+
+    private async Task SetSpriteImageFromUrl(string url, Image image)
+    {
+        image.sprite.texture.LoadRawTextureData([]);
+        image.sprite.texture.Apply();
+
+        var response = await _client.GetAsync(url);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _siraLog.Warn("Failed to fetch user profile picture!");
+            return;
+        }
+
+        var bytes = await response.Content.ReadAsByteArrayAsync();
+        
+        _siraLog.Info(bytes);
+        
+        image.sprite.texture.LoadRawTextureData(bytes);
+        image.sprite.texture.Apply();
     }
 
     public void UpdateHealth(int redHealth, int blueHealth)
@@ -47,8 +97,8 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
         {
             yield return new WaitUntil(() => _redEnergyBar != null);
             
-            RedText = redHealth.ToString("N0", CultureInfo.InvariantCulture);
-            BlueText = blueHealth.ToString("N0", CultureInfo.InvariantCulture);
+            RedHealthText = redHealth.ToString("N0", CultureInfo.InvariantCulture);
+            BlueHealthText = blueHealth.ToString("N0", CultureInfo.InvariantCulture);
         
             _redEnergyBar.SetEnergy((float) redHealth / 1000000);
             _blueEnergyBar.SetEnergy((float) blueHealth / 1000000);

@@ -9,18 +9,20 @@ namespace CompCube.UI.BSML.Components.EnergyBar;
 
 public class CustomEnergyBar(GameObject energyBarGameObject, bool depleteFromLeft)
 {
-    private readonly GameObject _energyBarGameObject = energyBarGameObject;
     private readonly Image _energyBarImage = energyBarGameObject.GetComponent<Image>();
-    
-    private readonly bool _depleteFromLeft = depleteFromLeft;
 
-    public static CustomEnergyBar ParseOntoViewController(ViewController viewController, Vector3 position, bool depleteFromLeft, Color color)
+    public static CustomEnergyBar InstantiateOntoViewController(ViewController viewController, Vector3 position, bool depleteFromLeft, Color color)
     {
         var image = LoadEnergyBarGameObject();
         
+        var energyBarBackgroundGameObject = Object.Instantiate(image, viewController.transform);
+        energyBarBackgroundGameObject.transform.localScale = new Vector3(4.08f * (depleteFromLeft ? -1 : 1), .04f);
+        energyBarBackgroundGameObject.transform.localPosition = position;
+        energyBarBackgroundGameObject.GetComponent<Image>().color = new Color(0f, 0f, 0f, .6f);
+        
         var energyBarGameObject = Object.Instantiate(image, viewController.transform);
         energyBarGameObject.name = "CustomEnergyBar";
-        energyBarGameObject.transform.localScale = new Vector3(4f * (depleteFromLeft ? 1 : -1), .02f);
+        energyBarGameObject.transform.localScale = new Vector3(4f * (depleteFromLeft ? -1 : 1), .02f);
         energyBarGameObject.transform.localPosition = position;
 
         energyBarGameObject.GetComponent<Image>().color = color;
@@ -35,7 +37,7 @@ public class CustomEnergyBar(GameObject energyBarGameObject, bool depleteFromLef
         if (!_energyBarImage)
             return;
         
-        // _energyBarImage.rectTransform.anchorMax = new Vector2(energy, 1f);
+        energyBarGameObject.transform.localScale = new Vector3(4f * (depleteFromLeft ? -1 : 1) * energy, .02f);
     }
 
     private static GameObject LoadEnergyBarGameObject()
