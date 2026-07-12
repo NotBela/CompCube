@@ -55,7 +55,7 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
         
         NotifyPropertyChanged(null);
 
-        StartCoroutine(PopulateImagesCoroutine());
+        _sharedCoroutineStarter.Run(PopulateImagesCoroutine());
         return;
 
         IEnumerator PopulateImagesCoroutine()
@@ -69,8 +69,7 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
 
     private async Task SetSpriteImageFromUrl(string url, Image image)
     {
-        image.sprite.texture.LoadRawTextureData([]);
-        image.sprite.texture.Apply();
+        image.sprite = Sprite.Create(new Texture2D(0, 0), new Rect(Vector2.zero, Vector2.zero), Vector2.zero);
 
         var response = await _client.GetAsync(url);
 
@@ -82,10 +81,11 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
 
         var bytes = await response.Content.ReadAsByteArrayAsync();
         
-        _siraLog.Info(bytes);
+        var tex = new Texture2D(2, 2);
+        tex.LoadImage(bytes);
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
         
-        image.sprite.texture.LoadRawTextureData(bytes);
-        image.sprite.texture.Apply();
+        image.sprite = sprite;
     }
 
     public void UpdateHealth(int redHealth, int blueHealth)

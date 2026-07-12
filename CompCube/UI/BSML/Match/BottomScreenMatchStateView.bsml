@@ -17,13 +17,13 @@
             <text text="~blueHealthText" italics="true" align="Right" font-size="4" color="#90D5FF"/>
     </vertical>
     
-    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="-52.5" anchor-pos-y="-22.5">
-        <image id="redImage" pref-width="5" preserve-aspect="true" pref-height="5"/>
-        <text text="~redPlayerText" align="Left" italics="true"/>
+    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="-52.5" anchor-pos-y="-20" vertical-fit="PreferredSize" pref-height="9">
+        <image id="redImage" pref-width="40" preserve-aspect="true"/>
+        <text text="~redPlayerText" align="BottomLeft" italics="true" font-size="4"/>
     </horizontal>
 
-    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="52.5" anchor-pos-y="-22.5">
-        <text text="~bluePlayerText" align="Right" italics="true"/>
-        <image id="blueImage" pref-width="5" preserve-aspect="true" pref-height="5"/>
+    <horizontal horizontal-fit="PreferredSize" spacing="2" pref-width="10" anchor-pos-x="52.5" anchor-pos-y="-20" vertical-fit="PreferredSize" pref-height="9">
+        <text text="~bluePlayerText" align="BottomRight" italics="true" font-size="4"/>
+        <image id="blueImage" pref-width="40" preserve-aspect="true"/>
     </horizontal>
 </bg>
