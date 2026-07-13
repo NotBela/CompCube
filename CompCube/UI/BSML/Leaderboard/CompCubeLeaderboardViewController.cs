@@ -88,9 +88,7 @@ namespace CompCube.UI.BSML.Leaderboard
             
             ProfilePictureLink = userInfo.ProfilePictureLink;
             ProfileNameText = $"{userInfo.GetFormattedUserName()}'s Profile";
-            ProfileMmrText = "MMR: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.Mmr.ToString().FormatWithHtmlColor(userInfo.Division.Color)}";
-            ProfileDivisionText =
-                "Division: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.Division.Division} {userInfo.Division.SubDivision}".FormatWithHtmlColor(userInfo.Division.Color);
+            ProfileMmrText = "ELO: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.Mmr.ToString()}";
             ProfileRankText = "Rank: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.Rank}";
             WinRateText = "Wins: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.Wins}" + "/".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.TotalGames}";
             WinStreakText = "Win Streak: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.Winstreak}" + " (Best: ".FormatWithHtmlColor("#6F6F6F") + $"{userInfo.HighestWinstreak}" + ")".FormatWithHtmlColor("#6F6F6F");

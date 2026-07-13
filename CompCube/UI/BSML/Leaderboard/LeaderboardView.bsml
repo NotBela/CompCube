@@ -26,7 +26,6 @@
         </vertical>
         <vertical pref-width="65" pref-height="30" anchor-pos-x="30" anchor-pos-y="-2.5" vertical-fit="PreferredSize">
             <text text="~profileMmrText" align="Left" font-size="3.5" italics="true"/>
-            <text text="~profileDivisionText" align="Left" font-size="3.5" italics="true"/>
             <text text="~profileRankText" align="Left" font-size="3.5" italics="true"/>
             <text text="~winRate" align="Left" font-size="3.5" italics="true"/>
             <text text="~winStreak" align="Left" font-size="3.5" italics="true"/>

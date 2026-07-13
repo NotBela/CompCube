@@ -13,7 +13,7 @@ public class LeaderboardSlot(CompCube_Models.Models.ClientData.UserInfo userInfo
 
     [UIValue("rankText")] private string RankText { get; set; } = userInfo.Rank + ".";
     [UIValue("playerNameText")] private string NameText { get; set; } = userInfo.GetFormattedUserName();
-    [UIValue("mmrText")] private string MmrText { get; set; } = $"{userInfo.Mmr:N0} MMR".FormatWithHtmlColor(isSelf ? OwnCellTextColor : userInfo.Division.Color);
+    [UIValue("mmrText")] private string MmrText { get; set; } = $"{userInfo.Mmr:N0} MMR".FormatWithHtmlColor(isSelf ? OwnCellTextColor : "white");
 
     [UIAction("profileButtonOnClick")]
     private void ProfileButtonOnClick() => OnUserInfoButtonClicked?.Invoke(userInfo);

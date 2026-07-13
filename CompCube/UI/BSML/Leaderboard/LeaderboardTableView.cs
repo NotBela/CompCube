@@ -191,7 +191,7 @@ public class PlayerCellDataSource : MonoBehaviour, TableView.IDataSource
     private void ConfigureText(LevelListTableCell cell, CompCube_Models.Models.ClientData.UserInfo user)
     {
         string name = $"#{user.Rank} - {user.GetFormattedUserName()}";
-        string divisionText = $"<color={user.Division.Color}>{user.Division.Division}</color> {user.Mmr} MMR";
+        string divisionText = $"{user.Mmr} ELO";// $"<color={user.Division.Color}>{user.Division.Division}</color> {user.Mmr} MMR";
 
         int losses = user.TotalGames - user.Wins;
         string recordText = $"{user.Wins}<color=green>W</color> / {losses}<color=red>L</color>";
