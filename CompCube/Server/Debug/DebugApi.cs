@@ -75,4 +75,9 @@ public class DebugApi : IApi
         await Task.Delay(500);
         return [];
     }
+
+    public Task<byte[]?> DownloadUserProfilePicture(CompCube_Models.Models.ClientData.UserInfo userInfo)
+    {
+        return Task.FromResult<byte[]?>([]);
+    }
 }

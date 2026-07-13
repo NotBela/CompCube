@@ -76,5 +76,15 @@ namespace CompCube.Server
             
             return await response.Content.ReadAsByteArrayAsync();
         }
+
+        public async Task<byte[]?> DownloadUserProfilePicture(CompCube_Models.Models.ClientData.UserInfo userInfo)
+        {
+            var response = await _client.GetAsync(userInfo.ProfilePictureLink);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+            
+            return await response.Content.ReadAsByteArrayAsync();
+        }
     }
 }

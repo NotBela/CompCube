@@ -19,4 +19,6 @@ public interface IApi
     public Task<EventData[]?> GetEvents();
 
     public Task<byte[]?> DownloadBeatmap(string hash);
+    
+    public Task<byte[]?> DownloadUserProfilePicture(CompCube_Models.Models.ClientData.UserInfo userInfo);
 }
