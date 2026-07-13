@@ -77,7 +77,7 @@ namespace CompCube.Server
             try
             {
                 _client = new TcpClient();
-                await _client.ConnectAsync(IPAddress.Parse(_config.ServerIp), _config.ServerPort);
+                await _client.ConnectAsync(_config.WebsocketIp, _config.ServerPort);
                 
                 //todo: change this to not be standard by default
                 await SendPacket(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));

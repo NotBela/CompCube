@@ -11,15 +11,15 @@ namespace CompCube.UI.BSML.Settings;
 [ViewDefinition("CompCube.UI.BSML.Settings.SettingsView.bsml")]
 public class SettingsViewController : BSMLAutomaticViewController, IInitializable, IDisposable
 {
-    [Inject] private readonly BSMLSettings _bsmlSettings = null;
-    [Inject] private readonly PluginConfig _config = null;
+    [Inject] private readonly BSMLSettings _bsmlSettings = null!;
+    [Inject] private readonly PluginConfig _config = null!;
 
-    [UIParams] private readonly BSMLParserParams _parserParams = null;
+    [UIParams] private readonly BSMLParserParams _parserParams = null!;
 
     [UIValue("serverIp")]
     private string ServerIp
     {
-        get => _config.ServerIp;
+        get => _config.WebsocketIp;
         set
         {
             if (!IPAddress.TryParse(value, out _))
@@ -28,7 +28,7 @@ public class SettingsViewController : BSMLAutomaticViewController, IInitializabl
                 return;
             }
 
-            _config.ServerIp = ServerIp;
+            _config.WebsocketIp = ServerIp;
         }
     }
 
@@ -62,13 +62,6 @@ public class SettingsViewController : BSMLAutomaticViewController, IInitializabl
 
             _config.ServerApiPort = port;
         }
-    }
-
-    [UIValue("mapAutoDownload")]
-    private bool MapAutoDownload
-    {
-        get => _config.DownloadMapsAutomatically;
-        set => _config.DownloadMapsAutomatically = value;
     }
 
     [UIValue("scoreSubmission")]

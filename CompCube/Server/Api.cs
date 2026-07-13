@@ -24,7 +24,7 @@ namespace CompCube.Server
                 handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             
             _client = new HttpClient(handler);
-            _client.BaseAddress = new Uri($"https://{config.ServerIp}:{config.ServerApiPort}/");
+            _client.BaseAddress = new Uri($"https://{config.ApiIP}/");
         }
 
         public async Task<CompCube_Models.Models.ClientData.UserInfo?> GetUserInfo(string id)
