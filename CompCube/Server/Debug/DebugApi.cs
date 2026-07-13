@@ -18,15 +18,13 @@ public class DebugApi : IApi
         new("44d8d1c7c5821a7f1929542cab49c906c9e585e4", VotingMap.DifficultyType.ExpertPlus, VotingMap.Category.Unknown, "Extreme")
     ];
 
-    public static readonly CompCube_Models.Models.ClientData.UserInfo DebugOpponent = new("debugOpponent", "1", 1000,
-        new DivisionInfo("Iron", 4, "#FFFFFF", false), null, 2, null,
+    public static readonly CompCube_Models.Models.ClientData.UserInfo DebugOpponent = new("debugOpponent", "1", 1000, null, 2, null,
         false, 0, 0, 0, 0);
 
     public static readonly CompCube_Models.Models.ClientData.UserInfo Self = new(
         "self",
         "0",
         1000,
-        new DivisionInfo("Iron", 1, "#FFFFFF", false),
         null,
         1,
         null,

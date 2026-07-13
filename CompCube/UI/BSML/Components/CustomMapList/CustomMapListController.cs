@@ -26,11 +26,10 @@ public class CustomMapListController : BSMLAutomaticViewController
     [UIValue("anchorPosY")] private float AnchorPosY { get; set; }
     [UIValue("anchorPosX")] private float AnchorPosX { get; set; }
 
-    public bool Interactable { get; set; } = true;
-
     public VotingMap[] MapsInList => _votingListDataSource.Data.ToArray();
 
-    public static CustomMapListController ParseOntoViewController(ViewController viewController, Action<VotingMap>? handleMapSelectedCallback, float xPos = 0f, float yPos = 0f, bool interactable = true)
+    public static CustomMapListController ParseOntoViewController(ViewController viewController,
+        Action<VotingMap>? handleMapSelectedCallback, float xPos = 0f, float yPos = 0f)
     {
         var controller = BeatSaberUI.CreateViewController<CustomMapListController>();
         
@@ -40,8 +39,6 @@ public class CustomMapListController : BSMLAutomaticViewController
 
         controller.SetPos(xPos, yPos);
         controller._handleMapSelectedCallback = handleMapSelectedCallback;
-        
-        controller.Interactable = interactable;
         
         return controller;
     }
@@ -54,7 +51,7 @@ public class CustomMapListController : BSMLAutomaticViewController
         NotifyPropertyChanged(null);
     }
     
-    public void SetMaps(VotingMap[] maps)
+    public void SetMaps(VotingMap[] maps, bool interactable = true)
     {
         _sharedCoroutineStarter.Run(PopulateDataCoroutine());
         return;
@@ -63,7 +60,7 @@ public class CustomMapListController : BSMLAutomaticViewController
         {
             yield return new WaitForEndOfFrame();
 
-            _votingListDataSource.SetData(maps.ToList());
+            _votingListDataSource.SetData(maps.ToList(), interactable);
             _votingListDataSource.TableView.ClearSelection();
         }
     }
@@ -83,12 +80,6 @@ public class CustomMapListController : BSMLAutomaticViewController
     
     private void DidSelectCellWithIdxEvent(TableView tableView, int idx)
     {
-        if (!Interactable)
-        {
-            ClearSelection();
-            return;
-        }
-        
         _handleMapSelectedCallback?.Invoke(_votingListDataSource.Data[idx]);
     }
 
@@ -110,6 +101,8 @@ public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
     public List<VotingMap> Data { get; private set; } = new();
 
     private LevelListTableCell _tableCellPrefab;
+    
+    private bool _interactable = true;
 
     private LevelListTableCell CreateTableCellPrefab()
     {
@@ -128,9 +121,10 @@ public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
         
     public void Init(TableView tableView) => TableView = tableView;
 
-    public void SetData(List<VotingMap> maps)
+    public void SetData(List<VotingMap> maps, bool interactable = true)
     {
         Data = maps;
+        _interactable = interactable;
         TableView.ReloadData();
     }
 
@@ -151,9 +145,7 @@ public class VotingListDataSource : MonoBehaviour, TableView.IDataSource
 
         var info = Data[idx];
         
-        if (info.GetBeatmapLevel() == null)
-            Plugin.Log.Info($"null");
-        cell.SetDataFromLevelAsync(info.GetBeatmapLevel(), false,false, false, true);
+        cell.SetDataFromLevelAsync(info.GetBeatmapLevel(), false,false, false, _interactable);
 
         return cell;
     }

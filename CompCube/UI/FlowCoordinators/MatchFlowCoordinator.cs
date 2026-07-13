@@ -83,7 +83,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
-                _votingScreenViewController.PopulateData(packet.InitialMaps, 30, HandleSkippingDiscardPhase, HandleVotingScreenTimerRanOutDuringDiscardPhase);
+                _votingScreenViewController.PopulateData("Discard up to two cards to be replaced!", packet.InitialMaps, 30, HandleSkippingDiscardPhase, HandleVotingScreenTimerRanOutDuringDiscardPhase);
                 StartCoroutine(ShowPhaseChangeModal("Discard Phase", ""));
             }
         }
@@ -249,9 +249,9 @@ namespace CompCube.UI.FlowCoordinators
                 
                 yield return new WaitUntil(() => _votingScreenViewController.isActivated);
                 
-                _votingScreenViewController.PopulateData(packet.AvailableMaps, 30, null, HandleVotingScreenTimerRanOutDuringPickPhase);
+                _votingScreenViewController.PopulateData("Pick a card to play against your opponent!", packet.AvailableMaps, 30, null, HandleVotingScreenTimerRanOutDuringPickPhase);
 
-                yield return new WaitUntil(() => !_votingScreenViewController.isInTransition);
+                yield return new WaitUntil(() => !_votingScreenViewController.isInTransition);  
                 
                 yield return ShowPhaseChangeModal("Pick Phase", $"{_matchStateManager.Self.GetFormattedUserName()}'s Pick");
             }

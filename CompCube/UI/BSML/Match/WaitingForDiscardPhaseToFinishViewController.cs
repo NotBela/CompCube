@@ -22,7 +22,7 @@ public class WaitingForDiscardPhaseToFinishViewController : BSMLAutomaticViewCon
     [UIAction("#post-parse")]
     private void PostParse()
     {
-        _customMapListController = CustomMapListController.ParseOntoViewController(this, null, 0f, -10f, false);
+        _customMapListController = CustomMapListController.ParseOntoViewController(this, null, 0f, -10f);
     }
 
     public void PopulateData(VotingMap[] votingMaps, bool waitingForOpponent = true)
@@ -35,7 +35,7 @@ public class WaitingForDiscardPhaseToFinishViewController : BSMLAutomaticViewCon
             yield return new WaitUntil(() => isActivated && !isInTransition);
             yield return new WaitForEndOfFrame();
             
-            _customMapListController.SetMaps(votingMaps);
+            _customMapListController.SetMaps(votingMaps, false);
         
             SetWaitingForOpponent(waitingForOpponent);
         }

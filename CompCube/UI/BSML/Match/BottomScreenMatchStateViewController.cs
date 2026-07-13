@@ -4,7 +4,6 @@ using System.Net.Http;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using CompCube.Extensions;
-using CompCube.Interfaces;
 using CompCube.UI.BSML.Components.EnergyBar;
 using SiraUtil.Logging;
 using UnityEngine;
@@ -18,7 +17,6 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
 {
     [Inject] private readonly SiraLog _siraLog = null!;
     [Inject] private readonly SharedCoroutineStarter _sharedCoroutineStarter = null!;
-    [Inject] private readonly IApi _api = null!;
     
     private CustomEnergyBar _redEnergyBar;
     private CustomEnergyBar _blueEnergyBar;
@@ -35,6 +33,8 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
 
     [UIComponent("redImage")] private readonly Image _redImage = null!;
     [UIComponent("blueImage")] private readonly Image _blueImage = null!;
+    
+    private readonly HttpClient _client = new();
 
     [UIAction("#post-parse")]
     void PostParse()
@@ -62,22 +62,24 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
         {
             yield return new WaitUntil(() => _redImage && _blueImage);
             
-            SetSpriteImage(red, _redImage);
-            SetSpriteImage(blue, _blueImage);
+            SetSpriteImageFromUrl(red.ProfilePictureLink, _redImage);
+            SetSpriteImageFromUrl(blue.ProfilePictureLink, _blueImage);
         }
     }
 
-    private async Task SetSpriteImage(CompCube_Models.Models.ClientData.UserInfo userInfo, Image image)
+    private async Task SetSpriteImageFromUrl(string url, Image image)
     {
         image.sprite = Sprite.Create(new Texture2D(0, 0), new Rect(Vector2.zero, Vector2.zero), Vector2.zero);
 
-        var bytes = await _api.DownloadUserProfilePicture(userInfo);
+        var response = await _client.GetAsync(url);
 
-        if (bytes == null)
+        if (!response.IsSuccessStatusCode)
         {
             _siraLog.Warn("Failed to fetch user profile picture!");
             return;
         }
+
+        var bytes = await response.Content.ReadAsByteArrayAsync();
         
         var tex = new Texture2D(2, 2);
         tex.LoadImage(bytes);
