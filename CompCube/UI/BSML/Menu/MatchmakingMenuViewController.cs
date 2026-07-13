@@ -69,14 +69,22 @@ namespace CompCube.UI.BSML.Menu
             }
             catch (Exception e)
             {
+                SetState(false);
+                ShowFailedToConnectModal();
                 _siraLog.Error(e);
             }
         }
 
-        private void ShowFailedToConnectModal(string reason)
+        private void ShowFailedToConnectModal(string reason = "")
         {
             SetState(false);
-            _warningModalViewController.ParseOntoGameObject(this, $"Failed to connect to server\nReason: {reason}", _warningModalViewController.Hide);
+
+            var modalText = "Failed to connect to server";
+            
+            if (reason != "")
+                modalText += "\nReason: " + reason;
+            
+            _warningModalViewController.ParseOntoGameObject(this, modalText, _warningModalViewController.Hide);
         }
 
         [UIComponent("join-pool-button")] private readonly Button _joinPoolButton = null!;
