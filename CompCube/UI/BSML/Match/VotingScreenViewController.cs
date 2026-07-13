@@ -29,7 +29,7 @@ public class VotingScreenViewController : BSMLAutomaticViewController
 
     [UIComponent("voteStatusText")] private readonly TextMeshProUGUI _voteStatusText = null!;
     [UIValue("timerText")] private string TimerText { get; set; } = "";
-    [UIValue("votingText")] private string VotingText { get; set; } = "Discard up to two cards to be replaced!";
+    [UIValue("votingText")] private string VotingText { get; set; } = "";
     
     private Action? _activationCallback = null;
     
@@ -79,7 +79,7 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         _customMapListController.SetMaps(_customMapListController.MapsInList.Where(i => i != map).ToArray());
     }
 
-    public void PopulateData(VotingMap[] maps, int waitTime, Action? skipButtonPressedCallback = null, Action? timerRanOutCallback = null)
+    public void PopulateData(string text, VotingMap[] maps, int waitTime, Action? skipButtonPressedCallback = null, Action? timerRanOutCallback = null)
     {
         _log.Notice("Populating maps");
         StartCoroutine(CountDown());
@@ -89,7 +89,8 @@ public class VotingScreenViewController : BSMLAutomaticViewController
         _ranOutOfTimeCallback = timerRanOutCallback;
         _skipButtonPressedCallback = skipButtonPressedCallback;
         
-        NotifyPropertyChanged(nameof(ShowSkipButton));
+        VotingText = text;
+        NotifyPropertyChanged(null);
         return;
 
         IEnumerator CountDown()
