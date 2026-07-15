@@ -74,43 +74,36 @@ namespace CompCube.Server
                 return;
             }
             
-            try
+            _client = new TcpClient();
+            await _client.ConnectAsync(_config.WebsocketIp, _config.ServerPort);
+                
+            await SendPacket(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));
+
+            while (!_client.GetStream().DataAvailable)
+                await Task.Delay(25);
+                
+            var bytes = new byte[1024];
+                
+            var bytesRead = _client.GetStream().Read(bytes, 0, bytes.Length);
+            Array.Resize(ref bytes, bytesRead);
+                
+            _siraLog.Info(Encoding.UTF8.GetString(bytes));
+
+            if (ServerPacket.Deserialize(Encoding.UTF8.GetString(bytes)) is not JoinResponsePacket responsePacket)
+                return;
+                
+            onConnectedCallBack.Invoke(responsePacket);
+
+            if (responsePacket.Successful)
             {
-                _client = new TcpClient();
-                await _client.ConnectAsync(_config.WebsocketIp, _config.ServerPort);
-                
-                await SendPacket(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));
-
-                while (!_client.GetStream().DataAvailable)
-                    await Task.Delay(25);
-                
-                var bytes = new byte[1024];
-                
-                var bytesRead = _client.GetStream().Read(bytes, 0, bytes.Length);
-                Array.Resize(ref bytes, bytesRead);
-                
-                _siraLog.Info(Encoding.UTF8.GetString(bytes));
-
-                if (ServerPacket.Deserialize(Encoding.UTF8.GetString(bytes)) is not JoinResponsePacket responsePacket)
-                    return;
-                
-                onConnectedCallBack.Invoke(responsePacket);
-
-                if (responsePacket.Successful)
-                {
-                    _listenerThread = new Thread(ListenToServer);
-                    _shouldListenToServer = true;
-                    _listenerThread.Start();
-                    OnConnected?.Invoke();
-                    return;
-                }
-                
-                Disconnect();
+                _listenerThread = new Thread(ListenToServer);
+                _shouldListenToServer = true;
+                _listenerThread.Start();
+                OnConnected?.Invoke();
+                return;
             }
-            catch (Exception e)
-            {
-                _siraLog.Error(e);
-            }
+                
+            Disconnect();
         }
 
         public async Task SendPacket(UserPacket packet)
