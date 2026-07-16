@@ -31,5 +31,5 @@ public interface IServerListener
 
     public void Disconnect();
     
-    public void DisconnectAbruptly(string reason);
+    public void HandleAbruptDisconnection(string reason);
 }

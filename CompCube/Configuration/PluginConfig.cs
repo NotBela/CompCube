@@ -7,7 +7,7 @@ namespace CompCube.Configuration
 {
     public class PluginConfig
     {
-        public virtual string WebsocketIp { get; set; } = "ws.compcube.net";
+        public virtual string WebsocketIp { get; set; } = "wss://ws.compcube.net";
         public virtual string ApiIP { get; set; } = "api.compcube.net";
         public virtual int ServerPort { get; set; } = 8008;
         public virtual int ServerApiPort { get; set; } = 7198;

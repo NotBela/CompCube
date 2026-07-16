@@ -73,7 +73,7 @@ public class DebugServerListener : IServerListener
         }
     }
 
-    public void DisconnectAbruptly(string reason)
+    public void HandleAbruptDisconnection(string reason)
     {
         if (!_isConnected) return;
         _isConnected = false;

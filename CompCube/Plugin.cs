@@ -15,6 +15,8 @@ namespace CompCube
         internal static Plugin Instance { get; private set; }
 
         internal static IPALogger Log;
+        
+        internal static PluginConfig _config;
 
         [Init]
         public void Init(Zenjector zenjector, IPALogger logger, Config config)
@@ -25,9 +27,14 @@ namespace CompCube
             zenjector.UseLogger(logger);
             zenjector.UseMetadataBinder<Plugin>();
 
-            zenjector.Install<AppInstaller>(Location.App, config.Generated<PluginConfig>());
+            _config = config.Generated<PluginConfig>();
+
+            zenjector.Install<AppInstaller>(Location.App, _config);
             zenjector.Install<MenuInstaller>(Location.Menu);
             zenjector.Install<GameInstaller>(Location.StandardPlayer);
+            
+            if (_config.SkipServerCertificateValidation)
+                System.Net.ServicePointManager.ServerCertificateValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
         }
     }
 }

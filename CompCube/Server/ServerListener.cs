@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Text;
 using CompCube_Models.Models.Packets;
 using CompCube_Models.Models.Packets.ServerPackets;
@@ -18,10 +19,7 @@ namespace CompCube.Server
         [Inject] private readonly PluginConfig _config = null!;
         [Inject] private readonly SiraLog _siraLog = null!;
 
-        private TcpClient _client = new();
-        private Thread? _listenerThread;
-
-        private bool _shouldListenToServer = false;
+        private ClientWebSocket _client = new();
         
         public event Action<MatchCreatedPacket>? OnMatchCreated;
         public event Action<PlayerSelectedMapPacket>? OnPlayerSelectedMap;
@@ -34,89 +32,146 @@ namespace CompCube.Server
         public event Action? OnDisconnected;
         public event Action<string>? OnAbruptDisconnect;
 
+        private bool _shouldListenToServer;
+
 
         [Inject] private readonly UserModelWrapper _userModelWrapper = null!;
 
-        public bool Connected
-        {
-            get
-            {
-                try
-                {
-                    if (!_client.Connected)
-                        return false;
-
-                    var blockingState = _client.Client.Blocking;
-                    _client.Client.Blocking = false;
-                    _client.Client.Send([], 0, SocketFlags.None);
-                    _client.Client.Blocking = blockingState;
-
-                    return true;
-                }
-                catch (SocketException e)
-                {
-                    return e.NativeErrorCode == 10035;
-                }
-                catch (Exception e)
-                {
-                    _siraLog.Error(e);
-                }
-
-                return false;
-            }
-        }
-
-        public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallBack)
+        public bool Connected => _client.State == WebSocketState.Open;
+        
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
+        
+        public async Task Connect(string queue, Action<JoinResponsePacket>? onConnectedCallback)
         {
             if (Connected)
             {
-                _siraLog.Error("Tried to connect to server while connected!");
+                _siraLog.Error("Tried to connect to server while already connected!");
                 return;
             }
-            
-            _client = new TcpClient();
-            await _client.ConnectAsync(_config.WebsocketIp, _config.ServerPort);
-                
-            await SendPacket(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));
 
-            while (!_client.GetStream().DataAvailable)
-                await Task.Delay(25);
-                
-            var bytes = new byte[1024];
-                
-            var bytesRead = _client.GetStream().Read(bytes, 0, bytes.Length);
-            Array.Resize(ref bytes, bytesRead);
-                
-            _siraLog.Info(Encoding.UTF8.GetString(bytes));
-
-            if (ServerPacket.Deserialize(Encoding.UTF8.GetString(bytes)) is not JoinResponsePacket responsePacket)
-                return;
-                
-            onConnectedCallBack.Invoke(responsePacket);
-
-            if (responsePacket.Successful)
+            try
             {
-                _listenerThread = new Thread(ListenToServer);
-                _shouldListenToServer = true;
-                _listenerThread.Start();
-                OnConnected?.Invoke();
-                return;
-            }
+                _client = new ClientWebSocket();
+                await _client.ConnectAsync(new Uri($"{_config.WebsocketIp}", UriKind.Absolute), _cancellationTokenSource.Token);
+
+                await SendPacket(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));
+
+                var bytes = new byte[1024];
+                var result = await _client.ReceiveAsync(new ArraySegment<byte>(bytes), _cancellationTokenSource.Token);
+                Array.Resize(ref bytes, result.Count);
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Normal Closure", _cancellationTokenSource.Token);
+                    HandleAbruptDisconnection("Disconnected");
+                    return;
+                }
                 
-            Disconnect();
+                var json = Encoding.UTF8.GetString(bytes);
+
+                if (ServerPacket.Deserialize(json) is not JoinResponsePacket joinResponsePacket)
+                {
+                    HandleAbruptDisconnection("Failed to get server response!");
+                    return;
+                }
+                
+                onConnectedCallback?.Invoke(joinResponsePacket);
+
+                if (!joinResponsePacket.Successful)
+                {
+                    HandleAbruptDisconnection(joinResponsePacket.Message);
+                    return;
+                }
+                
+                _shouldListenToServer = true;
+                
+                while (_shouldListenToServer)
+                    await ListenToServer();
+            }
+            catch (OperationCanceledException)
+            {
+                // do nothing
+            }
+        }
+
+        private async Task ListenToServer()
+        {
+            try
+            {
+                var data = new byte[4096];
+
+                var result = await _client.ReceiveAsync(new ArraySegment<byte>(data), _cancellationTokenSource.Token);
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    HandleAbruptDisconnection("Disconnected");
+                    return;
+                }
+
+                var json = Encoding.UTF8.GetString(data);
+
+                if (json == "")
+                    return;
+
+                var packet = ServerPacket.Deserialize(json);
+
+                switch (packet.PacketType)
+                {
+                    case ServerPacket.ServerPacketTypes.MatchCreated:
+                        OnMatchCreated?.Invoke(packet as MatchCreatedPacket);
+                        break;
+                    case ServerPacket.ServerPacketTypes.PlayerSelectedMap:
+                        OnPlayerSelectedMap?.Invoke(packet as PlayerSelectedMapPacket);
+                        break;
+                    case ServerPacket.ServerPacketTypes.RoundResults:
+                        OnRoundResults?.Invoke(packet as RoundResultsPacket);
+                        break;
+                    case ServerPacket.ServerPacketTypes.StartPickPhase:
+                        OnPickPhaseStarted?.Invoke(packet as StartPickPhasePacket);
+                        break;
+                    case ServerPacket.ServerPacketTypes.MatchFinished:
+                        OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
+                        break;
+                    case ServerPacket.ServerPacketTypes.UpdateCards:
+                        OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
+                        break;
+                    case ServerPacket.ServerPacketTypes.AbruptDisconnection:
+                        var disconnectPacket = packet as AbruptDisconnectionPacket;
+
+                        HandleAbruptDisconnection(disconnectPacket!.Reason);
+                        break;
+                    default:
+                        throw new Exception("Could not get packet type!");
+                }
+            }
+            catch (OperationCanceledException)
+            {
+
+            }
+            catch (Exception e)
+            {
+                _siraLog.Error(e);
+                HandleAbruptDisconnection("Unhandled exception, please check your logs!");
+            }
         }
 
         public async Task SendPacket(UserPacket packet)
-        { 
-            var bytes = packet.SerializeToBytes();
-            await _client.GetStream().WriteAsync(bytes, 0, bytes.Length);
+        {
+            try
+            {
+                var buffer = packet.SerializeToBytes();
+                await _client.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, _cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                
+            }
         }
 
-        public void DisconnectAbruptly(string reason)
+        private void StopListeningToServer()
         {
-            _siraLog.Info("disconnected abruptly");
-            OnAbruptDisconnect?.Invoke(reason);
-            StopListeningToServer();
+            _shouldListenToServer = false;
+            _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cancellationTokenSource.Token);
         }
 
         public void Disconnect()
@@ -125,79 +180,10 @@ namespace CompCube.Server
             OnDisconnected?.Invoke();
         }
 
-        private void StopListeningToServer()
+        public void HandleAbruptDisconnection(string reason)
         {
-            if (!Connected)
-                return;
-            
-            _shouldListenToServer = false;
-            _client.Close();
-        }
-
-        private void ListenToServer()
-        {
-            while (_shouldListenToServer)
-            {
-                try
-                {
-                    if (!Connected)
-                        return;
-
-                    var data = new byte[4096];
-
-                    var bytesRead = _client.GetStream().Read(data, 0, data.Length);
-                    Array.Resize(ref data, bytesRead);
-
-                    var json = Encoding.UTF8.GetString(data);
-
-                    if (json == "")
-                        continue;
-
-                    _siraLog.Info(json);
-
-                    var packet = ServerPacket.Deserialize(json);
-
-                    switch (packet.PacketType)
-                    {
-                        case ServerPacket.ServerPacketTypes.MatchCreated:
-                            OnMatchCreated?.Invoke(packet as MatchCreatedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.PlayerSelectedMap:
-                            OnPlayerSelectedMap?.Invoke(packet as PlayerSelectedMapPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.RoundResults:
-                            OnRoundResults?.Invoke(packet as RoundResultsPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.StartPickPhase:
-                            OnPickPhaseStarted?.Invoke(packet as StartPickPhasePacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.MatchFinished:
-                            OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.UpdateCards:
-                            OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
-                            break;
-                        case ServerPacket.ServerPacketTypes.AbruptDisconnection:
-                            var disconnectPacket = packet as AbruptDisconnectionPacket;
-                            
-                            DisconnectAbruptly(disconnectPacket.Reason);
-                            break;
-                        default:
-                            throw new Exception("Could not get packet type!");
-                    }
-                }
-                catch (SocketException e)
-                {
-                    if (e.SocketErrorCode == SocketError.WouldBlock)
-                        return;
-                    _siraLog.Error(e);
-                }
-                catch (Exception e)
-                {
-                    _siraLog.Error(e);
-                    DisconnectAbruptly("Unhandled exception, please check your logs!");
-                }
-            }
+            StopListeningToServer();
+            OnAbruptDisconnect?.Invoke(reason);
         }
 
         public void Dispose() => Disconnect();
