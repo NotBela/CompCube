@@ -32,38 +32,6 @@ public class SettingsViewController : BSMLAutomaticViewController, IInitializabl
         }
     }
 
-    [UIValue("serverPort")]
-    private string ServerPort
-    {
-        get => _config.ServerPort.ToString();
-        set
-        {
-            if (!int.TryParse(value, out var port))
-            {
-                _parserParams.EmitEvent("invalidValueModalShow");
-                return;
-            }
-
-            _config.ServerPort = port;
-        }
-    }
-
-    [UIValue("apiPort")]
-    private string ApiPort
-    {
-        get => _config.ServerApiPort.ToString();
-        set
-        {
-            if (!int.TryParse(value, out var port))
-            {
-                _parserParams.EmitEvent("invalidValueModalShow");
-                return;
-            }
-
-            _config.ServerApiPort = port;
-        }
-    }
-
     [UIValue("scoreSubmission")]
     private bool ScoreSubmission
     {
