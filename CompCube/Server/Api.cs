@@ -17,11 +17,7 @@ namespace CompCube.Server
 
         public Api(PluginConfig config)
         {
-            
             var handler = new HttpClientHandler();
-            
-            if (config.SkipServerCertificateValidation)
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             
             _client = new HttpClient(handler);
             _client.BaseAddress = new Uri($"{config.ApiIP}/", UriKind.Absolute);
