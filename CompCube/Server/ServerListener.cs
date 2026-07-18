@@ -131,6 +131,8 @@ namespace CompCube.Server
                         break;
                     case ServerPacket.ServerPacketTypes.MatchFinished:
                         OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
+                        
+                        StopListeningToServer();
                         break;
                     case ServerPacket.ServerPacketTypes.UpdateCards:
                         OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
@@ -170,6 +172,7 @@ namespace CompCube.Server
 
         private void StopListeningToServer()
         {
+            _cancellationTokenSource.Cancel();
             _shouldListenToServer = false;
             _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cancellationTokenSource.Token);
         }
