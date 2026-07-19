@@ -26,7 +26,7 @@ public class DebugServerListener : IServerListener
     public event Action<string>? OnAbruptDisconnect;
     public bool Connected => _isConnected;
 
-    public async Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback)
+    public async Task ConnectAsync(string queue, Action<JoinResponsePacket> onConnectedCallback)
     {
         await Task.Delay(1000);
 
@@ -37,10 +37,10 @@ public class DebugServerListener : IServerListener
         _siraLog.Info("connected");
 
         await Task.Delay(1000);
-        await SendPacket(new JoinRequestPacket(DebugApi.Self.Username, DebugApi.Self.UserId, queue));
+        await SendPacketAsync(new JoinRequestPacket(DebugApi.Self.Username, DebugApi.Self.UserId, queue));
     }
 
-    public async Task SendPacket(UserPacket packet)
+    public async Task SendPacketAsync(UserPacket packet)
     {
         _siraLog.Info($"sent packet {packet.PacketType.ToString()}");
         
@@ -73,19 +73,23 @@ public class DebugServerListener : IServerListener
         }
     }
 
-    public void HandleAbruptDisconnection(string reason)
+    public Task HandleAbruptDisconnectionAsync(string reason)
     {
-        if (!_isConnected) return;
+        if (!_isConnected) 
+            return Task.CompletedTask;
         _isConnected = false;
         
         OnAbruptDisconnect?.Invoke(reason);
+        return Task.CompletedTask;
     }
 
-    public void Disconnect()
+    public Task DisconnectAsync()
     {
-        if (!_isConnected) return;
+        if (!_isConnected) 
+            return Task.CompletedTask;
 
         _isConnected = false;
         OnDisconnected?.Invoke();
+        return Task.CompletedTask;
     }
 }

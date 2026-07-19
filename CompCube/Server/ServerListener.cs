@@ -41,7 +41,7 @@ namespace CompCube.Server
         
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         
-        public async Task Connect(string queue, Action<JoinResponsePacket>? onConnectedCallback)
+        public async Task ConnectAsync(string queue, Action<JoinResponsePacket>? onConnectedCallback)
         {
             if (Connected)
             {
@@ -54,7 +54,7 @@ namespace CompCube.Server
                 _client = new ClientWebSocket();
                 await _client.ConnectAsync(new Uri($"{_config.WebsocketIp}", UriKind.Absolute), _cancellationTokenSource.Token);
 
-                await SendPacket(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));
+                await SendPacketAsync(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));
 
                 var bytes = new byte[1024];
                 var result = await _client.ReceiveAsync(new ArraySegment<byte>(bytes), _cancellationTokenSource.Token);
@@ -63,7 +63,7 @@ namespace CompCube.Server
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
                     await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Normal Closure", _cancellationTokenSource.Token);
-                    HandleAbruptDisconnection("Disconnected");
+                    await HandleAbruptDisconnectionAsync("Disconnected");
                     return;
                 }
                 
@@ -71,7 +71,7 @@ namespace CompCube.Server
 
                 if (ServerPacket.Deserialize(json) is not JoinResponsePacket joinResponsePacket)
                 {
-                    HandleAbruptDisconnection("Failed to get server response!");
+                    await HandleAbruptDisconnectionAsync("Failed to get server response!");
                     return;
                 }
                 
@@ -79,14 +79,14 @@ namespace CompCube.Server
 
                 if (!joinResponsePacket.Successful)
                 {
-                    HandleAbruptDisconnection(joinResponsePacket.Message);
+                    await HandleAbruptDisconnectionAsync(joinResponsePacket.Message);
                     return;
                 }
                 
                 _shouldListenToServer = true;
                 
                 while (_shouldListenToServer)
-                    await ListenToServer();
+                    await ListenToServerAsync();
             }
             catch (OperationCanceledException)
             {
@@ -94,7 +94,7 @@ namespace CompCube.Server
             }
         }
 
-        private async Task ListenToServer()
+        private async Task ListenToServerAsync()
         {
             try
             {
@@ -104,7 +104,7 @@ namespace CompCube.Server
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    HandleAbruptDisconnection("Disconnected");
+                    await HandleAbruptDisconnectionAsync("Disconnected");
                     return;
                 }
 
@@ -132,7 +132,7 @@ namespace CompCube.Server
                     case ServerPacket.ServerPacketTypes.MatchFinished:
                         OnMatchFinished?.Invoke(packet as MatchFinishedPacket);
                         
-                        StopListeningToServer();
+                        await StopListeningToServerAsync();
                         break;
                     case ServerPacket.ServerPacketTypes.UpdateCards:
                         OnCardsUpdated?.Invoke(packet as UpdateCardsPacket);
@@ -140,7 +140,7 @@ namespace CompCube.Server
                     case ServerPacket.ServerPacketTypes.AbruptDisconnection:
                         var disconnectPacket = packet as AbruptDisconnectionPacket;
 
-                        HandleAbruptDisconnection(disconnectPacket!.Reason);
+                        await HandleAbruptDisconnectionAsync(disconnectPacket!.Reason);
                         break;
                     default:
                         throw new Exception("Could not get packet type!");
@@ -153,11 +153,11 @@ namespace CompCube.Server
             catch (Exception e)
             {
                 _siraLog.Error(e);
-                HandleAbruptDisconnection("Unhandled exception, please check your logs!");
+                await HandleAbruptDisconnectionAsync("Unhandled exception, please check your logs!");
             }
         }
 
-        public async Task SendPacket(UserPacket packet)
+        public async Task SendPacketAsync(UserPacket packet)
         {
             try
             {
@@ -170,25 +170,26 @@ namespace CompCube.Server
             }
         }
 
-        private void StopListeningToServer()
+        private async Task StopListeningToServerAsync()
         {
-            _cancellationTokenSource.Cancel();
             _shouldListenToServer = false;
-            _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cancellationTokenSource.Token);
+            _cancellationTokenSource.Cancel();
+            await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cancellationTokenSource.Token);
+            _client.Dispose();
         }
 
-        public void Disconnect()
+        public async Task DisconnectAsync()
         {
-            StopListeningToServer();
+            await StopListeningToServerAsync();
             OnDisconnected?.Invoke();
         }
 
-        public void HandleAbruptDisconnection(string reason)
+        public async Task HandleAbruptDisconnectionAsync(string reason)
         {
-            StopListeningToServer();
+            await StopListeningToServerAsync();
             OnAbruptDisconnect?.Invoke(reason);
         }
 
-        public void Dispose() => Disconnect();
+        public void Dispose() => _client.Dispose();
     }
 }

@@ -97,7 +97,7 @@ namespace CompCube.UI.FlowCoordinators
             {
                 _warningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the matchmaking queue?", () =>
                 {
-                    _serverListener.Disconnect();
+                    _serverListener.DisconnectAsync();
                     _mainFlowCoordinator.DismissFlowCoordinator(this);
                 }, _warningModalViewController.Hide);
                 return;

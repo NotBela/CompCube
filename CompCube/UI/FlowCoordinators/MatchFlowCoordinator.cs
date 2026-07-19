@@ -150,7 +150,7 @@ namespace CompCube.UI.FlowCoordinators
                 SetBottomScreenViewController(null, ViewController.AnimationType.Out);
                 SetLeftScreenViewController(null, ViewController.AnimationType.Out);
                 
-                _serverListener.Disconnect();
+                _serverListener.DisconnectAsync();
             }
         }
 
@@ -158,7 +158,7 @@ namespace CompCube.UI.FlowCoordinators
         {
             try
             {
-                await _serverListener.SendPacket(new DiscardMapsPacket(_matchBeatmapManager.DiscardedMaps.ToArray()));
+                await _serverListener.SendPacketAsync(new DiscardMapsPacket(_matchBeatmapManager.DiscardedMaps.ToArray()));
             }
             catch (Exception e)
             {
@@ -319,7 +319,7 @@ namespace CompCube.UI.FlowCoordinators
                 }
                 
                 StartCoroutine(ShowMapPreviewViewAndStartMatch(votingMap));
-                await _serverListener.SendPacket(new MapSelectionPacket(votingMap));
+                await _serverListener.SendPacketAsync(new MapSelectionPacket(votingMap));
             }
             catch (Exception e)
             {
@@ -374,7 +374,7 @@ namespace CompCube.UI.FlowCoordinators
                         _waitingViewController.SetText($"Waiting for {_matchStateManager.Opponent.GetFormattedUserName()} to submit a score...");
                         
                         HideLeaderboard(true);
-                        await _serverListener.SendPacket(new ScoreSubmissionPacket(results.multipliedScore,
+                        await _serverListener.SendPacketAsync(new ScoreSubmissionPacket(results.multipliedScore,
                             ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transitionSetupDataSo.transformedBeatmapData),
                             results.gameplayModifiers.proMode, results.notGoodCount, results.fullCombo));
                     }
@@ -407,11 +407,18 @@ namespace CompCube.UI.FlowCoordinators
 
         protected override void BackButtonWasPressed(ViewController viewController)
         {
-            _warningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", () =>
+            _warningModalViewController.ParseOntoGameObject(viewController, "Are you sure you want to leave the match early?\nLeaving the match early could result in penalties!", async void () =>
             {
-                _soundEffectManager.CrossfadeToDefault();
-                _onMatchFinishedCallback?.Invoke();
-                _serverListener.Disconnect();
+                try
+                {
+                    _soundEffectManager.CrossfadeToDefault();
+                    _onMatchFinishedCallback?.Invoke();
+                    await _serverListener.DisconnectAsync();
+                }
+                catch (Exception e)
+                {
+                    _siraLog.Error(e);
+                }
             }, _warningModalViewController.Hide);
         }
     }

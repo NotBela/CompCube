@@ -25,11 +25,11 @@ public interface IServerListener
     
     public bool Connected { get; }
 
-    public Task Connect(string queue, Action<JoinResponsePacket> onConnectedCallback);
+    public Task ConnectAsync(string queue, Action<JoinResponsePacket> onConnectedCallback);
 
-    public Task SendPacket(UserPacket packet);
+    public Task SendPacketAsync(UserPacket packet);
 
-    public void Disconnect();
+    public Task DisconnectAsync();
     
-    public void HandleAbruptDisconnection(string reason);
+    public Task HandleAbruptDisconnectionAsync(string reason);
 }

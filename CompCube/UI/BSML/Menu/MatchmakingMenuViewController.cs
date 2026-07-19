@@ -59,7 +59,7 @@ namespace CompCube.UI.BSML.Menu
                     return;
                 }
             
-                await _serverListener.Connect(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
+                await _serverListener.ConnectAsync(((QueueOptionTab) _queueOptions[_queueTabSelector.TextSegmentedControl.selectedCellNumber]).Queue, (response) =>
                 {
                     if (response.Successful) 
                         return;
@@ -119,7 +119,7 @@ namespace CompCube.UI.BSML.Menu
         private void LeaveMatchmakingPoolAllowButton()
         {
             _parserParams.EmitEvent("disconnectModalHideEvent");
-            _serverListener.Disconnect();
+            _serverListener.DisconnectAsync();
         }
 
         [UIAction("failedToConnectModalOkButtonOnClick")]
