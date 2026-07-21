@@ -1,18 +1,15 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 using CompCube_Models.Models.Packets;
 using CompCube_Models.Models.Packets.ServerPackets;
 using CompCube_Models.Models.Packets.UserPackets;
 using CompCube.Configuration;
-using CompCube.Game;
 using CompCube.Game.MatchState;
 using CompCube.Interfaces;
 using SiraUtil.Logging;
 using Zenject;
 
-namespace CompCube.Server
+namespace CompCube.Networking
 {
     public class ServerListener : IServerListener, IDisposable
     {
@@ -39,7 +36,7 @@ namespace CompCube.Server
 
         public bool Connected => _client.State == WebSocketState.Open;
         
-        private readonly CancellationTokenSource _cancellationTokenSource = new();
+        private CancellationTokenSource _cancellationTokenSource = new();
         
         public async Task ConnectAsync(string queue, Action<JoinResponsePacket>? onConnectedCallback)
         {
@@ -52,6 +49,7 @@ namespace CompCube.Server
             try
             {
                 _client = new ClientWebSocket();
+                _cancellationTokenSource = new CancellationTokenSource();
                 await _client.ConnectAsync(new Uri($"{_config.WebsocketIp}", UriKind.Absolute), _cancellationTokenSource.Token);
 
                 await SendPacketAsync(new JoinRequestPacket(_userModelWrapper.UserName, _userModelWrapper.UserId, queue));

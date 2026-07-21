@@ -394,6 +394,7 @@ namespace CompCube.UI.FlowCoordinators
             _serverListener.OnPlayerSelectedMap -= HandleOpponentSelectedMap;
             _matchBeatmapManager.CanNoLongerDiscardMaps -= HandleCanNoLongerDiscardMaps;
             _serverListener.OnMatchFinished -= HandleMatchFinished;
+            _serverListener.OnCardsUpdated -= HandleCardsUpdated;
         }
 
         private void HideStandardLevelDetailControllerIfPresent()

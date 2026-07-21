@@ -5,6 +5,7 @@ using CompCube.Game.MatchState;
 using CompCube.Server;
 using CompCube.Server.Debug;
 using CompCube.Interfaces;
+using CompCube.Networking;
 using CompCube.UI;
 using Zenject;
 
@@ -38,7 +39,7 @@ namespace CompCube.Installers
                 Container.BindInterfacesAndSelfTo<DebugApi>().AsSingle();
                 return;
             }
-            
+
             Container.BindInterfacesAndSelfTo<ServerListener>().AsSingle();
             Container.BindInterfacesAndSelfTo<Api>().AsSingle();
         }
