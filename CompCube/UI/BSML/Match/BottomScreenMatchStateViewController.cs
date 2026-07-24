@@ -88,7 +88,7 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
         image.sprite = sprite;
     }
 
-    public void UpdateHealth(int redHealth, int blueHealth)
+    public void UpdateHealth(float redHealth, float blueHealth)
     {
         _sharedCoroutineStarter.Run(UpdateHealthCoroutine());
         return;
@@ -97,11 +97,11 @@ public class BottomScreenMatchStateViewController : BSMLAutomaticViewController
         {
             yield return new WaitUntil(() => _redEnergyBar != null);
             
-            RedHealthText = redHealth.ToString("N0", CultureInfo.InvariantCulture);
-            BlueHealthText = blueHealth.ToString("N0", CultureInfo.InvariantCulture);
+            RedHealthText = redHealth.ToString("P", CultureInfo.InvariantCulture);
+            BlueHealthText = blueHealth.ToString("P", CultureInfo.InvariantCulture);
         
-            _redEnergyBar.SetEnergy((float) redHealth / 1000000);
-            _blueEnergyBar.SetEnergy((float) blueHealth / 1000000);
+            _redEnergyBar.SetEnergy(redHealth);
+            _blueEnergyBar.SetEnergy(blueHealth);
         
             NotifyPropertyChanged(null);
         }

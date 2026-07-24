@@ -12,8 +12,8 @@ public class MatchStateManager : IInitializable, IDisposable
     public CompCube_Models.Models.ClientData.UserInfo RedPlayer { get; private set; }
     public CompCube_Models.Models.ClientData.UserInfo BluePlayer { get; private set; }
 
-    public int RedHealth { get; private set; } = 1000000;
-    public int BlueHealth { get; private set; } = 1000000;
+    public float RedHealth { get; private set; } = 1f;
+    public float BlueHealth { get; private set; } = 1f;
 
     public float DamageMultiplier { get; private set; } = 1f;
 
@@ -43,8 +43,8 @@ public class MatchStateManager : IInitializable, IDisposable
         RedPlayer = matchCreated.Red;
         BluePlayer = matchCreated.Blue;
         
-        RedHealth = 1000000;
-        BlueHealth = 1000000;
+        RedHealth = 1f;
+        BlueHealth = 1f;
 
         DamageMultiplier = 1.0f;
 
